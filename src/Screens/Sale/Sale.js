@@ -5638,7 +5638,7 @@ const Sale = () => {
   const saleId = location.state?.saleId;
   const navigate = useNavigate();
 
-  const { CompanyState, unitType } = useCompanySetup();
+  const { CompanyState, unitType, fsize } = useCompanySetup();
   const { applicable194Q } = useTdsApplicable();
   const { company } = useContext(CompanyContext);
   const tenant = "03AAYFG4472A1ZG_01042025_31032026";
@@ -6320,10 +6320,6 @@ const Sale = () => {
     };
   };
 
-  // useEffect(() => {
-  //   setFormData((prevState) => calculateTotalGst(prevState));
-  // }, [items, T21, T12, formData.tcs1_rate]);
-
   const handleNumberChange = (event) => {
     const { id, value } = event.target;
 
@@ -6349,20 +6345,6 @@ const Sale = () => {
       return calculateTotalGst(newFormData, true); // ✅ KEEP THIS
     });
   };
-
-  // const handleNumberChange = (event) => {
-  //   const { id, value } = event.target;
-  //   const numberValue = value.replace(/[^0-9.]/g, "");
-  //   const validNumberValue =
-  //     numberValue.split(".").length > 2
-  //       ? numberValue.replace(/\.{2,}/g, "").replace(/(.*)\./g, "$1.")
-  //       : numberValue;
-
-  //   setFormData((prevState) => {
-  //     const newFormData = { ...prevState, [id]: validNumberValue };
-  //     return calculateTotalGst(newFormData, true); // ✅ Skip TCS recalculation
-  //   });
-  // };
 
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [data, setData] = useState([]);
@@ -6482,234 +6464,62 @@ const Sale = () => {
     return `${dd}-${mm}-${yyyy}`;
   };
 
-//   const fetchData = async () => {
-//     try {
-//       let response;
-//       if (saleId) {
-//         response = await axios.get(
-//           `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegstget/${saleId}`,
-//         );
-//       } else {
-//         response = await axios.get(
-//           `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last`,
-//         );
-//       }
-//       // const response = await axios.get(
-//       //   `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last`
-//       // );
+  const applySaleRecordToState = (record) => {
+    if (!record) return;
 
-//       if (response.status === 200 && response.data && response.data.data) {
-//         const lastEntry = response.data.data;
+    const updatedFormData = {
+      ...record.formData,
+      date: formatDateToDDMMYYYY(record.formData.date),
+      duedate: formatDateToDDMMYYYY(record.formData.duedate),
+    };
 
-//         const updatedFormData = {
-//           ...lastEntry.formData,
-//           date: formatDateToDDMMYYYY(lastEntry.formData.date),
-//           duedate: formatDateToDDMMYYYY(lastEntry.formData.duedate),
-//         };
+    setFormData(updatedFormData);
+    setData1({ ...record, formData: updatedFormData });
+    setItems(normalizeItems(record.items || []));
+    setcustomerDetails([...(record.customerDetails || [])]);
+    setshipped([...(record.shipped || [])]);
+    setIndex(record?.formData?.vbillno || 0);
 
-//         setFirstTimeCheckData("DataAvailable");
-//         setFormData(updatedFormData);
-
-//         // setItems([...lastEntry.items]);
-//         setItems(normalizeItems(lastEntry.items));
-//         setcustomerDetails([...lastEntry.customerDetails]);
-//         setshipped([...lastEntry.shipped]);
-
-//         if (lastEntry.customerDetails.length > 0) {
-//           setCustgst(lastEntry.customerDetails[0].gstno);
-//         }
-
-//         setData1({ ...lastEntry, formData: updatedFormData });
-//         setIndex(lastEntry.formData?.vbillno || 0);
-
-//         return lastEntry; // ✅ Return this for use in handleAdd
-//       } else {
-//         setFirstTimeCheckData("DataNotAvailable");
-//         initializeEmptyData();
-//         return null;
-//       }
-//     } catch (error) {
-//       console.error("Error fetching data", error);
-//       initializeEmptyData();
-//       return null;
-//     }
-//   };
-
-const applySaleRecordToState = (record) => {
-  if (!record) return;
-
-  const updatedFormData = {
-    ...record.formData,
-    date: formatDateToDDMMYYYY(record.formData.date),
-    duedate: formatDateToDDMMYYYY(record.formData.duedate),
-  };
-
-  setFormData(updatedFormData);
-  setData1({ ...record, formData: updatedFormData });
-  setItems(normalizeItems(record.items || []));
-  setcustomerDetails([...(record.customerDetails || [])]);
-  setshipped([...(record.shipped || [])]);
-  setIndex(record?.formData?.vbillno || 0);
-
-  if (record?.customerDetails?.length > 0) {
-    setCustgst(record.customerDetails[0].gstno || "");
-  }
-
-  setIsDisabled(true);
-};
-
-const fetchData = async () => {
-  try {
-    let response;
-
-    if (saleId) {
-      response = await axios.get(
-        `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegstget/${saleId}`
-      );
-    } else {
-      response = await axios.get(
-        `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last${getValphaQuery()}`
-      );
+    if (record?.customerDetails?.length > 0) {
+      setCustgst(record.customerDetails[0].gstno || "");
     }
 
-    if (response.status === 200 && response.data && response.data.data) {
-      const lastEntry = response.data.data;
+    setIsDisabled(true);
+  };
 
-      setFirstTimeCheckData("DataAvailable");
-      applySaleRecordToState(lastEntry);
+  const fetchData = async () => {
+    try {
+      let response;
 
-      return lastEntry;
-    } else {
-      setFirstTimeCheckData("DataNotAvailable");
+      if (saleId) {
+        response = await axios.get(
+          `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegstget/${saleId}`
+        );
+      } else {
+        response = await axios.get(
+          `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last${getValphaQuery()}`
+        );
+      }
+
+      if (response.status === 200 && response.data && response.data.data) {
+        const lastEntry = response.data.data;
+
+        setFirstTimeCheckData("DataAvailable");
+        applySaleRecordToState(lastEntry);
+
+        return lastEntry;
+      } else {
+        setFirstTimeCheckData("DataNotAvailable");
+        initializeEmptyData();
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching data", error);
       initializeEmptyData();
       return null;
     }
-  } catch (error) {
-    console.error("Error fetching data", error);
-    initializeEmptyData();
-    return null;
-  }
-};
+  };
 
-  // Function to initialize empty data
-//   const initializeEmptyData = () => {
-//     // Default date as current date
-//     const emptyFormData = {
-//       date: new Date().toLocaleDateString(), // Use today's date
-//       valpha:"",
-//       vtype: "S",
-//       vbillno: 0,
-//       vno: 0,
-//       gr: "",
-//       exfor: "",
-//       trpt: "",
-//       stype: "",
-//       btype: "",
-//       conv: "",
-//       rem1: "",
-//       rem2: "",
-//       v_tpt: "",
-//       broker: "",
-//       gross: false,
-//       srv_rate: 0,
-//       srv_tax: 0,
-//       tcs1_rate: 0,
-//       tcs1: 0,
-//       tcs206_rate: 0,
-//       tcs206: 0,
-//       duedate: "",
-//       pcess: 0,
-//       tax: 0,
-//       sub_total: 0,
-//       exp_before: 0,
-//       Exp_rate6: 0,
-//       Exp_rate7: 0,
-//       Exp_rate8: 0,
-//       Exp_rate9: 0,
-//       Exp_rate10: 0,
-//       Exp6: 0,
-//       Exp7: 0,
-//       Exp8: 0,
-//       Exp9: 0,
-//       Exp10: 0,
-//       cgst: 0,
-//       sgst: 0,
-//       igst: 0,
-//       expafterGST: 0,
-//       grandtotal: 0,
-//     };
-//     const emptyItems = [
-//       {
-//         id: 1,
-//         vcode: "",
-//         sdisc: "",
-//         Units: "",
-//         pkgs: "0.00",
-//         weight: "0.00",
-//         rate: "0.00",
-//         amount: "0.00",
-//         disc: 0,
-//         discount: "",
-//         gst: 0,
-//         RateCal: "",
-//         Qtyperpc: 0,
-//         Pcodes01: "",
-//         Pcodess: "",
-//         Scodes01: "",
-//         Scodess: "",
-//         Exp_rate1: 0,
-//         Exp_rate2: 0,
-//         Exp_rate3: 0,
-//         Exp_rate4: 0,
-//         Exp_rate5: 0,
-//         Exp1: 0,
-//         Exp2: 0,
-//         Exp3: 0,
-//         Exp4: 0,
-//         Exp5: 0,
-//         exp_before: 0,
-//         ctax: "0.00",
-//         stax: "0.00",
-//         itax: "0.00",
-//         tariff: "",
-//         vamt: "0.00",
-//       },
-//     ];
-//     const emptyshipped = [
-//       {
-//         shippedto: "",
-//         shippingAdd: "",
-//         shippingcity: "",
-//         shippingState: "",
-//         shippingGst: "",
-//         shippingPan: "",
-//       },
-//     ];
-//     const emptycustomer = [
-//       {
-//         Vcode: "",
-//         vacode: "",
-//         gstno: "",
-//         pan: "",
-//         city: "",
-//         state: "",
-//         Tcs206c1H: "",
-//         TDS194Q: "",
-//       },
-//     ];
-//     // Set the empty data
-//     setFormData(emptyFormData);
-//     setItems(normalizeItems([]));
-//     setcustomerDetails(emptycustomer);
-//     setshipped(emptyshipped);
-//     setData1({
-//       formData: emptyFormData,
-//       items: emptyItems,
-//       shipped: emptyshipped,
-//       customerDetails: emptycustomer,
-//     }); // Store empty data
-//     setIndex(0);
-//   };
  const saleWinFromState = location.state?.saleWin;
 
   // Load from localStorage if refresh
@@ -6722,141 +6532,136 @@ const fetchData = async () => {
 
   // Extract valpha safely
   const selectedValpha = saleWin?.valpha || "";
-const getValphaQuery = () => {
-  return selectedValpha
-    ? `?valpha=${encodeURIComponent(selectedValpha)}`
-    : "";
-};
-const initializeEmptyData = () => {
-  const emptyFormData = {
-    date: new Date().toLocaleDateString(),
-    valpha: selectedValpha || "",
-    vtype: "S",
-    vbillno: 0,
-    vno: 0,
-    gr: "",
-    exfor: "",
-    trpt: "",
-    stype: "",
-    btype: "",
-    conv: "",
-    rem1: "",
-    rem2: "",
-    v_tpt: "",
-    broker: "",
-    gross: false,
-    srv_rate: 0,
-    srv_tax: 0,
-    tcs1_rate: 0,
-    tcs1: 0,
-    tcs206_rate: 0,
-    tcs206: 0,
-    duedate: "",
-    pcess: 0,
-    tax: 0,
-    sub_total: 0,
-    exp_before: 0,
-    Exp_rate6: 0,
-    Exp_rate7: 0,
-    Exp_rate8: 0,
-    Exp_rate9: 0,
-    Exp_rate10: 0,
-    Exp6: 0,
-    Exp7: 0,
-    Exp8: 0,
-    Exp9: 0,
-    Exp10: 0,
-    cgst: 0,
-    sgst: 0,
-    igst: 0,
-    expafterGST: 0,
-    grandtotal: 0,
+  const getValphaQuery = () => {
+    return selectedValpha
+      ? `?valpha=${encodeURIComponent(selectedValpha)}`
+      : "";
+  };
+  const initializeEmptyData = () => {
+    const emptyFormData = {
+      date: new Date().toLocaleDateString(),
+      valpha: selectedValpha || "",
+      vtype: "S",
+      vbillno: 0,
+      vno: 0,
+      gr: "",
+      exfor: "",
+      trpt: "",
+      stype: "",
+      btype: "",
+      conv: "",
+      rem1: "",
+      rem2: "",
+      v_tpt: "",
+      broker: "",
+      gross: false,
+      srv_rate: 0,
+      srv_tax: 0,
+      tcs1_rate: 0,
+      tcs1: 0,
+      tcs206_rate: 0,
+      tcs206: 0,
+      duedate: "",
+      pcess: 0,
+      tax: 0,
+      sub_total: 0,
+      exp_before: 0,
+      Exp_rate6: 0,
+      Exp_rate7: 0,
+      Exp_rate8: 0,
+      Exp_rate9: 0,
+      Exp_rate10: 0,
+      Exp6: 0,
+      Exp7: 0,
+      Exp8: 0,
+      Exp9: 0,
+      Exp10: 0,
+      cgst: 0,
+      sgst: 0,
+      igst: 0,
+      expafterGST: 0,
+      grandtotal: 0,
+    };
+
+    const emptyItems = [
+      {
+        id: 1,
+        vcode: "",
+        sdisc: "",
+        Units: "",
+        pkgs: "0.00",
+        weight: "0.00",
+        rate: "0.00",
+        amount: "0.00",
+        disc: 0,
+        discount: "",
+        gst: 0,
+        RateCal: "",
+        Qtyperpc: 0,
+        Pcodes01: "",
+        Pcodess: "",
+        Scodes01: "",
+        Scodess: "",
+        Exp_rate1: 0,
+        Exp_rate2: 0,
+        Exp_rate3: 0,
+        Exp_rate4: 0,
+        Exp_rate5: 0,
+        Exp1: 0,
+        Exp2: 0,
+        Exp3: 0,
+        Exp4: 0,
+        Exp5: 0,
+        exp_before: 0,
+        ctax: "0.00",
+        stax: "0.00",
+        itax: "0.00",
+        tariff: "",
+        vamt: "0.00",
+      },
+    ];
+
+    const emptyshipped = [
+      {
+        shippedto: "",
+        shippingAdd: "",
+        shippingcity: "",
+        shippingState: "",
+        shippingGst: "",
+        shippingPan: "",
+      },
+    ];
+
+    const emptycustomer = [
+      {
+        Vcode: "",
+        vacode: "",
+        gstno: "",
+        pan: "",
+        city: "",
+        state: "",
+        Tcs206c1H: "",
+        TDS194Q: "",
+      },
+    ];
+
+    setFormData(emptyFormData);
+    setItems(normalizeItems([]));
+    setcustomerDetails(emptycustomer);
+    setshipped(emptyshipped);
+    setData1({
+      formData: emptyFormData,
+      items: emptyItems,
+      shipped: emptyshipped,
+      customerDetails: emptycustomer,
+    });
+    setIndex(0);
   };
 
-  const emptyItems = [
-    {
-      id: 1,
-      vcode: "",
-      sdisc: "",
-      Units: "",
-      pkgs: "0.00",
-      weight: "0.00",
-      rate: "0.00",
-      amount: "0.00",
-      disc: 0,
-      discount: "",
-      gst: 0,
-      RateCal: "",
-      Qtyperpc: 0,
-      Pcodes01: "",
-      Pcodess: "",
-      Scodes01: "",
-      Scodess: "",
-      Exp_rate1: 0,
-      Exp_rate2: 0,
-      Exp_rate3: 0,
-      Exp_rate4: 0,
-      Exp_rate5: 0,
-      Exp1: 0,
-      Exp2: 0,
-      Exp3: 0,
-      Exp4: 0,
-      Exp5: 0,
-      exp_before: 0,
-      ctax: "0.00",
-      stax: "0.00",
-      itax: "0.00",
-      tariff: "",
-      vamt: "0.00",
-    },
-  ];
-
-  const emptyshipped = [
-    {
-      shippedto: "",
-      shippingAdd: "",
-      shippingcity: "",
-      shippingState: "",
-      shippingGst: "",
-      shippingPan: "",
-    },
-  ];
-
-  const emptycustomer = [
-    {
-      Vcode: "",
-      vacode: "",
-      gstno: "",
-      pan: "",
-      city: "",
-      state: "",
-      Tcs206c1H: "",
-      TDS194Q: "",
-    },
-  ];
-
-  setFormData(emptyFormData);
-  setItems(normalizeItems([]));
-  setcustomerDetails(emptycustomer);
-  setshipped(emptyshipped);
-  setData1({
-    formData: emptyFormData,
-    items: emptyItems,
-    shipped: emptyshipped,
-    customerDetails: emptycustomer,
-  });
-  setIndex(0);
-};
-
-//   useEffect(() => {
-//     fetchData();
-//     setIsDisabled(true);
-//     // Add this line to set isDisabled to true initially
-//   }, []);
-useEffect(() => {
-  fetchData();
-  setIsDisabled(true);
-}, [selectedValpha, saleId, tenant]);
+  useEffect(() => {
+    fetchData();
+    setIsDisabled(true);
+  }, [selectedValpha, saleId, tenant]);
 
     // Search Modal states
   const [showSearch, setShowSearch] = useState(false);
@@ -6865,37 +6670,23 @@ useEffect(() => {
   const [filteredBills, setFilteredBills] = useState([]);
   const [searchDate, setSearchDate] = useState(null);
   const [activeRowIndex, setActiveRowIndex] = useState(0);
-    // ⭐ infinite scroll state
+  // ⭐ infinite scroll state
   const [visibleCount, setVisibleCount] = useState(10);
 
-  // Fetch all bills for search
-//   const fetchAllBills = async () => {
-//     try {
-//       const res = await axios.get(
-//         `https://www.shkunweb.com/shkunlive/${tenant}/tenant/api/sale`,
-//       );
-//       if (Array.isArray(res.data)) {
-//         setAllBills(res.data);
-//         setFilteredBills(res.data);
-//       }
-//     } catch (error) {
-//       console.error("Error fetching bills", error);
-//     }
-//   };
-const fetchAllBills = async () => {
-  try {
-    const res = await axios.get(
-      `https://www.shkunweb.com/shkunlive/${tenant}/tenant/api/sale${getValphaQuery()}`
-    );
+  const fetchAllBills = async () => {
+    try {
+      const res = await axios.get(
+        `https://www.shkunweb.com/shkunlive/${tenant}/tenant/api/sale${getValphaQuery()}`
+      );
 
-    if (Array.isArray(res.data)) {
-      setAllBills(res.data);
-      setFilteredBills(res.data);
+      if (Array.isArray(res.data)) {
+        setAllBills(res.data);
+        setFilteredBills(res.data);
+      }
+    } catch (error) {
+      console.error("Error fetching bills", error);
     }
-  } catch (error) {
-    console.error("Error fetching bills", error);
-  }
-};
+  };
 
   // Update filtering logic
   useEffect(() => {
@@ -6928,10 +6719,18 @@ const fetchAllBills = async () => {
   }, [searchBillNo, searchDate, allBills]);
 
   const handleSelectBill = (bill) => {
-    setFormData(bill.formData);
+    const updatedFormData = {
+      ...bill.formData,
+      date: formatDateToDDMMYYYY(bill.formData.date),
+      duedate: formatDateToDDMMYYYY(bill.formData.duedate),
+    };
+
+    setFormData(updatedFormData);
     setcustomerDetails(bill.customerDetails);
     setItems(normalizeItems(bill.items));
     setshipped(bill.shipped);
+    setData1({ ...bill, formData: updatedFormData });
+    setIndex(bill?.formData?.vbillno || 0);
   };
   
   useEffect(() => {
@@ -6990,677 +6789,265 @@ const fetchAllBills = async () => {
     return `${dd}-${mm}-${yyyy}`;
   };
 
-//   const fetchVoucherNumbers = async () => {
-//     try {
-//       const res = await axios.get(
-//         `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last-voucherno`,
-//       );
+  const fetchVoucherNumbers = async () => {
+    try {
+      const res = await axios.get(
+        `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last-voucherno${getValphaQuery()}`
+      );
 
-//       return {
-//         lastVno: res?.data?.lastVno || 0,
-//         nextVno: res?.data?.nextVno || 1,
-//       };
-//     } catch (error) {
-//       console.error("Error fetching voucher numbers:", error);
-//       toast.error("Unable to fetch voucher number", {
-//         position: "top-center",
-//       });
-//       return null;
-//     }
-//   };
-const fetchVoucherNumbers = async () => {
-  try {
-    const res = await axios.get(
-      `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last-voucherno${getValphaQuery()}`
-    );
+      return {
+        lastVno: res?.data?.lastVno || 0,
+        nextVno: res?.data?.nextVno || 1,
+        lastBillNo: res?.data?.lastBillNo || 0,
+        nextBillNo: res?.data?.nextBillNo || 1,
+        lastVoucherNo: res?.data?.lastVoucherNo || 0,
+        nextVoucherNo: res?.data?.nextVoucherNo || 1,
+      };
+    } catch (error) {
+      console.error("Error fetching voucher numbers:", error);
+      toast.error("Unable to fetch voucher number", {
+        position: "top-center",
+      });
+      return null;
+    }
+  };
 
-    return {
-      lastVno: res?.data?.lastVno || 0,
-      nextVno: res?.data?.nextVno || 1,
-      lastBillNo: res?.data?.lastBillNo || 0,
-      nextBillNo: res?.data?.nextBillNo || 1,
-      lastVoucherNo: res?.data?.lastVoucherNo || 0,
-      nextVoucherNo: res?.data?.nextVoucherNo || 1,
-    };
-  } catch (error) {
-    console.error("Error fetching voucher numbers:", error);
-    toast.error("Unable to fetch voucher number", {
-      position: "top-center",
-    });
-    return null;
-  }
-};
+  const handleNext = async () => {
+    document.body.style.backgroundColor = "white";
+    setTitle("(View)");
 
-//   const handleNext = async () => {
-//     document.body.style.backgroundColor = "white";
-//     setTitle("(View)");
-//     try {
-//       if (data1) {
-//         const response = await axios.get(
-//           `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/${data1._id}/next`,
-//         );
-//         if (response.status === 200 && response.data) {
-//           const nextData = response.data.data;
-//           setData1(nextData);
-//           setIndex(index + 1);
-//           setFormData({
-//           ...nextData.formData,
-//           date: formatDateToDDMMYYYY(nextData.formData.date),
-//           duedate: formatDateToDDMMYYYY(nextData.formData.duedate),
-//           });
+    try {
+      if (data1?._id) {
+        const response = await axios.get(
+          `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/${data1._id}/next?dummy=1${getValphaQueryWithPrefix()}`
+        );
 
-//           // Update items and supplier details
-//           const updatedItems = nextData.items.map((item) => ({
-//             ...item,
-//           }));
-//           const updatedCustomer = nextData.customerDetails.map((item) => ({
-//             ...item,
-//           }));
-//           const updatedshipped = nextData.shipped.map((item) => ({
-//             ...item,
-//           }));
-//           setItems(normalizeItems(updatedItems));
-//           // setItems(updatedItems);
-//           setcustomerDetails(updatedCustomer);
-//           setshipped(updatedshipped);
+        if (response.status === 200 && response.data?.data) {
+          applySaleRecordToState(response.data.data);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching next record:", error);
+    }
+  };
 
-//           // Set custGst from the supplier details
-//           if (updatedCustomer.length > 0) {
-//             setCustgst(updatedCustomer[0].gstno); // Set GST number
-//           }
-//           setIsDisabled(true);
-//         }
-//       }
-//     } catch (error) {
-//       console.error("Error fetching next record:", error);
-//     }
-//   };
-const handleNext = async () => {
-  document.body.style.backgroundColor = "white";
-  setTitle("(View)");
+  const handlePrevious = async () => {
+    document.body.style.backgroundColor = "white";
+    setTitle("(View)");
 
-  try {
-    if (data1?._id) {
+    try {
+      if (data1?._id) {
+        const response = await axios.get(
+          `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/${data1._id}/previous?dummy=1${getValphaQueryWithPrefix()}`
+        );
+
+        if (response.status === 200 && response.data?.data) {
+          applySaleRecordToState(response.data.data);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching previous record:", error);
+    }
+  };
+
+  const handleFirst = async () => {
+    document.body.style.backgroundColor = "white";
+    setTitle("(View)");
+
+    try {
       const response = await axios.get(
-        `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/${data1._id}/next?dummy=1${getValphaQueryWithPrefix()}`
+        `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/first${getValphaQuery()}`
       );
 
       if (response.status === 200 && response.data?.data) {
         applySaleRecordToState(response.data.data);
       }
+    } catch (error) {
+      console.error("Error fetching first record:", error);
     }
-  } catch (error) {
-    console.error("Error fetching next record:", error);
-  }
-};
+  };
 
-//   const handlePrevious = async () => {
-//     document.body.style.backgroundColor = "white";
-//     setTitle("(View)");
-//     try {
-//       if (data1) {
-//         const response = await axios.get(
-//           `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/${data1._id}/previous`,
-//         );
-//         if (response.status === 200 && response.data) {
-//           const prevData = response.data.data;
-//           setData1(prevData);
-//           setIndex(index - 1);
-//           setFormData({
-//           ...prevData.formData,
-//           date: formatDateToDDMMYYYY(prevData.formData.date),
-//           duedate: formatDateToDDMMYYYY(prevData.formData.duedate),
-//           });
+  const handleLast = async () => {
+    document.body.style.backgroundColor = "white";
+    setTitle("(View)");
 
-//           // Update items and supplier details
-//           const updatedItems = prevData.items.map((item) => ({
-//             ...item,
-//           }));
-//           const updatedCustomer = prevData.customerDetails.map((item) => ({
-//             ...item,
-//           }));
-//           const updatedshipped = prevData.shipped.map((item) => ({
-//             ...item,
-//           }));
-//           // setItems(updatedItems);
-//           setItems(normalizeItems(updatedItems));
-//           setcustomerDetails(updatedCustomer);
-//           setshipped(updatedshipped);
-
-//           // Set custGst from the supplier details
-//           if (updatedCustomer.length > 0) {
-//             setCustgst(updatedCustomer[0].gstno); // Set GST number
-//           }
-//           setIsDisabled(true);
-//         }
-//       }
-//     } catch (error) {
-//       console.error("Error fetching previous record:", error);
-//     }
-//   };
-const handlePrevious = async () => {
-  document.body.style.backgroundColor = "white";
-  setTitle("(View)");
-
-  try {
-    if (data1?._id) {
+    try {
       const response = await axios.get(
-        `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/${data1._id}/previous?dummy=1${getValphaQueryWithPrefix()}`
+        `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last${getValphaQuery()}`
       );
 
       if (response.status === 200 && response.data?.data) {
         applySaleRecordToState(response.data.data);
       }
+    } catch (error) {
+      console.error("Error fetching last record:", error);
     }
-  } catch (error) {
-    console.error("Error fetching previous record:", error);
-  }
-};
+  };
 
-//   const handleFirst = async () => {
-//     document.body.style.backgroundColor = "white";
-//     setTitle("(View)");
-
-//     try {
-//       const response = await axios.get(
-//         `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/first`,
-//       );
-//       if (response.status === 200 && response.data) {
-//         const firstData = response.data.data;
-//         setData1(firstData);
-//         setIndex(0);
-//         setFormData({
-//         ...firstData.formData,
-//         date: formatDateToDDMMYYYY(firstData.formData.date),
-//         duedate: formatDateToDDMMYYYY(firstData.formData.duedate),
-//         });
-
-//         // Update items and supplier details
-//         const updatedItems = firstData.items.map((item) => ({
-//           ...item,
-//         }));
-//         const updatedCustomer = firstData.customerDetails.map((item) => ({
-//           ...item,
-//         }));
-//         const updatedshipped = firstData.shipped.map((item) => ({
-//           ...item,
-//         }));
-//         // setItems(updatedItems);
-//         setItems(normalizeItems(updatedItems));
-//         setcustomerDetails(updatedCustomer);
-//         setshipped(updatedshipped);
-
-//         // Set custGst from the supplier details
-//         if (updatedCustomer.length > 0) {
-//           setCustgst(updatedCustomer[0].gstno); // Set GST number
-//         }
-
-//         setIsDisabled(true);
-//       }
-//     } catch (error) {
-//       console.error("Error fetching first record:", error);
-//     }
-//   };
-const handleFirst = async () => {
-  document.body.style.backgroundColor = "white";
-  setTitle("(View)");
-
-  try {
-    const response = await axios.get(
-      `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/first${getValphaQuery()}`
-    );
-
-    if (response.status === 200 && response.data?.data) {
-      applySaleRecordToState(response.data.data);
+  const handleAdd = async () => {
+    if (datePickerRef.current) {
+      datePickerRef.current.focus();
     }
-  } catch (error) {
-    console.error("Error fetching first record:", error);
-  }
-};
 
-//   const handleLast = async () => {
-//     document.body.style.backgroundColor = "white";
-//     setTitle("(View)");
+    try {
+      await fetchSalesSetup();
+      const voucherData = await fetchVoucherNumbers();
+      if (!voucherData) return;
 
-//     try {
-//       const response = await axios.get(
-//         `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last`,
-//       );
-//       if (response.status === 200 && response.data) {
-//         const lastData = response.data.data;
-//         setData1(lastData);
-//         const lastIndex = response.data.length - 1;
-//         setIndex(lastIndex);
-//         setFormData({
-//         ...lastData.formData,
-//         date: formatDateToDDMMYYYY(lastData.formData.date),
-//         duedate: formatDateToDDMMYYYY(lastData.formData.duedate),
-//         });
+      const nextBillNo =
+        voucherData.nextBillNo || voucherData.nextVno || 1;
 
-//         // Update items and supplier details
-//         const updatedItems = lastData.items.map((item) => ({
-//           ...item,
-//         }));
-//         const updatedCustomer = lastData.customerDetails.map((item) => ({
-//           ...item,
-//         }));
-//         const updatedshipped = lastData.shipped.map((item) => ({
-//           ...item,
-//         }));
-//         // setItems(updatedItems);
-//         setItems(normalizeItems(updatedItems));
-//         setcustomerDetails(updatedCustomer);
-//         setshipped(updatedshipped);
-//         // Set custGst from the supplier details
-//         if (updatedCustomer.length > 0) {
-//           setCustgst(updatedCustomer[0].gstno); // Set GST number
-//         }
+      const nextVoucherNo =
+        voucherData.nextVoucherNo || voucherData.nextVno || 1;
 
-//         setIsDisabled(true);
-//       }
-//     } catch (error) {
-//       console.error("Error fetching last record:", error);
-//     }
-//   };
-const handleLast = async () => {
-  document.body.style.backgroundColor = "white";
-  setTitle("(View)");
+      const newData = {
+        date: getTodayDDMMYYYY(),
+        valpha: selectedValpha || "",
+        vbillno: nextBillNo,
+        vno: nextVoucherNo,
+        vtype: "S",
+        gr: "",
+        exfor: "",
+        trpt: "",
+        stype: "",
+        btype: BillType,
+        conv: SupplyType,
+        rem1: "",
+        rem2: "",
+        v_tpt: "",
+        broker: "",
+        gross: false,
+        tcsper: 0,
+        srv_rate: 0,
+        srv_tax: 0,
+        tcs1_rate: 0,
+        tcs1: 0,
+        tcs206_rate: 0,
+        tcs206: 0,
+        duedate: getTodayDDMMYYYY(),
+        pcess: 0,
+        tax: 0,
+        sub_total: 0,
+        exp_before: 0,
+        Exp_rate6: 0,
+        Exp_rate7: 0,
+        Exp_rate8: 0,
+        Exp_rate9: 0,
+        Exp_rate10: 0,
+        Exp6: 0,
+        Exp7: 0,
+        Exp8: 0,
+        Exp9: 0,
+        Exp10: 0,
+        Tds2: "",
+        Ctds: "",
+        Stds: "",
+        iTds: "",
+        cgst: 0,
+        sgst: 0,
+        igst: 0,
+        expafterGST: 0,
+        ExpRoundoff: 0,
+        grandtotal: 0,
+      };
 
-  try {
-    const response = await axios.get(
-      `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last${getValphaQuery()}`
-    );
+      setData([...data, newData]);
+      setFormData(newData);
 
-    if (response.status === 200 && response.data?.data) {
-      applySaleRecordToState(response.data.data);
+      setItems(
+        normalizeItems([], {
+          ExpRate1,
+          ExpRate2,
+          ExpRate3,
+          ExpRate4,
+          ExpRate5,
+        })
+      );
+
+      setcustomerDetails([
+        {
+          Vcode: "",
+          vacode: "",
+          gstno: "",
+          pan: "",
+          Add1: "",
+          city: "",
+          state: "",
+          Tcs206c1H: "",
+          TDS194Q: "",
+        },
+      ]);
+
+      setshipped([
+        {
+          shippedto: "",
+          shippingAdd: "",
+          shippingcity: "",
+          shippingState: "",
+          shippingGst: "",
+          shippingPan: "",
+        },
+      ]);
+
+      setIndex(nextBillNo);
+      setIsAddEnabled(false);
+      setIsPreviousEnabled(false);
+      setIsNextEnabled(false);
+      setIsFirstEnabled(false);
+      setIsLastEnabled(false);
+      setIsSearchEnabled(false);
+      setIsSPrintEnabled(false);
+      setIsDeleteEnabled(false);
+      setIsDisabled(false);
+      setIsEditMode(true);
+      setIsAbcmode(false);
+      setTitle("NEW");
+    } catch (error) {
+      console.error("Error adding new entry:", error);
     }
-  } catch (error) {
-    console.error("Error fetching last record:", error);
-  }
-};
+  };
 
-//   const handleAdd = async () => {
-//     if (datePickerRef.current) {
-//       datePickerRef.current.focus();
-//     }
-//     try {
-//       await fetchSalesSetup();
-//       const voucherData = await fetchVoucherNumbers();
-//       if (!voucherData) return;
-
-//       const lastvoucherno = voucherData.nextVno;
-//       const lastvno = voucherData.nextVno;
-
-//       const newData = {
-//         date: getTodayDDMMYYYY(),
-//         valpha: selectedValpha,
-//         vbillno: lastvoucherno,
-//         vno: lastvno,
-//         vtype: "S",
-//         gr: "",
-//         exfor: "",
-//         trpt: "",
-//         stype: "",
-//         btype: BillType,
-//         conv: SupplyType,
-//         rem1: "",
-//         rem2: "",
-//         v_tpt: "",
-//         broker: "",
-//         gross: false,
-//         tcsper: 0,
-//         srv_rate: 0,
-//         srv_tax: 0,
-//         tcs1_rate: 0,
-//         tcs1: 0,
-//         tcs206_rate: 0,
-//         tcs206: 0,
-//         duedate: getTodayDDMMYYYY(),
-//         pcess: 0,
-//         tax: 0,
-//         sub_total: 0,
-//         exp_before: 0,
-//         Exp_rate6: 0,
-//         Exp_rate7: 0,
-//         Exp_rate8: 0,
-//         Exp_rate9: 0,
-//         Exp_rate10: 0,
-//         Exp6: 0,
-//         Exp7: 0,
-//         Exp8: 0,
-//         Exp9: 0,
-//         Exp10: 0,
-//         Tds2: "",
-//         Ctds: "",
-//         Stds: "",
-//         iTds: "",
-//         cgst: 0,
-//         sgst: 0,
-//         igst: 0,
-//         expafterGST: 0,
-//         ExpRoundoff: 0,
-//         grandtotal: 0,
-//       };
-//       setData([...data, newData]);
-//       setFormData(newData);
-//       // setItems(normalizeItems([]));
-//       setItems(
-//         normalizeItems([], {
-//           ExpRate1,
-//           ExpRate2,
-//           ExpRate3,
-//           ExpRate4,
-//           ExpRate5,
-//         }),
-//       );
-//       setcustomerDetails([
-//         {
-//           Vcode: "",
-//           vacode: "",
-//           gstno: "",
-//           pan: "",
-//           Add1: "",
-//           city: "",
-//           state: "",
-//           Tcs206c1H: "",
-//           TDS194Q: "",
-//         },
-//       ]);
-//       setshipped([
-//         {
-//           shippedto: "",
-//           shippingAdd: "",
-//           shippingcity: "",
-//           shippingState: "",
-//           shippingGst: "",
-//           shippingPan: "",
-//         },
-//       ]);
-//       setIndex(data.length);
-//       setIsAddEnabled(false);
-//       setIsPreviousEnabled(false);
-//       setIsNextEnabled(false);
-//       setIsFirstEnabled(false);
-//       setIsLastEnabled(false);
-//       setIsSearchEnabled(false);
-//       setIsSPrintEnabled(false);
-//       setIsDeleteEnabled(false);
-//       setIsDisabled(false);
-//       setIsEditMode(true);
-//       setIsAbcmode(false);
-//       setTitle("NEW");
-//     } catch (error) {
-//       console.error("Error adding new entry:", error);
-//     }
-//   };
-const handleAdd = async () => {
-  if (datePickerRef.current) {
-    datePickerRef.current.focus();
-  }
-
-  try {
-    await fetchSalesSetup();
-    const voucherData = await fetchVoucherNumbers();
-    if (!voucherData) return;
-
-    const nextBillNo =
-      voucherData.nextBillNo || voucherData.nextVno || 1;
-
-    const nextVoucherNo =
-      voucherData.nextVoucherNo || voucherData.nextVno || 1;
-
-    const newData = {
-      date: getTodayDDMMYYYY(),
-      valpha: selectedValpha || "",
-      vbillno: nextBillNo,
-      vno: nextVoucherNo,
-      vtype: "S",
-      gr: "",
-      exfor: "",
-      trpt: "",
-      stype: "",
-      btype: BillType,
-      conv: SupplyType,
-      rem1: "",
-      rem2: "",
-      v_tpt: "",
-      broker: "",
-      gross: false,
-      tcsper: 0,
-      srv_rate: 0,
-      srv_tax: 0,
-      tcs1_rate: 0,
-      tcs1: 0,
-      tcs206_rate: 0,
-      tcs206: 0,
-      duedate: getTodayDDMMYYYY(),
-      pcess: 0,
-      tax: 0,
-      sub_total: 0,
-      exp_before: 0,
-      Exp_rate6: 0,
-      Exp_rate7: 0,
-      Exp_rate8: 0,
-      Exp_rate9: 0,
-      Exp_rate10: 0,
-      Exp6: 0,
-      Exp7: 0,
-      Exp8: 0,
-      Exp9: 0,
-      Exp10: 0,
-      Tds2: "",
-      Ctds: "",
-      Stds: "",
-      iTds: "",
-      cgst: 0,
-      sgst: 0,
-      igst: 0,
-      expafterGST: 0,
-      ExpRoundoff: 0,
-      grandtotal: 0,
-    };
-
-    setData([...data, newData]);
-    setFormData(newData);
-
-    setItems(
-      normalizeItems([], {
-        ExpRate1,
-        ExpRate2,
-        ExpRate3,
-        ExpRate4,
-        ExpRate5,
-      })
-    );
-
-    setcustomerDetails([
-      {
-        Vcode: "",
-        vacode: "",
-        gstno: "",
-        pan: "",
-        Add1: "",
-        city: "",
-        state: "",
-        Tcs206c1H: "",
-        TDS194Q: "",
-      },
-    ]);
-
-    setshipped([
-      {
-        shippedto: "",
-        shippingAdd: "",
-        shippingcity: "",
-        shippingState: "",
-        shippingGst: "",
-        shippingPan: "",
-      },
-    ]);
-
-    setIndex(nextBillNo);
-    setIsAddEnabled(false);
-    setIsPreviousEnabled(false);
-    setIsNextEnabled(false);
-    setIsFirstEnabled(false);
-    setIsLastEnabled(false);
-    setIsSearchEnabled(false);
-    setIsSPrintEnabled(false);
-    setIsDeleteEnabled(false);
-    setIsDisabled(false);
-    setIsEditMode(true);
-    setIsAbcmode(false);
-    setTitle("NEW");
-  } catch (error) {
-    console.error("Error adding new entry:", error);
-  }
-};
-
-//   const handleExit = async () => {
-//     // Check if grandtotal is Greater Than zero
-//     if (formData.grandtotal > 0 && isEditMode) {
-//       const confirmExit = window.confirm(
-//         "Are you sure you want to Exit? Unsaved changes may be lost.",
-//       );
-//       if (!confirmExit) {
-//         return;
-//       }
-//     }
-    
-//     if(!isEditMode){
-//       navigate("/dashboard"); 
-//       return;
-//     }
-
-//     setTitle("(View)");
-//     try {
-//       const response = await axios.get(
-//         `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last`,
-//       );
-
-//       if (response.status === 200 && response.data.data) {
-//         const lastEntry = response.data.data;
-//         setFormData({
-//         ...lastEntry.formData,
-//         date: formatDateToDDMMYYYY(lastEntry.formData.date),
-//         duedate: formatDateToDDMMYYYY(lastEntry.formData.duedate),
-//         });
-//         setData1(response.data.data);
-//         // setItems(lastEntry.items.map((item) => ({ ...item })));
-//         setItems(normalizeItems(lastEntry.items));
-//         setcustomerDetails(
-//           lastEntry.customerDetails.map((item) => ({ ...item })),
-//         );
-//         setshipped(lastEntry.shipped.map((item) => ({ ...item })));
-
-//         setIsDisabled(true);
-//         setIndex(lastEntry.formData);
-//         setIsAddEnabled(true);
-//         setIsEditMode(false);
-//         setIsSubmitEnabled(false);
-//         setIsPreviousEnabled(true);
-//         setIsNextEnabled(true);
-//         setIsFirstEnabled(true);
-//         setIsLastEnabled(true);
-//         setIsSearchEnabled(true);
-//         setIsSPrintEnabled(true);
-//         setIsDeleteEnabled(true);
-//       } else {
-//         console.log("No data available");
-//         const newData = {
-//           date: "",
-//           valpha:"",
-//           vtype: "S",
-//           vbillno: 0,
-//           vno: 0,
-//           gr: "",
-//           exfor: "",
-//           trpt: "",
-//           stype: "",
-//           btype: "",
-//           conv: "",
-//           rem1: "",
-//           rem2: "",
-//           v_tpt: "",
-//           broker: "",
-//           srv_rate: 0,
-//           srv_tax: 0,
-//           tcs1_rate: 0,
-//           tcs1: 0,
-//           tcs206_rate: 0,
-//           tcs206: 0,
-//           duedate: "",
-//           pcess: 0,
-//           tax: 0,
-//           sub_total: 0,
-//           exp_before: 0,
-//           cgst: 0,
-//           sgst: 0,
-//           igst: 0,
-//           expafterGST: 0,
-//           grandtotal: 0,
-//         };
-//         setFormData(newData);
-//         setItems(normalizeItems([]));
-//         setcustomerDetails([
-//           {
-//             vacode: "",
-//             gstno: "",
-//             pan: "",
-//             Add1: "",
-//             city: "",
-//             state: "",
-//             Tcs206c1H: "",
-//             TDS194Q: "",
-//           },
-//         ]);
-//         setIsDisabled(true);
-//       }
-//     } catch (error) {
-//       console.error("Error fetching data", error);
-//     }
-//   };
-const handleExit = async () => {
-  if (formData.grandtotal > 0 && isEditMode) {
-    const confirmExit = window.confirm(
-      "Are you sure you want to Exit? Unsaved changes may be lost."
-    );
-    if (!confirmExit) return;
-  }
-
-  if (!isEditMode) {
-    navigate("/dashboard");
-    return;
-  }
-
-  setTitle("(View)");
-
-  try {
-    const response = await axios.get(
-      `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last${getValphaQuery()}`
-    );
-
-    if (response.status === 200 && response.data?.data) {
-      applySaleRecordToState(response.data.data);
-
-      setIsAddEnabled(true);
-      setIsEditMode(false);
-      setIsSubmitEnabled(false);
-      setIsPreviousEnabled(true);
-      setIsNextEnabled(true);
-      setIsFirstEnabled(true);
-      setIsLastEnabled(true);
-      setIsSearchEnabled(true);
-      setIsSPrintEnabled(true);
-      setIsDeleteEnabled(true);
-    } else {
-      initializeEmptyData();
-      setIsDisabled(true);
+  const handleExit = async () => {
+    if (formData.grandtotal > 0 && isEditMode) {
+      const confirmExit = window.confirm(
+        "Are you sure you want to Exit? Unsaved changes may be lost."
+      );
+      if (!confirmExit) return;
     }
-  } catch (error) {
-    console.error("Error fetching data", error);
-  }
-};
+
+    if (!isEditMode) {
+      navigate("/dashboard");
+      return;
+    }
+
+    setTitle("(View)");
+
+    try {
+      const response = await axios.get(
+        `https://www.shkunweb.com/shkunlive/${tenant}/tenant/salegst/last${getValphaQuery()}`
+      );
+
+      if (response.status === 200 && response.data?.data) {
+        applySaleRecordToState(response.data.data);
+
+        setIsAddEnabled(true);
+        setIsEditMode(false);
+        setIsSubmitEnabled(false);
+        setIsPreviousEnabled(true);
+        setIsNextEnabled(true);
+        setIsFirstEnabled(true);
+        setIsLastEnabled(true);
+        setIsSearchEnabled(true);
+        setIsSPrintEnabled(true);
+        setIsDeleteEnabled(true);
+      } else {
+        initializeEmptyData();
+        setIsDisabled(true);
+      }
+    } catch (error) {
+      console.error("Error fetching data", error);
+    }
+  };
 
   const handleEditClick = () => {
     setTitle("(Edit)");
@@ -9070,14 +8457,6 @@ const handleExit = async () => {
     items[currentIndex]?.RateCal,
   ]);
 
-  const [fontSize, setFontSize] = useState(17); // Initial font size in pixels
-  const increaseFontSize = () => {
-    setFontSize((prevSize) => (prevSize < 20 ? prevSize + 2 : prevSize)); // Increase font size up to 20 pixels
-  };
-
-  const decreaseFontSize = () => {
-    setFontSize((prevSize) => (prevSize > 14 ? prevSize - 2 : prevSize)); // Decrease font size down to 14 pixels
-  };
   const [pressedKey, setPressedKey] = useState(""); // State to hold the pressed key
   const fieldOrder = [
     { name: "vcode", refArray: itemCodeRefs },
@@ -9369,18 +8748,6 @@ const handleExit = async () => {
     }
   }, [isModalOpenExp]);
 
-  // const handleKeyDownModal = (event, index) => {
-  //   if (event.key === "Enter" || event.key === "Tab") {
-  //     event.preventDefault();
-
-  //     if (index < expRateRefs.current.length - 1) {
-  //       expRateRefs.current[index + 1]?.focus();
-  //       expRateRefs.current[index + 1]?.select();
-  //     } else {
-  //       closeButtonRef.current?.focus();
-  //     }
-  //   }
-  // };
   const handleKeyDownModal = (e, index) => {
   if (!expRateRefs.current) return;
 
@@ -9588,13 +8955,6 @@ const getValphaQueryWithPrefix = () => {
 
 
 return (
-  // ✅ ONLY CHANGE: added isMacOs class for Mac zoom fix
-//   <div className={`sa-sale-page ${isMacOs ? 'sa-mac' : ''}`}>
-    // <div   style={{
-    //         zoom: isMacOs ? 1 : 1,
-    //         WebkitTextSizeAdjust: "100%",
-    //         transformOrigin: "top left",
-    //       }}>
     <div className={`sa-sale-page ${isMacOs ? 'sa-mac' : ''}`}>
 
     <ToastContainer />
@@ -9633,6 +8993,7 @@ return (
               onKeyDown={(e) => {
                 handleEnterKeyPress(datePickerRef, voucherNoRef)(e);
               }}
+              style={{fontSize: `${fsize}px`}}
             />
           )}
         </InputMask>
@@ -9651,7 +9012,7 @@ return (
               maxLength: 48,
               style: {
                 height: "20px",
-                fontSize: `${fontSize}px`,
+                fontSize: `${fsize}px`,
               },
               readOnly: !isEditMode || isDisabled,
             }}
@@ -9929,7 +9290,7 @@ return (
                     maxLength: 48,
                     style: {
                       height: "20px",
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                     },
                     readOnly: !isEditMode || isDisabled,
                   }}
@@ -9946,7 +9307,7 @@ return (
                     maxLength: 48,
                     style: {
                       height: "20px",
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                     },
                     readOnly: !isEditMode || isDisabled,
                   }}
@@ -9969,7 +9330,7 @@ return (
                     maxLength: 48,
                     style: {
                       height: "20px",
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                     },
                     readOnly: !isEditMode || isDisabled,
                   }}
@@ -9990,7 +9351,7 @@ return (
                     maxLength: 48,
                     style: {
                       height: "20px",
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                     },
                     readOnly: !isEditMode || isDisabled,
                   }}
@@ -10028,8 +9389,8 @@ return (
                   InputProps={{
                     readOnly: !isEditMode || isDisabled,
                     style: {
-                      height: 100,
-                      fontSize: `${fontSize}px`,
+                      height: 85,
+                      fontSize: 13,
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
@@ -10037,7 +9398,7 @@ return (
                   }}
                   inputProps={{
                     maxLength: 150,
-                    fontSize: `${fontSize}px`,
+                    fontSize: 12,
                   }}
                   onKeyDown={(e) => {
                     handleOpenModal(e, index, "shippedto");
@@ -10079,7 +9440,7 @@ return (
               maxLength: 12,
               style: {
                 height: "20px",
-                fontSize: `${fontSize}px`,
+                fontSize: `${fsize}px`,
               },
               readOnly: !isEditMode || isDisabled,
             }}
@@ -10101,7 +9462,7 @@ return (
                 maxLength: 10,
                 style: {
                   height: "20px",
-                  fontSize: `${fontSize}px`,
+                  fontSize: `${fsize}px`,
                 },
                 readOnly: !isEditMode || isDisabled,
               }}
@@ -10124,7 +9485,7 @@ return (
               maxLength: 48,
               style: {
                 height: "20px",
-                fontSize: `${fontSize}px`,
+                fontSize: `${fsize}px`,
               },
               readOnly: !isEditMode || isDisabled,
             }}
@@ -10133,7 +9494,7 @@ return (
             <FormControl
               className="sa-Billss sa-custom-bordered-input"
               sx={{
-                fontSize: `${fontSize}px`,
+                fontSize: `${fsize}px`,
                 "& .MuiFilledInput-root": { height: 48 },
               }}
               size="small"
@@ -10168,7 +9529,7 @@ return (
                 displayEmpty
                 inputProps={{
                   sx: {
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     pointerEvents: !isEditMode || isDisabled ? "none" : "auto",
                   },
                 }}
@@ -10189,7 +9550,7 @@ return (
               variant="filled"
               className="sa-TAXtypez sa-custom-bordered-input"
               sx={{
-                fontSize: `${fontSize}px`,
+                fontSize: `${fsize}px`,
                 "& .MuiFilledInput-root": { height: 48 },
               }}
             >
@@ -10223,7 +9584,7 @@ return (
                 MenuProps={{ disablePortal: true }}
                 inputProps={{
                   sx: {
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     pointerEvents: !isEditMode || isDisabled ? "none" : "auto",
                   },
                 }}
@@ -10248,7 +9609,7 @@ return (
             <FormControl
               className="sa-SupplyTYPE sa-custom-bordered-input"
               sx={{
-                fontSize: `${fontSize}px`,
+                fontSize: `${fsize}px`,
                 "& .MuiFilledInput-root": { height: 48 },
               }}
               size="small"
@@ -10283,7 +9644,7 @@ return (
                 displayEmpty
                 inputProps={{
                   sx: {
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     pointerEvents: !isEditMode || isDisabled ? "none" : "auto",
                   },
                 }}
@@ -10342,7 +9703,7 @@ return (
                   <input
                     disabled={!canEditRow(index)}
                     className="sa-ItemCode"
-                    style={{ height: 40, fontSize: `${fontSize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5 }}
+                    style={{ height: 40, fontSize: `${fsize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5 }}
                     type="text"
                     value={item.vcode}
                     readOnly
@@ -10363,7 +9724,7 @@ return (
                   <input
                     disabled={!canEditRow(index)}
                     className="sa-desc"
-                    style={{ height: 40, fontSize: `${fontSize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5 }}
+                    style={{ height: 40, fontSize: `${fsize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5 }}
                     maxLength={48}
                     value={item.sdisc}
                     readOnly={!isEditMode || isDisabled}
@@ -10379,7 +9740,7 @@ return (
                   <input
                     disabled={!canEditRow(index)}
                     className="sa-Hsn"
-                    style={{ height: 40, fontSize: `${fontSize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right" }}
+                    style={{ height: 40, fontSize: `${fsize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right" }}
                     maxLength={8}
                     readOnly={!isEditMode || isDisabled}
                     value={item.tariff}
@@ -10395,7 +9756,7 @@ return (
                   <input
                     disabled={!canEditRow(index)}
                     className="sa-PCS"
-                    style={{ height: 40, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right", fontSize: `${fontSize}px` }}
+                    style={{ height: 40, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right", fontSize: `${fsize}px` }}
                     maxLength={48}
                     readOnly={!isEditMode || isDisabled}
                     value={Number(item.pkgs) === 0 ? "" : item.pkgs}
@@ -10412,7 +9773,7 @@ return (
                   <input
                     disabled={!canEditRow(index)}
                     className="sa-QTY"
-                    style={{ height: 40, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right", fontSize: `${fontSize}px` }}
+                    style={{ height: 40, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right", fontSize: `${fsize}px` }}
                     maxLength={48}
                     readOnly={!isEditMode || isDisabled}
                     value={Number(item.weight) === 0 ? "" : item.weight}
@@ -10429,7 +9790,7 @@ return (
                   <input
                     disabled={!canEditRow(index)}
                     className="sa-Price"
-                    style={{ height: 40, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right", fontSize: `${fontSize}px` }}
+                    style={{ height: 40, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right", fontSize: `${fsize}px` }}
                     maxLength={48}
                     readOnly={!isEditMode || isDisabled}
                     value={Number(item.rate) === 0 ? "" : item.rate}
@@ -10446,7 +9807,7 @@ return (
                   <input
                     disabled={!canEditRow(index)}
                     className="sa-Amount"
-                    style={{ height: 40, fontSize: `${fontSize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right" }}
+                    style={{ height: 40, fontSize: `${fsize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right" }}
                     maxLength={48}
                     readOnly={!isEditMode || isDisabled}
                     value={Number(item.amount) === 0 ? "" : item.amount}
@@ -10467,7 +9828,7 @@ return (
                   <input
                     disabled={!canEditRow(index)}
                     className="sa-Disc"
-                    style={{ height: 40, fontSize: `${fontSize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right" }}
+                    style={{ height: 40, fontSize: `${fsize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right" }}
                     value={Number(item.disc) === 0 ? "" : item.disc}
                     onChange={(e) => handleItemChange(index, "disc", e.target.value)}
                     onKeyDown={(e) => { handleKeyDown(e, index, "disc"); }}
@@ -10484,7 +9845,7 @@ return (
                     disabled={!canEditRow(index)}
                     id="discount"
                     className="sa-discount"
-                    style={{ height: 40, fontSize: `${fontSize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right" }}
+                    style={{ height: 40, fontSize: `${fsize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right" }}
                     value={Number(item.discount) === 0 ? "" : item.discount}
                     onChange={(e) => handleItemChange(index, "discount", e.target.value)}
                     onKeyDown={(e) => { handleKeyDown(e, index, "discount"); }}
@@ -10500,7 +9861,7 @@ return (
                   <input
                     disabled={!canEditRow(index)}
                     className="sa-Others"
-                    style={{ height: 40, fontSize: `${fontSize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "center" }}
+                    style={{ height: 40, fontSize: `${fsize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "center" }}
                     maxLength={2}
                     value={Number(item.gst) === 0 ? "" : item.gst + "%"}
                     readOnly={!isEditMode || isDisabled}
@@ -10512,7 +9873,7 @@ return (
                   <input
                     disabled={!canEditRow(index)}
                     className="sa-Others"
-                    style={{ height: 40, fontSize: `${fontSize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right" }}
+                    style={{ height: 40, fontSize: `${fsize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right" }}
                     maxLength={48}
                     type="text"
                     value={Number(item.exp_before) === 0 ? "" : item.exp_before}
@@ -10533,376 +9894,315 @@ return (
                   />
                 </td>
               )}
-              {/* {isModalOpenExp && currentIndex !== null && (
-                <div className="sa-Modalz">
-                  <div className="sa-Modal-content">
-                    <h1 className="sa-headingE">ADD/LESS BEFORE GST</h1>
-                    <div className="sa-form-group">
-                      <input
-                        type="checkbox"
-                        id="gross"
-                        checked={items[currentIndex]?.gross || false}
-                        onChange={(e) => handleInputChange(currentIndex, "gross", e.target.checked)}
-                      />
-                      <label style={{ marginLeft: 5 }} className="sa-label" htmlFor="Gross">GROSS</label>
-                    </div>
-                    {[
-                      { label: Expense1, rate: "Exp_rate1", value: "Exp1" },
-                      { label: Expense2, rate: "Exp_rate2", value: "Exp2" },
-                      { label: Expense3, rate: "Exp_rate3", value: "Exp3" },
-                      { label: Expense4, rate: "Exp_rate4", value: "Exp4" },
-                      { label: Expense5, rate: "Exp_rate5", value: "Exp5" },
-                    ].map((field, idx) => {
-                      const rateIndex = idx * 2;
-                      const valueIndex = idx * 2 + 1;
-                      return (
-                        <div key={idx} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
-                          <label style={{ width: "100px", fontWeight: "bold" }}>{field.label}</label>
-                          <input
-                            ref={(el) => (expRateRefs.current[rateIndex] = el)}
-                            value={items[currentIndex][field.rate]}
-                            style={{ border: "1px solid black", padding: "5px", width: "120px", textAlign: "right", borderRadius: "4px" }}
-                            onChange={(e) => handleInputChange(currentIndex, field.rate, e.target.value)}
-                            onKeyDown={(e) => handleKeyDownModal(e, rateIndex)}
-                          />
-                          <input
-                            ref={(el) => (expRateRefs.current[valueIndex] = el)}
-                            value={items[currentIndex][field.value]}
-                            style={{ border: "1px solid black", padding: "5px", width: "120px", textAlign: "right", borderRadius: "4px" }}
-                            onBlur={() => handleExpenseBlur(currentIndex, field.value)}
-                            onChange={(e) => handleInputChange(currentIndex, field.value, e.target.value)}
-                            onKeyDown={(e) => handleKeyDownModal(e, valueIndex)}
-                          />
-                        </div>
-                      );
-                    })}
-                    <Button
-                      ref={closeButtonRef}
-                      onClick={() => {
-                        const idx = currentIndex;
-                        setIsModalOpenExp(false);
-                        setCurrentIndex(null);
-                        setTimeout(() => {
-                          othersRefs.current[idx]?.focus();
-                          othersRefs.current[idx]?.select();
-                        }, 0);
-                      }}
-                      style={{ borderColor: "transparent", backgroundColor: "red", marginTop: 10 }}
-                    >
-                      CLOSE
-                    </Button>
-                  </div>
-                </div>
-              )} */}
               {isModalOpenExp && currentIndex !== null && (
-  <div
-    tabIndex={-1}
-      onKeyDown={(e) => {
-      if (e.key === "Escape") {
-        const idx = currentIndex;
-        setIsModalOpenExp(false);
-        setCurrentIndex(null);
-        setTimeout(() => {
-          othersRefs.current[idx]?.focus();
-          othersRefs.current[idx]?.select();
-        }, 0);
-      }
-    }}
-    onClick={(e) => {
-      if (e.target === e.currentTarget) {
-        const idx = currentIndex;
-        setIsModalOpenExp(false);
-        setCurrentIndex(null);
-        setTimeout(() => {
-          othersRefs.current[idx]?.focus();
-          othersRefs.current[idx]?.select();
-        }, 0);
-      }
-    }}
-    style={{
-      position: "fixed",
-      inset: 0,
-      background: "rgba(15, 23, 42, 0.18)",
-      backdropFilter: "blur(3px)",
-      WebkitBackdropFilter: "blur(3px)",
-      display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      zIndex: 2000,
-      padding: "20px",
-    }}
-  >
-    <div
-      style={{
-        width: "100%",
-        maxWidth: "620px",
-        background: "#ffffff",
-        borderRadius: "18px",
-        boxShadow: "0 18px 50px rgba(15, 23, 42, 0.18)",
-        border: "1px solid rgba(148, 163, 184, 0.22)",
-        overflow: "hidden",
-      }}
-      onClick={(e) => e.stopPropagation()}
-    >
-      <div
-        style={{
-          padding: "18px 22px 14px",
-          borderBottom: "1px solid #e5e7eb",
-          background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
-          position: "relative",
-        }}
-      >
-        <div
-          style={{
-            fontSize: "19px",
-            fontWeight: 800,
-            color: "#0f172a",
-            letterSpacing: "0.4px",
-            textAlign: "center",
-          }}
-        >
-          ADD / LESS BEFORE GST
-        </div>
-
-        <div
-          style={{
-            fontSize: "12px",
-            color: "#64748b",
-            textAlign: "center",
-            marginTop: 4,
-          }}
-        >
-          Manage expense values before GST calculation
-        </div>
-
-        <button
-          type="button"
-          onClick={() => {
-            const idx = currentIndex;
-            setIsModalOpenExp(false);
-            setCurrentIndex(null);
-            setTimeout(() => {
-              othersRefs.current[idx]?.focus();
-              othersRefs.current[idx]?.select();
-            }, 0);
-          }}
-          style={{
-            position: "absolute",
-            right: "14px",
-            top: "14px",
-            width: "34px",
-            height: "34px",
-            borderRadius: "10px",
-            border: "1px solid #e2e8f0",
-            background: "#ffffff",
-            color: "#334155",
-            cursor: "pointer",
-            fontSize: "18px",
-            fontWeight: 700,
-            lineHeight: 1,
-          }}
-        >
-          ×
-        </button>
-      </div>
-
-      <div style={{ padding: "20px 22px 22px" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "10px",
-            marginBottom: "18px",
-            padding: "12px 14px",
-            background: "#f8fafc",
-            border: "1px solid #e2e8f0",
-            borderRadius: "12px",
-          }}
-        >
-          <input
-            type="checkbox"
-            id="gross"
-            checked={items[currentIndex]?.gross || false}
-            onChange={(e) =>
-              handleInputChange(currentIndex, "gross", e.target.checked)
-            }
-            style={{
-              width: "16px",
-              height: "16px",
-              cursor: "pointer",
-              accentColor: "#2563eb",
-            }}
-          />
-          <label
-            htmlFor="gross"
-            style={{
-              fontSize: "14px",
-              fontWeight: 700,
-              color: "#0f172a",
-              cursor: "pointer",
-            }}
-          >
-            GROSS
-          </label>
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "170px 1fr 1fr",
-            gap: "12px 14px",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              fontSize: "12px",
-              fontWeight: 800,
-              color: "#475569",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-            }}
-          >
-            Expense
-          </div>
-          <div
-            style={{
-              fontSize: "12px",
-              fontWeight: 800,
-              color: "#475569",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-              textAlign: "center",
-            }}
-          >
-            Rate
-          </div>
-          <div
-            style={{
-              fontSize: "12px",
-              fontWeight: 800,
-              color: "#475569",
-              textTransform: "uppercase",
-              letterSpacing: "0.5px",
-              textAlign: "center",
-            }}
-          >
-            Value
-          </div>
-
-          {[
-            { label: Expense1, rate: "Exp_rate1", value: "Exp1" },
-            { label: Expense2, rate: "Exp_rate2", value: "Exp2" },
-            { label: Expense3, rate: "Exp_rate3", value: "Exp3" },
-            { label: Expense4, rate: "Exp_rate4", value: "Exp4" },
-            { label: Expense5, rate: "Exp_rate5", value: "Exp5" },
-          ].map((field, idx) => {
-            const rateIndex = idx * 2;
-            const valueIndex = idx * 2 + 1;
-
-            return (
-              <React.Fragment key={idx}>
                 <div
+                  tabIndex={-1}
+                    onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      const idx = currentIndex;
+                      setIsModalOpenExp(false);
+                      setCurrentIndex(null);
+                      setTimeout(() => {
+                        othersRefs.current[idx]?.focus();
+                        othersRefs.current[idx]?.select();
+                      }, 0);
+                    }
+                  }}
+                  onClick={(e) => {
+                    if (e.target === e.currentTarget) {
+                      const idx = currentIndex;
+                      setIsModalOpenExp(false);
+                      setCurrentIndex(null);
+                      setTimeout(() => {
+                        othersRefs.current[idx]?.focus();
+                        othersRefs.current[idx]?.select();
+                      }, 0);
+                    }
+                  }}
                   style={{
-                    fontSize: "13px",
-                    fontWeight: 700,
-                    color: "#1e293b",
-                    paddingLeft: "4px",
+                    position: "fixed",
+                    inset: 0,
+                    background: "rgba(15, 23, 42, 0.18)",
+                    backdropFilter: "blur(3px)",
+                    WebkitBackdropFilter: "blur(3px)",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    zIndex: 2000,
+                    padding: "20px",
                   }}
                 >
-                  {field.label}
+                  <div
+                    style={{
+                      width: "100%",
+                      maxWidth: "620px",
+                      background: "#ffffff",
+                      borderRadius: "18px",
+                      boxShadow: "0 18px 50px rgba(15, 23, 42, 0.18)",
+                      border: "1px solid rgba(148, 163, 184, 0.22)",
+                      overflow: "hidden",
+                    }}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <div
+                      style={{
+                        padding: "18px 22px 14px",
+                        borderBottom: "1px solid #e5e7eb",
+                        background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
+                        position: "relative",
+                      }}
+                    >
+                      <div
+                        style={{
+                          fontSize: "19px",
+                          fontWeight: 800,
+                          color: "#0f172a",
+                          letterSpacing: "0.4px",
+                          textAlign: "center",
+                        }}
+                      >
+                        ADD / LESS BEFORE GST
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#64748b",
+                          textAlign: "center",
+                          marginTop: 4,
+                        }}
+                      >
+                        Manage expense values before GST calculation
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const idx = currentIndex;
+                          setIsModalOpenExp(false);
+                          setCurrentIndex(null);
+                          setTimeout(() => {
+                            othersRefs.current[idx]?.focus();
+                            othersRefs.current[idx]?.select();
+                          }, 0);
+                        }}
+                        style={{
+                          position: "absolute",
+                          right: "14px",
+                          top: "14px",
+                          width: "34px",
+                          height: "34px",
+                          borderRadius: "10px",
+                          border: "1px solid #e2e8f0",
+                          background: "#ffffff",
+                          color: "#334155",
+                          cursor: "pointer",
+                          fontSize: "18px",
+                          fontWeight: 700,
+                          lineHeight: 1,
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    <div style={{ padding: "20px 22px 22px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: "10px",
+                          marginBottom: "18px",
+                          padding: "12px 14px",
+                          background: "#f8fafc",
+                          border: "1px solid #e2e8f0",
+                          borderRadius: "12px",
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          id="gross"
+                          checked={items[currentIndex]?.gross || false}
+                          onChange={(e) =>
+                            handleInputChange(currentIndex, "gross", e.target.checked)
+                          }
+                          style={{
+                            width: "16px",
+                            height: "16px",
+                            cursor: "pointer",
+                            accentColor: "#2563eb",
+                          }}
+                        />
+                        <label
+                          htmlFor="gross"
+                          style={{
+                            fontSize: "14px",
+                            fontWeight: 700,
+                            color: "#0f172a",
+                            cursor: "pointer",
+                          }}
+                        >
+                          GROSS
+                        </label>
+                      </div>
+
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "170px 1fr 1fr",
+                          gap: "12px 14px",
+                          alignItems: "center",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            color: "#475569",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                          }}
+                        >
+                          Expense
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            color: "#475569",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                            textAlign: "center",
+                          }}
+                        >
+                          Rate
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            color: "#475569",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                            textAlign: "center",
+                          }}
+                        >
+                          Value
+                        </div>
+
+                        {[
+                          { label: Expense1, rate: "Exp_rate1", value: "Exp1" },
+                          { label: Expense2, rate: "Exp_rate2", value: "Exp2" },
+                          { label: Expense3, rate: "Exp_rate3", value: "Exp3" },
+                          { label: Expense4, rate: "Exp_rate4", value: "Exp4" },
+                          { label: Expense5, rate: "Exp_rate5", value: "Exp5" },
+                        ].map((field, idx) => {
+                          const rateIndex = idx * 2;
+                          const valueIndex = idx * 2 + 1;
+
+                          return (
+                            <React.Fragment key={idx}>
+                              <div
+                                style={{
+                                  fontSize: "13px",
+                                  fontWeight: 700,
+                                  color: "#1e293b",
+                                  paddingLeft: "4px",
+                                }}
+                              >
+                                {field.label}
+                              </div>
+
+                              <input
+                                ref={(el) => (expRateRefs.current[rateIndex] = el)}
+                                value={items[currentIndex][field.rate] || ""}
+                                onChange={(e) =>
+                                  handleInputChange(currentIndex, field.rate, e.target.value)
+                                }
+                                onKeyDown={(e) => handleKeyDownModal(e, rateIndex)}
+                                style={{
+                                  width: "100%",
+                                  height: "40px",
+                                  border: "1px solid #cbd5e1",
+                                  outline: "none",
+                                  padding: "0 12px",
+                                  textAlign: "right",
+                                  fontSize: "14px",
+                                  borderRadius: "10px",
+                                  background: "#ffffff",
+                                  color: "#0f172a",
+                                  boxSizing: "border-box",
+                                }}
+                              />
+
+                              <input
+                                ref={(el) => (expRateRefs.current[valueIndex] = el)}
+                                value={items[currentIndex][field.value] || ""}
+                                onBlur={() => handleExpenseBlur(currentIndex, field.value)}
+                                onChange={(e) =>
+                                  handleInputChange(currentIndex, field.value, e.target.value)
+                                }
+                                onKeyDown={(e) => handleKeyDownModal(e, valueIndex)}
+                                style={{
+                                  width: "100%",
+                                  height: "40px",
+                                  border: "1px solid #cbd5e1",
+                                  outline: "none",
+                                  padding: "0 12px",
+                                  textAlign: "right",
+                                  fontSize: "14px",
+                                  borderRadius: "10px",
+                                  background: "#ffffff",
+                                  color: "#0f172a",
+                                  boxSizing: "border-box",
+                                }}
+                              />
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: "22px",
+                          display: "flex",
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <Button
+                          ref={closeButtonRef}
+                          onClick={() => {
+                            const idx = currentIndex;
+                            setIsModalOpenExp(false);
+                            setCurrentIndex(null);
+                            setTimeout(() => {
+                              othersRefs.current[idx]?.focus();
+                              othersRefs.current[idx]?.select();
+                            }, 0);
+                          }}
+                          style={{
+                            minWidth: "110px",
+                            background: "#ffffff",
+                            border: "1px solid #cbd5e1",
+                            color: "#0f172a",
+                            fontWeight: 700,
+                            borderRadius: "10px",
+                            padding: "9px 16px",
+                            boxShadow: "0 4px 14px rgba(15, 23, 42, 0.06)",
+                          }}
+                        >
+                          CLOSE
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-
-                <input
-                  ref={(el) => (expRateRefs.current[rateIndex] = el)}
-                  value={items[currentIndex][field.rate] || ""}
-                  onChange={(e) =>
-                    handleInputChange(currentIndex, field.rate, e.target.value)
-                  }
-                  onKeyDown={(e) => handleKeyDownModal(e, rateIndex)}
-                  style={{
-                    width: "100%",
-                    height: "40px",
-                    border: "1px solid #cbd5e1",
-                    outline: "none",
-                    padding: "0 12px",
-                    textAlign: "right",
-                    fontSize: "14px",
-                    borderRadius: "10px",
-                    background: "#ffffff",
-                    color: "#0f172a",
-                    boxSizing: "border-box",
-                  }}
-                />
-
-                <input
-                  ref={(el) => (expRateRefs.current[valueIndex] = el)}
-                  value={items[currentIndex][field.value] || ""}
-                  onBlur={() => handleExpenseBlur(currentIndex, field.value)}
-                  onChange={(e) =>
-                    handleInputChange(currentIndex, field.value, e.target.value)
-                  }
-                  onKeyDown={(e) => handleKeyDownModal(e, valueIndex)}
-                  style={{
-                    width: "100%",
-                    height: "40px",
-                    border: "1px solid #cbd5e1",
-                    outline: "none",
-                    padding: "0 12px",
-                    textAlign: "right",
-                    fontSize: "14px",
-                    borderRadius: "10px",
-                    background: "#ffffff",
-                    color: "#0f172a",
-                    boxSizing: "border-box",
-                  }}
-                />
-              </React.Fragment>
-            );
-          })}
-        </div>
-
-        <div
-          style={{
-            marginTop: "22px",
-            display: "flex",
-            justifyContent: "flex-end",
-          }}
-        >
-          <Button
-            ref={closeButtonRef}
-            onClick={() => {
-              const idx = currentIndex;
-              setIsModalOpenExp(false);
-              setCurrentIndex(null);
-              setTimeout(() => {
-                othersRefs.current[idx]?.focus();
-                othersRefs.current[idx]?.select();
-              }, 0);
-            }}
-            style={{
-              minWidth: "110px",
-              background: "#ffffff",
-              border: "1px solid #cbd5e1",
-              color: "#0f172a",
-              fontWeight: 700,
-              borderRadius: "10px",
-              padding: "9px 16px",
-              boxShadow: "0 4px 14px rgba(15, 23, 42, 0.06)",
-            }}
-          >
-            CLOSE
-          </Button>
-        </div>
-      </div>
-    </div>
-  </div>
-)}
+              )}
               {tableData.cgst && (
                 <td style={{ padding: 0 }}>
                   <input
                     className="sa-CTax"
-                    style={{ height: 40, fontSize: `${fontSize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right", color: "black" }}
+                    style={{ height: 40, fontSize: `${fsize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right", color: "black" }}
                     maxLength={48}
                     disabled
                     value={Number(item.ctax) === 0 ? "" : item.ctax}
@@ -10917,7 +10217,7 @@ return (
                 <td style={{ padding: 0 }}>
                   <input
                     className="sa-STax"
-                    style={{ height: 40, fontSize: `${fontSize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right", color: "black" }}
+                    style={{ height: 40, fontSize: `${fsize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right", color: "black" }}
                     maxLength={48}
                     disabled
                     value={Number(item.stax) === 0 ? "" : item.stax}
@@ -10933,7 +10233,7 @@ return (
                 <td style={{ padding: 0 }}>
                   <input
                     className="sa-ITax"
-                    style={{ height: 40, fontSize: `${fontSize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right", color: "black" }}
+                    style={{ height: 40, fontSize: `${fsize}px`, width: "100%", boxSizing: "border-box", border: "none", padding: 5, textAlign: "right", color: "black" }}
                     maxLength={48}
                     disabled
                     value={Number(item.itax) === 0 ? "" : item.itax}
@@ -10964,7 +10264,7 @@ return (
             background: color,
             position: "sticky",
             bottom: -6,
-            fontSize: `${fontSize}px`,
+            fontSize: `${fsize}px`,
             borderTop: "1px solid black",
           }}
         >
@@ -11019,7 +10319,7 @@ return (
             label="REMARKS"
             onChange={HandleValueChange}
             onKeyDown={(e) => { handleKeyDowndown(e, transportRef); }}
-            inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fontSize}px` } }}
+            inputProps={{ maxLength: 48, style: { height: 20,fontSize: `${fsize}px` } }}
             onFocus={(e) => e.target.select()}
             size="small"
             variant="filled"
@@ -11035,7 +10335,7 @@ return (
               handleKeyDowndown(e, brokerRef);
               handleOpenModalTpt(e, "v_tpt", "v_tpt");
             }}
-            inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fontSize}px` } }}
+            inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fsize}px` } }}
             onFocus={(e) => e.target.select()}
             size="small"
             variant="filled"
@@ -11051,7 +10351,7 @@ return (
               handleKeyDowndown(e, expAfterGSTRef);
               handleOpenModalBroker(e, "broker", "broker");
             }}
-            inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fontSize}px` } }}
+            inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fsize}px` } }}
             onFocus={(e) => e.target.select()}
             size="small"
             variant="filled"
@@ -11074,7 +10374,10 @@ return (
                   size="small"
                   variant="filled"
                   fullWidth
-                  style={{ width: 225}}
+                  InputProps={{
+                    style: { fontSize: `${fsize}px` }
+                  }}
+                  style={{ width: 214, height: 45}}
                 />
               )}
             </InputMask>
@@ -11086,7 +10389,7 @@ return (
               value={formData.srv_tax}
               label="TDS 194-Q"
               onChange={handleNumericValue}
-              inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fontSize}px`, color: "red" } }}
+              inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fsize}px`, color: "red" } }}
               onFocus={(e) => e.target.select()}
               size="small"
               variant="filled"
@@ -11101,7 +10404,7 @@ return (
               value={formData.tcs1_rate}
               onKeyDown={(e) => handleKeyDowndown(e, expAfterGSTRef)}
               onChange={(e) => setFormData((prev) => ({ ...prev, tcs1_rate: e.target.value }))}
-              inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fontSize}px`, color: "red" } }}
+              inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fsize}px`, color: "red" } }}
               onFocus={(e) => e.target.select()}
               size="small"
               variant="filled"
@@ -11112,7 +10415,7 @@ return (
               id="tcs1"
               value={formData.tcs1}
               label="TCS 206C@"
-              inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fontSize}px`, color: "red" } }}
+              inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fsize}px`, color: "red" } }}
               onFocus={(e) => e.target.select()}
               size="small"
               variant="filled"
@@ -11122,11 +10425,11 @@ return (
         <div className="sa-footer-col sa-footer-taxcol" style={{ display: "flex", flexDirection: "column", marginLeft: 5, marginTop: "auto" }}>
           {formData.Tds2 && Number(formData.Tds2) > 0 && (
             <TextField
-              className="sa-custom-bordered-input"
+              className="sa-CTDS sa-custom-bordered-input"
               id="tax"
               value={"2%"}
               label="GST. TDS"
-              inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fontSize}px` } }}
+              inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fsize}px` } }}
               onFocus={(e) => e.target.select()}
               size="small"
               variant="filled"
@@ -11134,20 +10437,20 @@ return (
             />
           )}
           <div style={{ display: "flex", flexDirection: "row" }}>
-            <TextField className="sa-CTDS sa-custom-bordered-input" value={formData.Ctds} label="C.TDS" size="small" variant="filled" inputProps={{ style: { height: 20, fontSize: `${fontSize}px`, backgroundColor: "white", borderRadius: 5 } }} />
-            <TextField className="sa-CTDS sa-custom-bordered-input" value={formData.Stds} label="S.TDS" size="small" variant="filled" inputProps={{ style: { height: 20, fontSize: `${fontSize}px`, backgroundColor: "white", borderRadius: 5 } }} />
-            <TextField className="sa-CTDS sa-custom-bordered-input" value={formData.iTds} label="I.TDS" size="small" variant="filled" inputProps={{ style: { height: 20, fontSize: `${fontSize}px`, backgroundColor: "white", borderRadius: 5 } }} />
+            <TextField className="sa-CTDS sa-custom-bordered-input" value={formData.Ctds} label="C.TDS" size="small" variant="filled" inputProps={{ style: { height: 20, fontSize: `${fsize}px`, backgroundColor: "white", borderRadius: 5 } }} />
+            <TextField className="sa-CTDS sa-custom-bordered-input" value={formData.Stds} label="S.TDS" size="small" variant="filled" inputProps={{ style: { height: 20, fontSize: `${fsize}px`, backgroundColor: "white", borderRadius: 5 } }} />
+            <TextField className="sa-CTDS sa-custom-bordered-input" value={formData.iTds} label="I.TDS" size="small" variant="filled" inputProps={{ style: { height: 20, fontSize: `${fsize}px`, backgroundColor: "white", borderRadius: 5 } }} />
             <span style={{ fontSize: 20, marginTop: "10px" }}>=</span>
-            <TextField className="sa-CTDS sa-custom-bordered-input" value={formData.Tds2} label="TOTAL" size="small" variant="filled" inputProps={{ style: { height: 20, fontSize: `${fontSize}px`, backgroundColor: "white", borderRadius: 5 } }} />
+            <TextField className="sa-CTDS sa-custom-bordered-input" value={formData.Tds2} label="TOTAL" size="small" variant="filled" inputProps={{ style: { height: 20, fontSize: `${fsize}px`, backgroundColor: "white", borderRadius: 5 } }} />
           </div>
         </div>
-        <div className="sa-totals sa-footer-col sa-footer-totalcol" style={{ display: "flex", flexDirection: "column", marginLeft: "auto", marginRight: "12px" }}>
+        <div className="sa-totals" style={{ display: "flex", flexDirection: "column", marginLeft: "auto", marginRight: "12px" }}>
           <TextField
             className="sa-TOTALFIELDS sa-custom-bordered-input"
             id="tax"
             value={formData.tax}
             label="TOTAL GST"
-            inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fontSize}px` } }}
+            inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fsize}px` } }}
             onFocus={(e) => e.target.select()}
             size="small"
             variant="filled"
@@ -11168,7 +10471,7 @@ return (
                 if (WindowAfter) setIsModalOpenAfter(true);
               }}
               onDoubleClick={() => handleDoubleClickAfter("expafterGST")}
-              inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fontSize}px` }, readOnly: !isEditMode || isDisabled }}
+              inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fsize}px` }, readOnly: !isEditMode || isDisabled }}
               size="small"
               variant="filled"
             />
@@ -11420,7 +10723,7 @@ return (
             value={formData.grandtotal}
             label="GRAND TOTAL"
             onKeyDown={handleKeyDownTab2}
-            inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fontSize}px`, color: "red", fontWeight: "bold" } }}
+            inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fsize}px`, color: "red", fontWeight: "bold" } }}
             size="small"
             variant="filled"
             className="sa-TOTALFIELDS sa-custom-bordered-input"
@@ -11438,7 +10741,7 @@ return (
         <Button className="sa-Buttonz" style={{ background: color }} disabled={!isSearchEnabled} onClick={() => { fetchAllBills(); setActiveRowIndex(0); setShowSearch(true); }}>Search</Button>
         <Button ref={printButtonRef} className="sa-Buttonz" onClick={openPrintMenu} style={{ background: color }} disabled={!isPrintEnabled}>Print</Button>
         <BillPrintMenu isOpen={isMenuOpen} onClose={closePrintMenu} preview={handleOpen} formDataSale={formData} handlePrint={handlePrintClick} setSelectedCopies={setSelectedCopies} onFaView={handleViewFAVoucher} />
-        <Button className="sa-delete" style={{ background: color }} onClick={handleDeleteClick} disabled={!isDeleteEnabled}>Delete</Button>
+        <Button className="sa-Buttonz" style={{ background: color }} onClick={handleDeleteClick} disabled={!isDeleteEnabled}>Delete</Button>
         <Button className="sa-Buttonz" style={{ background: color }} onClick={handleExit}>Exit</Button>
         <Button ref={saveButtonRef} className="sa-Buttonz" onClick={handleDataSave} disabled={!isSubmitEnabled} style={{ background: color }}>Save</Button>
       </div>

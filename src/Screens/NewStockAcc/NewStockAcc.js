@@ -104,6 +104,7 @@ const NewStockAcc = ({ onSave, StockId }) => {
        });
  
        setFormData(updatedFormData);
+       setData1(product);
        setShowModal(false);
      }
    };

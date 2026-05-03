@@ -2037,7 +2037,7 @@ body,
 
 .pu-sale-main-title {
   font-size: var(--pu-header-title-font-size);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 2.4px;
   text-transform: uppercase;
   color: #0f172a;
@@ -2059,7 +2059,7 @@ body,
 
 .pu-sale-main-title1 {
   font-size: var(--pu-header-subtitle-font-size);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 1.3px;
   text-transform: uppercase;
   color: #475569;
@@ -2133,7 +2133,7 @@ body,
 
 .pu-centered-title-main {
   font-size: 22px;
-  font-weight: 800;
+  font-weight: 600;
   line-height: 1;
   color: #111827;
   letter-spacing: 0.2px;
@@ -2176,10 +2176,8 @@ body,
 
 .pu-BillDate {
   display: flex;
-  flex-direction: row;
-  gap: 8px;
-  align-items: center;
-  margin-left: 5px;
+  flex-direction: column;
+  margin-left: auto;
 }
 
 .pu-billdivz {
@@ -2200,11 +2198,6 @@ body,
   flex-direction: column;
 }
 
-/* .pu-ExFor {
-  margin-top: 3px;
-  width: 128px;
-} */
-
 .pu-VehicleDiv {
   display: flex;
   flex-direction: column;
@@ -2212,8 +2205,6 @@ body,
 }
 
 .pu-SELFinv {
-  width: 180px;
-  /* margin-top: 8px; */
   outline: none;
   font-weight: bold;
 }
@@ -2257,22 +2248,21 @@ body,
 .pu-erp-input3 {
   position: relative;
   width: 165px;
+  margin-top: 2px;
 }
 
 .pu-erp-label3 {
   position: absolute;
   top: 7px;
   left: 10px;
-  font-size: var(--pu-header-label-font-size);
   color: #475569;
-  font-weight: 800;
+  font-size: 11.5px;
   pointer-events: none;
   z-index: 2;
 }
 
 .pu-custom-style3 {
   border: 1px solid #bfc8d6;
-  font-size: var(--pu-header-input-font-size);
   font-weight: 700;
   width: 165px;
   height: 48px;
@@ -2301,7 +2291,6 @@ body,
 .pu-custom-datepickerr {
   border: 1px solid #bcc7d7;
   padding: 5px;
-  font-size: var(--pu-header-input-font-size);
   outline: none;
   font-weight: bold;
   width: 125px;
@@ -2331,7 +2320,6 @@ body,
   border: 1px solid #bfc8d6;
   padding: 10px;
   border-radius: 8px;
-  font-size: var(--pu-header-input-font-size);
   outline: none;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
   background: linear-gradient(to bottom, #ffffff, #f8fbff);
@@ -2601,7 +2589,7 @@ body,
 /* =========================
    COMMON FILLED INPUTS / MUI
 ========================= */
-.MuiInputLabel-root { font-weight: 800 !important; }
+.MuiInputLabel-root { font-weight: 600 ; }
 
 .pu-custom-bordered-input .MuiFilledInput-root {
   border: 1px solid #bfc8d6;
@@ -2609,6 +2597,7 @@ body,
   font-weight: 700;
   background: linear-gradient(to bottom, #ffffff, #f8fbff);
   box-shadow: 0 4px 10px rgba(15, 23, 42, 0.05);
+  padding-top: 2px;
 }
 
 .pu-custom-bordered-input .MuiFilledInput-root:hover {
@@ -2657,7 +2646,6 @@ body,
 .pu-custom-table td {
   border: 1px solid #d5deea;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .pu-custom-table thead {
@@ -2666,8 +2654,8 @@ body,
 
 .pu-custom-table thead th {
   border-bottom: 1px solid #aebed1;
+  font-weight: 600;
   font-size: 13px;
-  font-weight: 800;
   color: #334155;
   padding: 8px 6px;
   white-space: nowrap;
@@ -2682,8 +2670,8 @@ body,
 .pu-custom-table tbody tr:hover { background-color: #f3f8ff; }
 
 .pu-custom-table tfoot td {
-  padding: 8px 6px;
-  font-weight: 800;
+  font-weight: 600;
+  font-size: 14px;
   color: #1e293b;
   border-top: 1px solid #97a9c3;
   background: rgba(255, 255, 255, 0.92);
@@ -2697,7 +2685,6 @@ body,
 .pu-Amount, .pu-Disc, .pu-discount, .pu-CTax, .pu-STax,
 .pu-ITax, .pu-Hsn, .pu-Others {
   font-weight: bold;
-  font-size: 16px;
 }
 
 .pu-ItemCode:focus, .pu-desc:focus, .pu-PCS:focus, .pu-QTY:focus,
@@ -2976,12 +2963,12 @@ body,
   --pu-header-label-font-size:    calc(11px  * var(--pu-header-font-scale));
   --pu-header-input-font-size:    calc(13px  * var(--pu-header-font-scale));
   --pu-header-small-font-size:    calc(12px  * var(--pu-header-font-scale));
-  --pu-header-mui-label-font-size:calc(10px  * var(--pu-header-font-scale));
+  --pu-header-mui-label-font-size:calc(18px  * var(--pu-header-font-scale));
   --pu-header-input-height:       36px;
   --pu-header-multiline-height:   82px;
 
   --pu-footer-font-scale: 0.82;
-  --pu-footer-label-font-size:    calc(10.5px * var(--pu-footer-font-scale));
+  --pu-footer-label-font-size:    calc(18px * var(--pu-footer-font-scale));
   --pu-footer-input-font-size:    calc(12.5px * var(--pu-footer-font-scale));
   --pu-footer-input-height:       34px;
   --pu-footer-total-input-height: 35px;
@@ -3061,7 +3048,7 @@ body,
   box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
   font-family: "Times New Roman", Times, serif;
   font-size: var(--pu-header-title-font-size);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 2px;
   color: #0f172a;
   white-space: nowrap;
@@ -3077,7 +3064,7 @@ body,
   min-width: 82px;
   height: 36px;
   padding: 0 12px;
-  font-size: var(--pu-header-small-font-size) !important;
+  font-size: var(--pu-header-small-font-size) ;
 }
 
 .pu-Setting {
@@ -3135,6 +3122,13 @@ body,
 .pu-GRNOZ, .pu-VEHICLE, .pu-Billss, .pu-TAXtypez,
 .pu-SupplyTYPE, .pu-shippedtoz { width: 100%; }
 
+.pu-cityName{
+  width: 200px !important;
+}
+.pu-PANNoZ{
+  width: 200px !important;
+}
+
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ DATE PICKER ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pu-DatePICKER,
 .pu-DatePICKERP {
@@ -3142,7 +3136,6 @@ body,
   height: var(--pu-header-input-height);
   margin-top: 0;
   padding: 6px 9px;
-  font-size: var(--pu-header-input-font-size) !important;
   color: #1e293b;
   border: 1px solid #bfc8d6;
   border-radius: 8px;
@@ -3165,41 +3158,39 @@ body,
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ MUI INPUT SIZING ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pu-sale_toppart .pu-custom-bordered-input .MuiFilledInput-root,
 .pu-pur_toppart .pu-custom-bordered-input .MuiFilledInput-root {
-  min-height: var(--pu-header-input-height) !important;
+  min-height: var(--pu-header-input-height) ;
 }
 
 .pu-sale_toppart .pu-custom-bordered-input .MuiInputLabel-root,
 .pu-sale_toppart .pu-custom-bordered-input .MuiInputLabel-filled,
 .pu-pur_toppart .pu-custom-bordered-input .MuiInputLabel-root,
 .pu-pur_toppart .pu-custom-bordered-input .MuiInputLabel-filled {
-  font-size: var(--pu-header-mui-label-font-size) !important;
+  font-size: var(--pu-header-mui-label-font-size) ;
 }
 
 .pu-sale_toppart .pu-custom-bordered-input .MuiFilledInput-input,
 .pu-pur_toppart .pu-custom-bordered-input .MuiFilledInput-input {
-  font-size: var(--pu-header-input-font-size) !important;
-  padding-top: 15px !important;
-  padding-bottom: 4px !important;
+  padding-top: 15px ;
 }
 
 .pu-shippedtoz .MuiFilledInput-root {
-  min-height: var(--pu-header-multiline-height) !important;
+  min-height: var(--pu-header-multiline-height) ;
   align-items: flex-start;
 }
 
 .pu-shippedtoz textarea,
 .pu-shippedtoz .MuiFilledInput-inputMultiline {
-  font-size: var(--pu-header-input-font-size) !important;
-  line-height: 1.2 !important;
-  white-space: pre-wrap !important;
-  overflow: auto !important;
-  padding-top: 22px !important;
+  font-size: var(--pu-header-input-font-size) ;
+  line-height: 1.2 ;
+  white-space: pre-wrap ;
+  overflow: auto ;
+  padding-top: 22px ;
 }
 
 .pu-Billss .MuiFilledInput-root,
 .pu-TAXtypez .MuiFilledInput-root,
 .pu-SupplyTYPE .MuiFilledInput-root {
-  min-height: var(--pu-header-input-height) !important;
+  min-height: var(--pu-header-input-height) ;
 }
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ TABLE CONTAINER ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
@@ -3210,7 +3201,7 @@ body,
   flex: 1;
   min-height: 200px;
   overflow: auto;
-  margin: 4px 8px 0 !important;
+  margin: 4px 8px 0 ;
   border: 1px solid #d5deea;
   border-radius: 12px;
   background: #ffffff;
@@ -3220,19 +3211,17 @@ body,
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ TABLE SIZING ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pu-custom-table thead th {
   height: var(--pu-table-head-height);
-  padding: 4px 4px !important;
-  font-size: var(--pu-table-head-font-size) !important;
+  padding: 4px 4px ;
   line-height: 1.05;
 }
 
 .pu-custom-table tbody td {
-  height: var(--pu-table-row-height) !important;
+  height: var(--pu-table-row-height) ;
 }
 
 .pu-custom-table tfoot td {
-  padding: 4px 4px !important;
-  bottom: 0 !important;
-  font-size: var(--pu-table-foot-font-size) !important;
+  padding: 4px 4px ;
+  bottom: 0 ;
   line-height: 1.05;
 }
 
@@ -3240,18 +3229,18 @@ body,
 .pu-ItemCode, .pu-desc, .pu-PCS, .pu-QTY, .pu-Price,
 .pu-Amount, .pu-Disc, .pu-discount, .pu-CTax, .pu-STax,
 .pu-ITax, .pu-Hsn, .pu-Others {
-  height: var(--pu-table-row-height) !important;
-  min-height: var(--pu-table-row-height) !important;
-  padding: 3px 5px !important;
-  font-size: var(--pu-table-input-font-size) !important;
+  height: var(--pu-table-row-height) ;
+  min-height: var(--pu-table-row-height) ;
+  padding: 3px 5px ;
+  font-size: var(--pu-table-input-font-size) ;
   line-height: 1.1;
 }
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ ADD ROW BUTTON ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pu-addbutton {
   flex-shrink: 0;
-  margin-top: 4px !important;
-  margin-bottom: 2px !important;
+  margin-top: 4px ;
+  margin-bottom: 2px ;
   padding: 0 8px;
 }
 
@@ -3269,7 +3258,7 @@ body,
   flex-shrink: 0;
   position: sticky;
   bottom: 0;
-  padding-top: 4px !important;
+  padding-top: 4px ;
   background: linear-gradient(
     to top,
     rgba(255, 255, 255, 0.99),
@@ -3281,7 +3270,7 @@ body,
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ FOOTER LAYOUT ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pu-Parent {
-  display: flex !important;
+  display: flex ;
   align-items: flex-end;
   gap: 6px;
   padding: 0 8px 4px;
@@ -3295,53 +3284,51 @@ body,
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ FOOTER MUI SIZING ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pu-Belowcontents .pu-custom-bordered-input .MuiFilledInput-root {
-  min-height: var(--pu-footer-input-height) !important;
+  min-height: var(--pu-footer-input-height) ;
 }
 
 .pu-Belowcontents .pu-custom-bordered-input .MuiInputLabel-root,
 .pu-Belowcontents .pu-custom-bordered-input .MuiInputLabel-filled {
-  font-size: var(--pu-footer-label-font-size) !important;
+  font-size: var(--pu-footer-label-font-size) ;
 }
 
 .pu-Belowcontents .pu-custom-bordered-input .MuiFilledInput-input {
-  font-size: var(--pu-footer-input-font-size) !important;
-  padding-top: 14px !important;
-  padding-bottom: 4px !important;
+  padding-top: 14px ;
 }
 
 .pu-Belowcontents input:not([type="checkbox"]) {
-  font-size: var(--pu-footer-input-font-size) !important;
+  font-size: var(--pu-footer-input-font-size) ;
 }
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ FOOTER FIELD WIDTHS ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
-.pu-Belowcontents .pu-Remz        { width: 260px !important; }
+.pu-Belowcontents .pu-Remz        { width: 260px ; }
 .pu-Belowcontents .pu-duedatez,
-.pu-Belowcontents .pu-duedatez .MuiFormControl-root { width: 214px !important; }
-.pu-Belowcontents .pu-TCSRATE     { width: 70px !important; }
-.pu-Belowcontents .pu-TCSPER      { width: 118px !important; }
-.pu-Belowcontents .pu-CTDS        { width: 82px !important; }
+.pu-Belowcontents .pu-duedatez .MuiFormControl-root { width: 214px ; }
+.pu-Belowcontents .pu-TCSRATE     { width: 70px ; }
+.pu-Belowcontents .pu-TCSPER      { width: 154px ; }
+.pu-Belowcontents .pu-CTDS        { width: 100px ; }
 .pu-Belowcontents .pu-TOTALFIELDS,
-.pu-Belowcontents .pu-TOTALFIELD  { width: 160px !important; }
+.pu-Belowcontents .pu-TOTALFIELD  { width: 160px ; }
 
 .pu-Belowcontents .pu-TOTALFIELDS .MuiFilledInput-root,
 .pu-Belowcontents .pu-TOTALFIELD .MuiFilledInput-root {
-  min-height: var(--pu-footer-total-input-height) !important;
+  min-height: var(--pu-footer-total-input-height) ;
 }
 
 .pu-totals { gap: 4px; }
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ BUTTON GROUP ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .pu-Buttonsgroupz {
-  padding: 5px 8px 8px !important;
+  padding: 5px 8px 8px ;
   gap: 5px;
 }
 
 .pu-Buttonz,
 .pu-delete {
-  height: 38px !important;
-  min-width: 90px !important;
-  padding: 0 12px !important;
-  font-size: 13px !important;
+  height: 38px ;
+  min-width: 90px ;
+  padding: 0 12px ;
+  font-size: 13px ;
 }
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ RESPONSIVE BREAKPOINTS ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
@@ -3352,15 +3339,15 @@ body,
       minmax(0, 1.12fr)
       minmax(96px, 0.62fr)
       minmax(128px, 0.82fr)
-      minmax(0, 1.18fr) !important;
+      minmax(0, 1.18fr) ;
   }
 
-  .pu-Remz { width: 244px !important; }
+  .pu-Remz { width: 244px ; }
 }
 
 @media (max-width: 1280px) {
   .pu-Dated {
-    grid-template-columns: 104px 136px minmax(150px, 1fr) auto !important;
+    grid-template-columns: 104px 136px minmax(150px, 1fr) auto ;
   }
 
   .pu-sale-center-title-main {
@@ -3373,7 +3360,7 @@ body,
   .pu-footer-midcol   { width: 200px; }
 
   .pu-Belowcontents .pu-TOTALFIELDS,
-  .pu-Belowcontents .pu-TOTALFIELD { width: 150px !important; }
+  .pu-Belowcontents .pu-TOTALFIELD { width: 150px ; }
 }
 
 @media (max-width: 1180px) {
@@ -3461,14 +3448,14 @@ body,
   /* Top panel */
   .pu-sale_toppart,
   .pu-pur_toppart {
-    padding: 6px 10px 9px !important;
+    padding: 6px 10px 9px ;
   }
 
   /* Date picker */
   .pu-DatePICKER,
   .pu-DatePICKERP {
-    height: 40px !important;
-    font-size: var(--pu-header-input-font-size) !important;
+    height: 40px ;
+    font-size: var(--pu-header-input-font-size) ;
   }
 
   .pu-billdivz,
@@ -3484,9 +3471,9 @@ body,
 
   /* Setup buttons */
   .pu-Button {
-    height: 40px !important;
-    min-width: 86px !important;
-    font-size: var(--pu-header-small-font-size) !important;
+    height: 40px ;
+    min-width: 86px ;
+    font-size: var(--pu-header-small-font-size) ;
   }
 
   .pu-Setting {
@@ -3495,74 +3482,74 @@ body,
   }
 
   /* Top field gaps */
-  .pu-TopFields { gap: 8px !important; }
-  .pu-CUS, .pu-GST { gap: 8px !important; }
+  .pu-TopFields { gap: 8px ; }
+  .pu-CUS, .pu-GST { gap: 8px ; }
 
   /* MUI inputs */
   .pu-sale_toppart .pu-custom-bordered-input .MuiFilledInput-root,
   .pu-pur_toppart .pu-custom-bordered-input .MuiFilledInput-root {
-    min-height: 40px !important;
+    min-height: 40px ;
   }
 
   .pu-sale_toppart .pu-custom-bordered-input .MuiFilledInput-input,
   .pu-pur_toppart .pu-custom-bordered-input .MuiFilledInput-input {
-    font-size: var(--pu-header-input-font-size) !important;
-    padding-top: 16px !important;
-    padding-bottom: 4px !important;
+    font-size: var(--pu-header-input-font-size) ;
+    padding-top: 16px ;
+    padding-bottom: 4px ;
   }
 
-  .pu-shippedtoz .MuiFilledInput-root { min-height: 90px !important; }
+  .pu-shippedtoz .MuiFilledInput-root { min-height: 90px ; }
 
   .pu-Billss .MuiFilledInput-root,
   .pu-TAXtypez .MuiFilledInput-root,
-  .pu-SupplyTYPE .MuiFilledInput-root { min-height: 40px !important; }
+  .pu-SupplyTYPE .MuiFilledInput-root { min-height: 40px ; }
 
   /* Table inputs */
   .pu-custom-table tbody input,
   .pu-ItemCode, .pu-desc, .pu-PCS, .pu-QTY, .pu-Price,
   .pu-Amount, .pu-Disc, .pu-discount, .pu-CTax, .pu-STax,
   .pu-ITax, .pu-Hsn, .pu-Others {
-    height: 35px !important;
-    min-height: 35px !important;
-    font-size: var(--pu-table-input-font-size) !important;
-    padding: 3px 5px !important;
+    height: 35px ;
+    min-height: 35px ;
+    font-size: var(--pu-table-input-font-size) ;
+    padding: 3px 5px ;
   }
 
   /* Add row button */
   .pu-addbutton .btn {
-    height: 35px !important;
-    font-size: 12.5px !important;
-    padding: 0 13px !important;
+    height: 35px ;
+    font-size: 12.5px ;
+    padding: 0 13px ;
   }
 
   /* Footer MUI */
   .pu-Belowcontents .pu-custom-bordered-input .MuiFilledInput-root {
-    min-height: 37px !important;
+    min-height: 37px ;
   }
 
   .pu-Belowcontents .pu-custom-bordered-input .MuiFilledInput-input {
-    font-size: var(--pu-footer-input-font-size) !important;
-    padding-top: 14px !important;
-    padding-bottom: 4px !important;
+    font-size: var(--pu-footer-input-font-size) ;
+    padding-top: 14px ;
+    padding-bottom: 4px ;
   }
 
   .pu-Belowcontents input:not([type="checkbox"]) {
-    font-size: var(--pu-footer-input-font-size) !important;
+    font-size: var(--pu-footer-input-font-size) ;
   }
 
   /* Footer field widths ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â scale up ~10% */
-  .pu-Belowcontents .pu-Remz        { width: 286px !important; }
+  .pu-Belowcontents .pu-Remz        { width: 286px ; }
   .pu-Belowcontents .pu-duedatez,
-  .pu-Belowcontents .pu-duedatez .MuiFormControl-root { width: 235px !important; }
-  .pu-Belowcontents .pu-TCSRATE     { width: 77px !important; }
-  .pu-Belowcontents .pu-TCSPER      { width: 130px !important; }
-  .pu-Belowcontents .pu-CTDS        { width: 90px !important; }
+  .pu-Belowcontents .pu-duedatez .MuiFormControl-root { width: 235px ; }
+  .pu-Belowcontents .pu-TCSRATE     { width: 77px ; }
+  .pu-Belowcontents .pu-TCSPER      { width: 130px ; }
+  .pu-Belowcontents .pu-CTDS        { width: 90px ; }
   .pu-Belowcontents .pu-TOTALFIELDS,
-  .pu-Belowcontents .pu-TOTALFIELD  { width: 176px !important; }
+  .pu-Belowcontents .pu-TOTALFIELD  { width: 176px ; }
 
   .pu-Belowcontents .pu-TOTALFIELDS .MuiFilledInput-root,
   .pu-Belowcontents .pu-TOTALFIELD .MuiFilledInput-root {
-    min-height: 38px !important;
+    min-height: 38px ;
   }
 
   .pu-footer-leftcol  { width: 286px; }
@@ -3572,15 +3559,15 @@ body,
   /* Action buttons */
   .pu-Buttonz,
   .pu-delete {
-    height: 41px !important;
-    min-width: 93px !important;
-    font-size: 13.5px !important;
-    padding: 0 13px !important;
+    height: 41px ;
+    min-width: 93px ;
+    font-size: 13.5px ;
+    padding: 0 13px ;
   }
 
   .pu-Buttonsgroupz {
-    padding: 5px 9px 9px !important;
-    gap: 5px !important;
+    padding: 5px 9px 9px ;
+    gap: 5px ;
   }
 }
 /* =========================================================
@@ -3604,9 +3591,9 @@ body,
 .pu-Billss .MuiFilledInput-root,
 .pu-TAXtypez .MuiFilledInput-root,
 .pu-SupplyTYPE .MuiFilledInput-root {
-  min-height: var(--pu-header-input-height) !important;
-  height: var(--pu-header-input-height) !important;
-  box-sizing: border-box !important;
+  min-height: var(--pu-header-input-height) ;
+  height: var(--pu-header-input-height) ;
+  box-sizing: border-box ;
 }
 
 .pu-sale_toppart .pu-custom-bordered-input .MuiFilledInput-input,
@@ -3622,10 +3609,7 @@ body,
 .pu-SupplyTYPE .MuiFilledInput-input,
 .pu-sale_toppart .pu-custom-bordered-input input,
 .pu-pur_toppart .pu-custom-bordered-input input {
-  font-size: var(--pu-header-input-font-size) !important;
-  padding-top: 14px !important;
-  padding-bottom: 4px !important;
-  box-sizing: border-box !important;
+  padding-top: 20px;
 }
 
 .pu-custom-style3,
@@ -3634,14 +3618,14 @@ body,
 .pu-DatePICKER,
 .pu-DatePICKERP,
 .pu-VbillzNo {
-  height: var(--pu-header-input-height) !important;
-  min-height: var(--pu-header-input-height) !important;
-  box-sizing: border-box !important;
+  height: var(--pu-header-input-height) ;
+  min-height: var(--pu-header-input-height) ;
+  box-sizing: border-box ;
   border-radius: 8px;
 }
 
 .pu-custom-style3 {
-  padding: 18px 10px 6px 10px !important;
+  padding: 18px 10px 6px 10px ;
 }
 
 .pu-custom-datepickerr,
@@ -3649,36 +3633,36 @@ body,
 .pu-DatePICKER,
 .pu-DatePICKERP,
 .pu-VbillzNo {
-  line-height: calc(var(--pu-header-input-height) - 2px) !important;
+  line-height: calc(var(--pu-header-input-height) - 2px) ;
 }
 
 .pu-DatePICKER,
 .pu-DatePICKERP {
-  padding: 0 9px !important;
-  margin-top: 0 !important;
+  padding: 0 9px ;
+  margin-top: 0 ;
 }
 
 .pu-custom-datepickerr,
 .pu-inputfields,
 .pu-VbillzNo {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  padding-top: 0 ;
+  padding-bottom: 0 ;
 }
 
 .pu-erp-label3 {
-  top: 5px !important;
+  top: 5px ;
 }
 
 .pu-shippedtoz .MuiFilledInput-root {
-  min-height: var(--pu-header-multiline-height) !important;
-  height: var(--pu-header-multiline-height) !important;
-  align-items: flex-start !important;
+  min-height: var(--pu-header-multiline-height) ;
+  height: var(--pu-header-multiline-height) ;
+  align-items: flex-start ;
 }
 
 .pu-shippedtoz textarea,
 .pu-shippedtoz .MuiFilledInput-inputMultiline {
-  padding-top: 22px !important;
-  line-height: 1.2 !important;
+  padding-top: 22px ;
+  line-height: 1.2 ;
 }
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
@@ -3694,27 +3678,27 @@ body,
    Only nudge Date and Bill No blocks a little to the right.
 ========================================================= */
 .pu-Dated > :first-child {
-  margin-left: 34px !important;
+  margin-left: 34px ;
 }
 
 .pu-Dated > :nth-child(2) {
-  margin-left: 8px !important;
+  margin-left: 8px ;
 }
 
 @media (max-width: 1280px) {
   .pu-Dated > :first-child {
-    margin-left: 24px !important;
+    margin-left: 24px ;
   }
 
   .pu-Dated > :nth-child(2) {
-    margin-left: 4px !important;
+    margin-left: 4px ;
   }
 }
 
 @media (max-width: 860px) {
   .pu-Dated > :first-child,
   .pu-Dated > :nth-child(2) {
-    margin-left: 0 !important;
+    margin-left: 0 ;
   }
 }
 
@@ -3723,27 +3707,27 @@ body,
    Move Date and Bill No a little more to the right.
 ========================================================= */
 .pu-Dated > :first-child {
-  margin-left: 36px !important;
+  margin-left: 36px ;
 }
 
 .pu-Dated > :nth-child(2) {
-  margin-left: 12px !important;
+  margin-left: 12px ;
 }
 
 @media (max-width: 1280px) {
   .pu-Dated > :first-child {
-    margin-left: 30px !important;
+    margin-left: 30px ;
   }
 
   .pu-Dated > :nth-child(2) {
-    margin-left: 6px !important;
+    margin-left: 6px ;
   }
 }
 
 @media (max-width: 860px) {
   .pu-Dated > :first-child,
   .pu-Dated > :nth-child(2) {
-    margin-left: 0 !important;
+    margin-left: 0 ;
   }
 }
 .ps-newModalz {

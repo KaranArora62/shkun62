@@ -8,6 +8,7 @@ import Button from "react-bootstrap/Button";
 import ProductModal from "../Modals/ProductModal";
 import ProductModalCustomer from "../Modals/ProductModalCustomer";
 import axios from "axios";
+import ReactDOM from "react-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCog, FaTimes } from "react-icons/fa";
@@ -36,6 +37,7 @@ import FAVoucherModal from "../Shared/FAVoucherModal";
 import { useNavigate, useLocation } from "react-router-dom";
 import useShortcuts from "../Shared/useShortcuts";
 import F3Modal from "../Modals/F3Modal";
+import { isMacOs } from 'react-device-detect';
 
 const LOCAL_STORAGE_KEY = "tabledataSS";
 
@@ -277,6 +279,7 @@ const SaleService = () => {
     igst: true,
   };
 
+  const [fontSize, setFontSize] = useState(14);
   const [tableData, settableData] = useState(() => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
     const parsed = saved ? JSON.parse(saved) : {};
@@ -2862,14 +2865,6 @@ const SaleService = () => {
     items[currentIndex]?.RateCal,
   ]);
 
-  const [fsize, setfsize] = useState(17); // Initial font size in pixels
-  const increaseFontSize = () => {
-    setfsize((prevSize) => (prevSize < 20 ? prevSize + 2 : prevSize)); // Increase font size up to 20 pixels
-  };
-
-  const decreaseFontSize = () => {
-    setfsize((prevSize) => (prevSize > 14 ? prevSize - 2 : prevSize)); // Decrease font size down to 14 pixels
-  };
   const [pressedKey, setPressedKey] = useState(""); // State to hold the pressed key
   const fieldOrder = [
     { name: "vacode", refArray: itemCodeRefs },
@@ -3287,7 +3282,7 @@ const SaleService = () => {
   };
 
   return (
-    <div>
+    <div className={`sa-sale-page ${isMacOs ? 'sa-mac' : ''}`}>
       <ToastContainer />
       {isModalOpen && <SaleSetup onClose={closeModal} />}
       <div style={{ visibility: "hidden", width: 0, height: 0 }}>
@@ -3304,59 +3299,56 @@ const SaleService = () => {
           />
         )}
       </div>
-      <div style={{ display: "flex", flexDirection: "row", marginTop: -30 }}>
-        <h1 className="headerSale">
-          SALE GST SERVICES{" "}
-          <span className="text-black-500 font-semibold text-base sm:text-lg">
-            {title}
-          </span>
-        </h1>
-      </div>
       {/* Top Parts */}
-      <div className="sale_toppart ">
-        <div className="Dated ">
+      <div className="sa-sale_toppart sa-pur_toppart">
+        <div  className="sa-Dated" style={{marginLeft:20}}>
           <InputMask
             mask="99-99-9999"
             placeholder="dd-mm-yyyy"
             value={formData.date}
+  
             readOnly={!isEditMode || isDisabled}
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
           >
             {(inputProps) => (
               <input
                 {...inputProps}
-                className="DatePICKER"
+                className="sa-DatePICKER"
                 ref={datePickerRef}
                 onKeyDown={(e) => {
                   handleEnterKeyPress(datePickerRef, voucherNoRef)(e);
                 }}
+                style={{fontSize: `${fontSize}px`}}
               />
             )}
           </InputMask>
-          <div className="billdivz">
+          <div className="sa-billdivz">
             <TextField
               inputRef={voucherNoRef}
-              className="billzNo custom-bordered-input"
+              className="sa-billzNo sa-custom-bordered-input"
               id="vbillno"
               value={formData.vbillno}
+              style={{marginLeft:30}}
               variant="filled"
               size="small"
               label="BILL NO"
-              onKeyDown={handleKeyDownTab} // Handle Tab key here
+              onKeyDown={handleKeyDownTab}
               inputProps={{
                 maxLength: 48,
                 style: {
                   height: "20px",
-                  fontSize: `${fsize}px`,
-                  // padding: "0 8px"
+                  fontSize: `${fontSize}px`,
                 },
                 readOnly: !isEditMode || isDisabled,
               }}
             />
           </div>
-          <div className="Setup">
+          <div className="sa-sale-center-title">
+            <span className="sa-sale-center-title-main">SALE GST SERVICES</span>
+          </div>
+          <div className="sa-Setup">
             <button
-              className="Button"
+              className="sa-Button"
               style={{
                 backgroundColor: "blue",
                 color: "white",
@@ -3366,11 +3358,10 @@ const SaleService = () => {
             >
               SETUP
             </button>
-            {/* Settings Button */}
             <button
               type="button"
               onClick={() => setSettingsOpen(true)}
-              className="Setting text-xl text-blue-700"
+              className="sa-Setting text-xl text-blue-700"
               style={{
                 cursor: "pointer",
                 border: "none",
@@ -3382,7 +3373,6 @@ const SaleService = () => {
             >
               <FaCog />
             </button>
-            {/* Fullscreen Overlay Drawer */}
             <Modal
               show={settingsOpen}
               onHide={() => setSettingsOpen(false)}
@@ -3391,9 +3381,8 @@ const SaleService = () => {
               backdrop="static"
               keyboard={true}
               dialogClassName="p-0"
-              style={{ maxHeight: "100vh", overflowY: "hidden", marginTop:-10 }}
+              style={{ maxHeight: "100vh", overflowY: "hidden", marginTop: -10 }}
             >
-              {/* Premium Header */}
               <div
                 style={{
                   padding: "14px 18px",
@@ -3430,9 +3419,7 @@ const SaleService = () => {
                   <FaTimes />
                 </button>
               </div>
-              {/* Body */}
               <Modal.Body style={{ padding: 18, background: "rgba(249,250,251,0.85)" }}>
-                {/* Theme Card */}
                 <div
                   style={{
                     borderRadius: 16,
@@ -3491,7 +3478,6 @@ const SaleService = () => {
                     ))}
                   </select>
                 </div>
-                {/* Fields Card */}
                 <div
                   style={{
                     borderRadius: 16,
@@ -3604,18 +3590,18 @@ const SaleService = () => {
             </Modal>
           </div>
         </div>
-        <div className="TopFields">
+        <div className="sa-TopFields">
           {customerDetails.map((item, index) => (
             <div key={item.vacode}>
-              <div className="CUS">
-                <div className="customerdiv">
+              <div className="sa-CUS">
+                <div className="sa-customerdiv">
                   <TextField
                     inputRef={customerNameRef}
                     label="CUSTOMER NAME"
                     variant="filled"
                     size="small"
                     value={item.vacode}
-                    className="customerNAME custom-bordered-input"
+                    className="sa-customerNAME sa-custom-bordered-input"
                     onKeyDown={(e) => {
                       handleEnterKeyPress(customerNameRef, shippedtoRef)(e);
                       handleKeyDown(e, index, "accountname");
@@ -3629,16 +3615,15 @@ const SaleService = () => {
                       maxLength: 48,
                       style: {
                         height: "20px",
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                       },
                       readOnly: !isEditMode || isDisabled,
                     }}
                   />
                 </div>
-                <div className="citydivZ">
+                <div className="sa-citydivZ">
                   <TextField
-                    //  disabled
-                    className="cityName custom-bordered-input"
+                    className="sa-cityName sa-custom-bordered-input"
                     value={item.city}
                     variant="filled"
                     label="CITY"
@@ -3647,8 +3632,7 @@ const SaleService = () => {
                       maxLength: 48,
                       style: {
                         height: "20px",
-                        fontSize: `${fsize}px`,
-                        // padding: "0 8px",
+                        fontSize: `${fontSize}px`,
                       },
                       readOnly: !isEditMode || isDisabled,
                     }}
@@ -3659,11 +3643,10 @@ const SaleService = () => {
                   />
                 </div>
               </div>
-              <div className="GST">
+              <div className="sa-GST" style={{marginTop:5}}>
                 <div>
                   <TextField
-                    //  disabled
-                    className="gstnoZ custom-bordered-input"
+                    className="sa-gstnoZ sa-custom-bordered-input"
                     value={item.gstno}
                     variant="filled"
                     size="small"
@@ -3672,8 +3655,7 @@ const SaleService = () => {
                       maxLength: 48,
                       style: {
                         height: "20px",
-                        fontSize: `${fsize}px`,
-                        // padding: "0 8px",
+                        fontSize: `${fontSize}px`,
                       },
                       readOnly: !isEditMode || isDisabled,
                     }}
@@ -3683,10 +3665,9 @@ const SaleService = () => {
                     onFocus={(e) => e.target.select()}
                   />
                 </div>
-                <div className="pandivZ">
+                <div className="sa-pandivZ">
                   <TextField
-                    //  disabled
-                    className="PANNoZ custom-bordered-input"
+                    className="sa-PANNoZ sa-custom-bordered-input"
                     value={item.pan}
                     variant="filled"
                     size="small"
@@ -3695,8 +3676,7 @@ const SaleService = () => {
                       maxLength: 48,
                       style: {
                         height: "20px",
-                        fontSize: `${fsize}px`,
-                        // padding: "0 8px",
+                        fontSize: `${fontSize}px`,
                       },
                       readOnly: !isEditMode || isDisabled,
                     }}
@@ -3718,14 +3698,14 @@ const SaleService = () => {
               tenant={tenant}
             />
           )}
-          <div className="shippedTO">
+          <div className="sa-shippedTO">
             {shipped.map((item, index) => (
               <div key={item.shippedto}>
                 <div>
                   <TextField
                     multiline
                     inputRef={shippedtoRef}
-                    className="shippedtoz custom-bordered-input"
+                    className="sa-shippedtoz sa-custom-bordered-input"
                     id="shippedto"
                     variant="filled"
                     label="SHIPPED TO"
@@ -3734,8 +3714,8 @@ const SaleService = () => {
                     InputProps={{
                       readOnly: !isEditMode || isDisabled,
                       style: {
-                        height: 100,
-                        fontSize: 14,
+                        height: 85,
+                        fontSize: 12,
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
@@ -3743,7 +3723,7 @@ const SaleService = () => {
                     }}
                     inputProps={{
                       maxLength: 150,
-                      fontSize: 14,
+                      fontSize: 12,
                     }}
                     onKeyDown={(e) => {
                       handleOpenModal(e, index, "shippedto");
@@ -3769,10 +3749,10 @@ const SaleService = () => {
               />
             )}
           </div>
-          <div className="GRNo">
+          <div className="sa-GRNo">
             <TextField
               inputRef={grNoRef}
-              className="GRNOZ custom-bordered-input"
+              className="sa-GRNOZ sa-custom-bordered-input"
               id="gr"
               label="GR NO"
               value={formData.gr}
@@ -3785,21 +3765,21 @@ const SaleService = () => {
                 maxLength: 12,
                 style: {
                   height: "20px",
-                  fontSize: `${fsize}px`,
-                  // padding: "0 8px"
+                  fontSize: `${fontSize}px`,
                 },
                 readOnly: !isEditMode || isDisabled,
               }}
             />
-            <div className="ExFor">
+            <div className="sa-ExFor">
               <TextField
                 inputRef={termsRef}
-                className="custom-bordered-input"
+                className="sa-custom-bordered-input"
                 id="exfor"
                 value={formData.exfor}
                 variant="filled"
                 label="TERMS"
                 size="small"
+                fullWidth
                 onChange={HandleValueChange}
                 onKeyDown={handleEnterKeyPress(termsRef, vehicleNoRef)}
                 onFocus={(e) => e.target.select()}
@@ -3807,19 +3787,17 @@ const SaleService = () => {
                   maxLength: 10,
                   style: {
                     height: "20px",
-                    fontSize: `${fsize}px`,
-                    // padding: "0 8px"
+                    fontSize: `${fontSize}px`,
                   },
                   readOnly: !isEditMode || isDisabled,
                 }}
-                // sx={{ width: 128}}
               />
             </div>
           </div>
-          <div className="VehicleDiv">
+          <div className="sa-VehicleDiv">
             <TextField
               inputRef={vehicleNoRef}
-              className="VEHICLE custom-bordered-input"
+              className="sa-VEHICLE sa-custom-bordered-input"
               id="trpt"
               value={formData.trpt}
               variant="filled"
@@ -3832,155 +3810,119 @@ const SaleService = () => {
                 maxLength: 48,
                 style: {
                   height: "20px",
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                 },
                 readOnly: !isEditMode || isDisabled,
               }}
             />
-            <div className="BillType">
+            <div className="sa-BillType">
               <FormControl
-                className=" Billss custom-bordered-input"
+                className="sa-Billss sa-custom-bordered-input"
                 sx={{
-                  fontSize: `${fsize}px`,
-                  "& .MuiFilledInput-root": {
-                    height: 48, // adjust as needed (default ~56px for filled)
-                  },
+                  fontSize: `${fontSize}px`,
+                  "& .MuiFilledInput-root": { height: 48 },
                 }}
                 size="small"
                 variant="filled"
-                // disabled={!isEditMode || isDisabled}
               >
                 <InputLabel id="billcash-label">BILL TYPE</InputLabel>
                 <Select
-                inputRef={billcashRef}
-                  className="custom-bordered-input"
+                  inputRef={billcashRef}
+                  className="sa-custom-bordered-input"
                   labelId="billcash-label"
                   id="billcash"
                   value={formData.btype}
                   onChange={(e) => {
-                    if (!isEditMode || isDisabled) return; // prevent changing
+                    if (!isEditMode || isDisabled) return;
                     handleBillCash(e);
                   }}
                   onOpen={(e) => {
-                    if (!isEditMode || isDisabled) {
-                      e.preventDefault(); // prevent dropdown opening
-                    }
+                    if (!isEditMode || isDisabled) e.preventDefault();
                   }}
                   onKeyDownCapture={(e) => {
                     if (e.key === "Enter") {
                       const menuOpen = document.querySelector(".MuiMenu-paper");
-
-                      // ✅ CLOSED → move next (block opening)
                       if (!menuOpen) {
                         e.preventDefault();
                         e.stopPropagation();
-
                         handleEnterKeyPress(billcashRef, taxTypreRef)(e);
                       }
-                      // ✅ OPEN → let MUI handle selection
                     }
-
-                    // ArrowDown → let MUI open normally
                     if (e.key === "ArrowDown") return;
                   }}
                   label="BILL TYPE"
                   displayEmpty
                   inputProps={{
                     sx: {
-                      fontSize: `${fsize}px`,
-                      pointerEvents:
-                        !isEditMode || isDisabled ? "none" : "auto", // stop mouse clicks
+                      fontSize: `${fontSize}px`,
+                      pointerEvents: !isEditMode || isDisabled ? "none" : "auto",
                     },
                   }}
                   MenuProps={{ disablePortal: true }}
                 >
-                  <MenuItem value="">
-                    <em></em>
-                  </MenuItem>
+                  <MenuItem value=""><em></em></MenuItem>
                   <MenuItem value="Bill">Bill</MenuItem>
                   <MenuItem value="Cash">Cash</MenuItem>
                 </Select>
               </FormControl>
             </div>
           </div>
-          <div className="TAXDiv">
+          <div className="sa-TAXDiv">
             <div>
               <FormControl
                 fullWidth
                 size="small"
                 variant="filled"
-                // disabled={!isEditMode || isDisabled}
-                className="TAXtypez custom-bordered-input"
+                className="sa-TAXtypez sa-custom-bordered-input"
                 sx={{
-                  fontSize: `${fsize}px`,
-                  "& .MuiFilledInput-root": {
-                    height: 48, // adjust as needed (default ~56px for filled)
-                  },
+                  fontSize: `${fontSize}px`,
+                  "& .MuiFilledInput-root": { height: 48 },
                 }}
               >
                 <InputLabel id="taxtype-label">TAX TYPE</InputLabel>
                 <Select
-                inputRef={taxTypreRef}
-                  className="TAXtypez"
+                  inputRef={taxTypreRef}
+                  className="sa-TAXtypez"
                   labelId="taxtype-label"
                   id="stype"
                   value={formData.stype}
                   onChange={(e) => {
-                    if (!isEditMode || isDisabled) return; // prevent changing
+                    if (!isEditMode || isDisabled) return;
                     handleTaxType(e);
                   }}
                   onOpen={(e) => {
-                    if (!isEditMode || isDisabled) {
-                      e.preventDefault(); // prevent dropdown opening
-                    }
+                    if (!isEditMode || isDisabled) e.preventDefault();
                   }}
                   onKeyDownCapture={(e) => {
                     if (e.key === "Enter") {
                       const menuOpen = document.querySelector(".MuiMenu-paper");
-
-                      // ✅ CLOSED → move next (block opening)
                       if (!menuOpen) {
                         e.preventDefault();
                         e.stopPropagation();
-
                         handleEnterKeyPress(taxTypreRef, supplyRef)(e);
                       }
-                      // ✅ OPEN → let MUI handle selection
                     }
-
-                    // ArrowDown → let MUI open normally
                     if (e.key === "ArrowDown") return;
                   }}
                   label="TAX TYPE"
                   displayEmpty
-                  MenuProps={{
-                    disablePortal: true,
-                  }}
+                  MenuProps={{ disablePortal: true }}
                   inputProps={{
                     sx: {
-                      fontSize: `${fsize}px`,
-                      pointerEvents:
-                        !isEditMode || isDisabled ? "none" : "auto", // stop mouse clicks
+                      fontSize: `${fontSize}px`,
+                      pointerEvents: !isEditMode || isDisabled ? "none" : "auto",
                     },
                   }}
                 >
-                  <MenuItem value="">
-                    <em></em>
-                  </MenuItem>
+                  <MenuItem value=""><em></em></MenuItem>
                   <MenuItem value="GST Sale (RD)">GST Sale (RD)</MenuItem>
                   <MenuItem value="IGST Sale (RD)">IGST Sale (RD)</MenuItem>
                   <MenuItem value="GST (URD)">GST (URD)</MenuItem>
                   <MenuItem value="IGST (URD)">IGST (URD)</MenuItem>
-                  <MenuItem value="Tax Free Within State">
-                    Tax Free Within State
-                  </MenuItem>
-                  <MenuItem value="Tax Free Interstate">
-                    Tax Free Interstate
-                  </MenuItem>
+                  <MenuItem value="Tax Free Within State">Tax Free Within State</MenuItem>
+                  <MenuItem value="Tax Free Interstate">Tax Free Interstate</MenuItem>
                   <MenuItem value="Export Sale">Export Sale</MenuItem>
-                  <MenuItem value="Export Sale(IGST)">
-                    Export Sale(IGST)
-                  </MenuItem>
+                  <MenuItem value="Export Sale(IGST)">Export Sale(IGST)</MenuItem>
                   <MenuItem value="Including GST">Including GST</MenuItem>
                   <MenuItem value="Including IGST">Including IGST</MenuItem>
                   <MenuItem value="Not Applicable">Not Applicable</MenuItem>
@@ -3988,70 +3930,53 @@ const SaleService = () => {
                 </Select>
               </FormControl>
             </div>
-            <div style={{ marginTop: 3 }}>
+            <div>
               <FormControl
-                className="SupplyTYPE custom-bordered-input"
+                className="sa-SupplyTYPE sa-custom-bordered-input"
                 sx={{
-                  // width: '250px',
-                  fontSize: `${fsize}px`,
-                  "& .MuiFilledInput-root": {
-                    height: 48, // adjust as needed (default ~56px for filled)
-                  },
+                  fontSize: `${fontSize}px`,
+                  "& .MuiFilledInput-root": { height: 48 },
                 }}
                 size="small"
-                // disabled={!isEditMode || isDisabled}
                 variant="filled"
               >
                 <InputLabel id="supply-label">SUPPLY TYPE</InputLabel>
                 <Select
-                inputRef={supplyRef}
-                  className="SupplyTYPE"
+                  inputRef={supplyRef}
+                  className="sa-SupplyTYPE"
                   labelId="supply-label"
                   id="supply"
                   value={formData.conv}
                   onChange={(e) => {
-                    if (!isEditMode || isDisabled) return; // prevent changing
+                    if (!isEditMode || isDisabled) return;
                     handleSupply(e);
                   }}
                   onOpen={(e) => {
-                    if (!isEditMode || isDisabled) {
-                      e.preventDefault(); // prevent dropdown opening
-                    }
+                    if (!isEditMode || isDisabled) e.preventDefault();
                   }}
                   onKeyDownCapture={(e) => {
                     if (e.key === "Enter") {
                       const menuOpen = document.querySelector(".MuiMenu-paper");
-
-                      // ✅ CLOSED → move next (block opening)
                       if (!menuOpen) {
                         e.preventDefault();
                         e.stopPropagation();
-
                         handleEnterKeyPress(supplyRef, null)(e);
                       }
-                      // ✅ OPEN → let MUI handle selection
                     }
-
-                    // ArrowDown → let MUI open normally
                     if (e.key === "ArrowDown") return;
                   }}
                   label="SUPPLY TYPE"
                   displayEmpty
                   inputProps={{
                     sx: {
-                      fontSize: `${fsize}px`,
-                      pointerEvents:
-                        !isEditMode || isDisabled ? "none" : "auto", // stop mouse clicks
+                      fontSize: `${fontSize}px`,
+                      pointerEvents: !isEditMode || isDisabled ? "none" : "auto",
                     },
                   }}
                   MenuProps={{ disablePortal: true }}
                 >
-                  <MenuItem value="">
-                    <em></em>
-                  </MenuItem>
-                  <MenuItem value="Manufacturing Sale">
-                    1. Manufacturing Sale
-                  </MenuItem>
+                  <MenuItem value=""><em></em></MenuItem>
+                  <MenuItem value="Manufacturing Sale">1. Manufacturing Sale</MenuItem>
                   <MenuItem value="Trading Sale">2. Trading Sale</MenuItem>
                 </Select>
               </FormControl>
@@ -4062,10 +3987,10 @@ const SaleService = () => {
       {/* Table Part */}
       <div
         ref={tableContainerRef}
-        style={{ marginTop: 5 }}
-        className="TableContainer"
+        style={{ marginTop: 0, zoom: isMacOs ? 1.4 : 1 }}
+        className="sa-TableContainer"
       >
-        <Table ref={tableRef} className="custom-table">
+        <Table ref={tableRef} className="sa-custom-table">
           <thead
             style={{
               background: color,
@@ -4099,10 +4024,10 @@ const SaleService = () => {
                   <td style={{ padding: 0, width: 300 }}>
                     <input
                       disabled={!canEditRow(index)}
-                      className="ItemCode"
+                      className="sa-ItemCode"
                       style={{
                         height: 40,
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         width: "100%",
                         boxSizing: "border-box",
                         border: "none",
@@ -4129,10 +4054,10 @@ const SaleService = () => {
                   <td style={{ padding: 0, width: 250 }}>
                     <input
                       disabled={!canEditRow(index)}
-                      className="desc"
+                      className="sa-desc"
                       style={{
                         height: 40,
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         width: "100%",
                         boxSizing: "border-box",
                         border: "none",
@@ -4156,10 +4081,10 @@ const SaleService = () => {
                   <td style={{ padding: 0 }}>
                     <input
                       disabled={!canEditRow(index)}
-                      className="Hsn"
+                      className="sa-Hsn"
                       style={{
                         height: 40,
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         width: "100%",
                         boxSizing: "border-box",
                         border: "none",
@@ -4184,7 +4109,7 @@ const SaleService = () => {
                   <td style={{ padding: 0 }}>
                     <input
                       disabled={!canEditRow(index)}
-                      className="PCS"
+                      className="sa-PCS"
                       style={{
                         height: 40,
                         width: "100%",
@@ -4192,7 +4117,7 @@ const SaleService = () => {
                         border: "none",
                         padding: 5,
                         textAlign: "right",
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                       }}
                       maxLength={48}
                       readOnly={!isEditMode || isDisabled}
@@ -4213,7 +4138,7 @@ const SaleService = () => {
                   <td style={{ padding: 0 }}>
                     <input
                       disabled={!canEditRow(index)}
-                      className="QTY"
+                      className="sa-QTY"
                       style={{
                         height: 40,
                         width: "100%",
@@ -4221,7 +4146,7 @@ const SaleService = () => {
                         border: "none",
                         padding: 5,
                         textAlign: "right",
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                       }}
                       maxLength={48}
                       readOnly={!isEditMode || isDisabled}
@@ -4242,7 +4167,7 @@ const SaleService = () => {
                   <td style={{ padding: 0 }}>
                     <input
                       disabled={!canEditRow(index)}
-                      className="Price"
+                      className="sa-Price"
                       style={{
                         height: 40,
                         width: "100%",
@@ -4250,7 +4175,7 @@ const SaleService = () => {
                         border: "none",
                         padding: 5,
                         textAlign: "right",
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                       }}
                       maxLength={48}
                       readOnly={!isEditMode || isDisabled}
@@ -4271,10 +4196,10 @@ const SaleService = () => {
                   <td style={{ padding: 0 }}>
                     <input
                       disabled={!canEditRow(index)}
-                      className="Amount"
+                      className="sa-Amount"
                       style={{
                         height: 40,
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         width: "100%",
                         boxSizing: "border-box",
                         border: "none",
@@ -4310,10 +4235,10 @@ const SaleService = () => {
                   <td style={{ padding: 0 }}>
                     <input
                       disabled={!canEditRow(index)}
-                      className="Disc"
+                      className="sa-Disc"
                       style={{
                         height: 40,
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         width: "100%",
                         boxSizing: "border-box",
                         border: "none",
@@ -4339,10 +4264,10 @@ const SaleService = () => {
                     <input
                       disabled={!canEditRow(index)}
                       id="discount"
-                      className="discount"
+                      className="sa-discount"
                       style={{
                         height: 40,
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         width: "100%",
                         boxSizing: "border-box",
                         border: "none",
@@ -4367,10 +4292,10 @@ const SaleService = () => {
                   <td style={{ padding: 0 }}>
                     <input
                       disabled={!canEditRow(index)}
-                      className="Others"
+                      className="sa-Others"
                       style={{
                         height: 40,
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         width: "100%",
                         boxSizing: "border-box",
                         border: "none",
@@ -4403,108 +4328,306 @@ const SaleService = () => {
                   </td>
                 )}
                 {isModalOpenExp && currentIndex !== null && (
-                  <div className="Modalz">
-                    <div className="Modal-content">
-                      <h1 className="headingE">ADD/LESS BEFORE GST</h1>
-                      <div className="form-group">
-                        <input
-                          type="checkbox"
-                          id="gross"
-                          checked={items[currentIndex]?.gross || false}
-                          onChange={(e) =>
-                            handleInputChange(
-                              currentIndex,
-                              "gross",
-                              e.target.checked,
-                            )
-                          }
-                        />
-                        <label
-                          style={{ marginLeft: 5 }}
-                          className="label"
-                          htmlFor="Gross"
-                        >
-                          GROSS
-                        </label>
-                      </div>
-                      {[
-                        { label: Expense1, rate: "Exp_rate1", value: "Exp1" },
-                        { label: Expense2, rate: "Exp_rate2", value: "Exp2" },
-                        { label: Expense3, rate: "Exp_rate3", value: "Exp3" },
-                        { label: Expense4, rate: "Exp_rate4", value: "Exp4" },
-                        { label: Expense5, rate: "Exp_rate5", value: "Exp5" },
-                        ].map((field, idx) => {
-                          const rateIndex = idx * 2;
-                          const valueIndex = idx * 2 + 1;
-
-                          return (
-                            <div key={idx} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
-                              
-                              <label style={{ width: "100px", fontWeight: "bold" }}>
-                                {field.label}
-                              </label>
-
-                              {/* RATE FIELD */}
-                              <input
-                                ref={(el) => (expRateRefs.current[rateIndex] = el)}
-                                value={items[currentIndex][field.rate]}
-                                style={{
-                                  border: "1px solid black",
-                                  padding: "5px",
-                                  width: "120px",
-                                  textAlign: "right",
-                                  borderRadius: "4px",
-                                }}
-                                onChange={(e) =>
-                                  handleInputChange(currentIndex, field.rate, e.target.value)
-                                }
-                                onKeyDown={(e) => handleKeyDownModal(e, rateIndex)}
-                              />
-
-                              {/* VALUE FIELD */}
-                              <input
-                                ref={(el) => (expRateRefs.current[valueIndex] = el)}
-                                value={items[currentIndex][field.value]}
-                                style={{
-                                  border: "1px solid black",
-                                  padding: "5px",
-                                  width: "120px",
-                                  textAlign: "right",
-                                  borderRadius: "4px",
-                                }}
-                                onBlur={() =>
-                                  handleExpenseBlur(currentIndex, field.value)
-                                }
-                                onChange={(e) =>
-                                  handleInputChange(currentIndex, field.value, e.target.value)
-                                }
-                                onKeyDown={(e) => handleKeyDownModal(e, valueIndex)}
-                              />
-                            </div>
-                          );
-                      })}
-                      <Button
-                        ref={closeButtonRef}
-                        onClick={() => {
-                          const idx = currentIndex; // store before reset
-
-                          setIsModalOpenExp(false);
-                          setCurrentIndex(null);
-
-                          // restore focus to Others field
-                          setTimeout(() => {
-                            othersRefs.current[idx]?.focus();
-                            othersRefs.current[idx]?.select();
-                          }, 0);
-                        }}
+                  <div
+                    tabIndex={-1}
+                      onKeyDown={(e) => {
+                      if (e.key === "Escape") {
+                        const idx = currentIndex;
+                        setIsModalOpenExp(false);
+                        setCurrentIndex(null);
+                        setTimeout(() => {
+                          othersRefs.current[idx]?.focus();
+                          othersRefs.current[idx]?.select();
+                        }, 0);
+                      }
+                    }}
+                    onClick={(e) => {
+                      if (e.target === e.currentTarget) {
+                        const idx = currentIndex;
+                        setIsModalOpenExp(false);
+                        setCurrentIndex(null);
+                        setTimeout(() => {
+                          othersRefs.current[idx]?.focus();
+                          othersRefs.current[idx]?.select();
+                        }, 0);
+                      }
+                    }}
+                    style={{
+                      position: "fixed",
+                      inset: 0,
+                      background: "rgba(15, 23, 42, 0.18)",
+                      backdropFilter: "blur(3px)",
+                      WebkitBackdropFilter: "blur(3px)",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      zIndex: 2000,
+                      padding: "20px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        maxWidth: "620px",
+                        background: "#ffffff",
+                        borderRadius: "18px",
+                        boxShadow: "0 18px 50px rgba(15, 23, 42, 0.18)",
+                        border: "1px solid rgba(148, 163, 184, 0.22)",
+                        overflow: "hidden",
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div
                         style={{
-                          borderColor: "transparent",
-                          backgroundColor: "red",
-                          marginTop: 10,
+                          padding: "18px 22px 14px",
+                          borderBottom: "1px solid #e5e7eb",
+                          background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
+                          position: "relative",
                         }}
                       >
-                        CLOSE
-                      </Button>
+                        <div
+                          style={{
+                            fontSize: "19px",
+                            fontWeight: 800,
+                            color: "#0f172a",
+                            letterSpacing: "0.4px",
+                            textAlign: "center",
+                          }}
+                        >
+                          ADD / LESS BEFORE GST
+                        </div>
+
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#64748b",
+                            textAlign: "center",
+                            marginTop: 4,
+                          }}
+                        >
+                          Manage expense values before GST calculation
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const idx = currentIndex;
+                            setIsModalOpenExp(false);
+                            setCurrentIndex(null);
+                            setTimeout(() => {
+                              othersRefs.current[idx]?.focus();
+                              othersRefs.current[idx]?.select();
+                            }, 0);
+                          }}
+                          style={{
+                            position: "absolute",
+                            right: "14px",
+                            top: "14px",
+                            width: "34px",
+                            height: "34px",
+                            borderRadius: "10px",
+                            border: "1px solid #e2e8f0",
+                            background: "#ffffff",
+                            color: "#334155",
+                            cursor: "pointer",
+                            fontSize: "18px",
+                            fontWeight: 700,
+                            lineHeight: 1,
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+
+                      <div style={{ padding: "20px 22px 22px" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            marginBottom: "18px",
+                            padding: "12px 14px",
+                            background: "#f8fafc",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "12px",
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            id="gross"
+                            checked={items[currentIndex]?.gross || false}
+                            onChange={(e) =>
+                              handleInputChange(currentIndex, "gross", e.target.checked)
+                            }
+                            style={{
+                              width: "16px",
+                              height: "16px",
+                              cursor: "pointer",
+                              accentColor: "#2563eb",
+                            }}
+                          />
+                          <label
+                            htmlFor="gross"
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: 700,
+                              color: "#0f172a",
+                              cursor: "pointer",
+                            }}
+                          >
+                            GROSS
+                          </label>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "170px 1fr 1fr",
+                            gap: "12px 14px",
+                            alignItems: "center",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: 800,
+                              color: "#475569",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.5px",
+                            }}
+                          >
+                            Expense
+                          </div>
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: 800,
+                              color: "#475569",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.5px",
+                              textAlign: "center",
+                            }}
+                          >
+                            Rate
+                          </div>
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: 800,
+                              color: "#475569",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.5px",
+                              textAlign: "center",
+                            }}
+                          >
+                            Value
+                          </div>
+
+                          {[
+                            { label: Expense1, rate: "Exp_rate1", value: "Exp1" },
+                            { label: Expense2, rate: "Exp_rate2", value: "Exp2" },
+                            { label: Expense3, rate: "Exp_rate3", value: "Exp3" },
+                            { label: Expense4, rate: "Exp_rate4", value: "Exp4" },
+                            { label: Expense5, rate: "Exp_rate5", value: "Exp5" },
+                          ].map((field, idx) => {
+                            const rateIndex = idx * 2;
+                            const valueIndex = idx * 2 + 1;
+
+                            return (
+                              <React.Fragment key={idx}>
+                                <div
+                                  style={{
+                                    fontSize: "13px",
+                                    fontWeight: 700,
+                                    color: "#1e293b",
+                                    paddingLeft: "4px",
+                                  }}
+                                >
+                                  {field.label}
+                                </div>
+
+                                <input
+                                  ref={(el) => (expRateRefs.current[rateIndex] = el)}
+                                  value={items[currentIndex][field.rate] || ""}
+                                  onChange={(e) =>
+                                    handleInputChange(currentIndex, field.rate, e.target.value)
+                                  }
+                                  onKeyDown={(e) => handleKeyDownModal(e, rateIndex)}
+                                  style={{
+                                    width: "100%",
+                                    height: "40px",
+                                    border: "1px solid #cbd5e1",
+                                    outline: "none",
+                                    padding: "0 12px",
+                                    textAlign: "right",
+                                    fontSize: "14px",
+                                    borderRadius: "10px",
+                                    background: "#ffffff",
+                                    color: "#0f172a",
+                                    boxSizing: "border-box",
+                                  }}
+                                />
+
+                                <input
+                                  ref={(el) => (expRateRefs.current[valueIndex] = el)}
+                                  value={items[currentIndex][field.value] || ""}
+                                  onBlur={() => handleExpenseBlur(currentIndex, field.value)}
+                                  onChange={(e) =>
+                                    handleInputChange(currentIndex, field.value, e.target.value)
+                                  }
+                                  onKeyDown={(e) => handleKeyDownModal(e, valueIndex)}
+                                  style={{
+                                    width: "100%",
+                                    height: "40px",
+                                    border: "1px solid #cbd5e1",
+                                    outline: "none",
+                                    padding: "0 12px",
+                                    textAlign: "right",
+                                    fontSize: "14px",
+                                    borderRadius: "10px",
+                                    background: "#ffffff",
+                                    color: "#0f172a",
+                                    boxSizing: "border-box",
+                                  }}
+                                />
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
+
+                        <div
+                          style={{
+                            marginTop: "22px",
+                            display: "flex",
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          <Button
+                            ref={closeButtonRef}
+                            onClick={() => {
+                              const idx = currentIndex;
+                              setIsModalOpenExp(false);
+                              setCurrentIndex(null);
+                              setTimeout(() => {
+                                othersRefs.current[idx]?.focus();
+                                othersRefs.current[idx]?.select();
+                              }, 0);
+                            }}
+                            style={{
+                              minWidth: "110px",
+                              background: "#ffffff",
+                              border: "1px solid #cbd5e1",
+                              color: "#0f172a",
+                              fontWeight: 700,
+                              borderRadius: "10px",
+                              padding: "9px 16px",
+                              boxShadow: "0 4px 14px rgba(15, 23, 42, 0.06)",
+                            }}
+                          >
+                            CLOSE
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -4512,11 +4635,11 @@ const SaleService = () => {
                   <td style={{ padding: 0 }}>
                    <input
                       disabled={!canEditRow(index)}
-                      className="Others"
+                      className="sa-Others"
                       id="gst"
                       style={{
                         height: 40,
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         width: "100%",
                         boxSizing: "border-box",
                         border: "none",
@@ -4540,10 +4663,10 @@ const SaleService = () => {
                 {tableData.cgst && (
                   <td style={{ padding: 0 }}>
                     <input
-                      className="CTax"
+                      className="sa-CTax"
                       style={{
                         height: 40,
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         width: "100%",
                         boxSizing: "border-box",
                         border: "none",
@@ -4568,10 +4691,10 @@ const SaleService = () => {
                 {tableData.sgst && (
                   <td style={{ padding: 0 }}>
                     <input
-                      className="STax"
+                      className="sa-STax"
                       style={{
                         height: 40,
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         width: "100%",
                         boxSizing: "border-box",
                         border: "none",
@@ -4597,10 +4720,10 @@ const SaleService = () => {
                 {tableData.igst && (
                   <td style={{ padding: 0 }}>
                     <input
-                      className="ITax"
+                      className="sa-ITax"
                       style={{
                         height: 40,
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         width: "100%",
                         boxSizing: "border-box",
                         border: "none",
@@ -4649,7 +4772,7 @@ const SaleService = () => {
               background: color,
               position: "sticky",
               bottom: -6,
-              fontSize: `${fsize}px`,
+              fontSize: `${fontSize}px`,
               borderTop: "1px solid black",
             }}
           >
@@ -4753,20 +4876,20 @@ const SaleService = () => {
         />
       )}
 
-      <div className="addbutton" style={{ marginTop: 2, marginBottom: 5 }}>
+      {/* <div className="sa-addbutton" style={{ marginTop: 2, marginBottom: 5 }}>
         <Button className="fw-bold btn-secondary" onClick={handleAddItem}>
           Add Row
         </Button>
-      </div>
+      </div> */}
       {/* Bottom Part */}
-      <div className="Belowcontents">
+      <div className="sa-Belowcontents">
         <div
-          className="Parent"
+          className="sa-Parent"
           style={{ display: "flex", flexDirection: "row" }}
         >
           <div style={{ display: "flex", flexDirection: "column" }}>
             <TextField
-              className="Remz custom-bordered-input"
+              className="sa-Remz sa-custom-bordered-input"
               id="rem2"
               value={formData.rem2}
               inputRef={remarksRef}
@@ -4779,7 +4902,7 @@ const SaleService = () => {
                 maxLength: 48,
                 style: {
                   height: 20,
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                 },
               }}
               onFocus={(e) => e.target.select()}
@@ -4788,7 +4911,7 @@ const SaleService = () => {
               // sx={{ width: 280 }}
             />
             <TextField
-              className="Remz custom-bordered-input"
+              className="sa-Remz sa-custom-bordered-input"
               id="v_tpt"
               value={formData.v_tpt}
               inputRef={transportRef}
@@ -4802,7 +4925,7 @@ const SaleService = () => {
                 maxLength: 48,
                 style: {
                   height: 20,
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                 },
               }}
               onFocus={(e) => e.target.select()}
@@ -4811,7 +4934,7 @@ const SaleService = () => {
               // sx={{ width: 280 }}
             />
             <TextField
-              className="Remz custom-bordered-input"
+              className="sa-Remz sa-custom-bordered-input"
               id="broker"
               value={formData.broker}
               inputRef={brokerRef}
@@ -4825,7 +4948,7 @@ const SaleService = () => {
                 maxLength: 48,
                 style: {
                   height: 20,
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                 },
               }}
               onFocus={(e) => e.target.select()}
@@ -4836,7 +4959,7 @@ const SaleService = () => {
           <div
             style={{ display: "flex", flexDirection: "column", marginLeft: 5 }}
           >
-            <div className="duedatez">
+            <div className="sa-duedatez">
               <InputMask
                 mask="99-99-9999"
                 placeholder="dd-mm-yyyy"
@@ -4848,20 +4971,23 @@ const SaleService = () => {
               >
                 {(props) => (
                   <TextField
-                    className="custom-bordered-input"
+                    className="sa-custom-bordered-input"
                     {...props}
                     label="DUE DATE"
                     size="small"
                     variant="filled"
                     fullWidth
-                    style={{ width: 225 }}
+                    InputProps={{
+                      style: { fontSize: `${fontSize}px` }
+                    }}
+                  style={{ width: 214, height: 45}}
                   />
                 )}
               </InputMask>
             </div>
             <div>
               <TextField
-                className="custom-bordered-input"
+                className="sa-custom-bordered-input"
                 id="srv_tax"
                 value={formData.srv_tax}
                 // disabled
@@ -4871,14 +4997,14 @@ const SaleService = () => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     color: "red",
                   },
                 }}
                 onFocus={(e) => e.target.select()}
                 size="small"
                 variant="filled"
-                sx={{ width: 225 }}
+                sx={{ width: 214 }}
               />
             </div>
             <div
@@ -4889,7 +5015,7 @@ const SaleService = () => {
               }}
             >
               <TextField
-                className="TCSRATE custom-bordered-input"
+                className="sa-TCSRATE sa-custom-bordered-input"
                 inputRef={tcsRef2}
                 id="tcs1_rate"
                 value={formData.tcs1_rate}
@@ -4904,7 +5030,7 @@ const SaleService = () => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     color: "red",
                   },
                 }}
@@ -4915,7 +5041,7 @@ const SaleService = () => {
               />
 
               <TextField
-                className="TCSPER custom-bordered-input"
+                className="sa-TCSPER sa-custom-bordered-input"
                 id="tcs1"
                 value={formData.tcs1}
                 label="TCS 206C@"
@@ -4923,7 +5049,7 @@ const SaleService = () => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     color: "red",
                   },
                 }}
@@ -4944,7 +5070,7 @@ const SaleService = () => {
           >
             {formData.Tds2 && Number(formData.Tds2) > 0 && (
               <TextField
-                className="custom-bordered-input"
+                className="sa-custom-bordered-input"
                 id="tax"
                 value={"2%"}
                 label="GST. TDS"
@@ -4952,7 +5078,7 @@ const SaleService = () => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                   },
                 }}
                 onFocus={(e) => e.target.select()}
@@ -4963,7 +5089,7 @@ const SaleService = () => {
             )}
             <div style={{ display: "flex", flexDirection: "row" }}>
               <TextField
-                className="CTDS custom-bordered-input"
+                className="sa-CTDS sa-custom-bordered-input"
                 value={formData.Ctds}
                 label="C.TDS"
                 size="small"
@@ -4971,7 +5097,7 @@ const SaleService = () => {
                 inputProps={{
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     backgroundColor: "white",
                     borderRadius: 5,
                   },
@@ -4985,7 +5111,7 @@ const SaleService = () => {
                 }}
               />
               <TextField
-                className="CTDS custom-bordered-input"
+                className="sa-CTDS sa-custom-bordered-input"
                 value={formData.Stds}
                 label="S.TDS"
                 size="small"
@@ -4993,7 +5119,7 @@ const SaleService = () => {
                 inputProps={{
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     backgroundColor: "white",
                     borderRadius: 5,
                   },
@@ -5007,7 +5133,7 @@ const SaleService = () => {
                 }}
               />
               <TextField
-                className="CTDS custom-bordered-input"
+                className="sa-CTDS sa-custom-bordered-input"
                 value={formData.iTds}
                 label="I.TDS"
                 size="small"
@@ -5015,7 +5141,7 @@ const SaleService = () => {
                 inputProps={{
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     backgroundColor: "white",
                     borderRadius: 5,
                   },
@@ -5030,7 +5156,7 @@ const SaleService = () => {
               />
               <span style={{ fontSize: 20, marginTop: "10px" }}>=</span>
               <TextField
-                className="CTDS custom-bordered-input"
+                className="sa-CTDS sa-custom-bordered-input"
                 value={formData.Tds2}
                 label="TOTAL"
                 size="small"
@@ -5038,7 +5164,7 @@ const SaleService = () => {
                 inputProps={{
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     backgroundColor: "white",
                     borderRadius: 5,
                   },
@@ -5054,7 +5180,7 @@ const SaleService = () => {
             </div>
           </div>
           <div
-            className="totals"
+            className="sa-totals"
             style={{
               display: "flex",
               flexDirection: "column",
@@ -5063,7 +5189,7 @@ const SaleService = () => {
             }}
           >
             <TextField
-              className="TOTALFIELDS custom-bordered-input"
+              className="sa-TOTALFIELDS sa-custom-bordered-input"
               id="tax"
               value={formData.tax}
               label="TOTAL GST"
@@ -5071,7 +5197,7 @@ const SaleService = () => {
                 maxLength: 48,
                 style: {
                   height: 20,
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                 },
               }}
               onFocus={(e) => e.target.select()}
@@ -5081,7 +5207,7 @@ const SaleService = () => {
             />
             <div>
               <TextField
-                className="TOTALFIELDS custom-bordered-input"
+                className="sa-TOTALFIELDS sa-custom-bordered-input"
                 inputRef={expAfterGSTRef}
                 id="expafterGST"
                 value={formData.expafterGST}
@@ -5101,7 +5227,7 @@ const SaleService = () => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                   },
                   readOnly: !isEditMode || isDisabled,
                 }}
@@ -5109,128 +5235,247 @@ const SaleService = () => {
                 variant="filled"
                 // sx={{ width: 150 }}
               />
-              {isModalOpenAfter && (
+              {isModalOpenAfter &&
+              ReactDOM.createPortal(
                 <div
+                  tabIndex={-1}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      closeModalAfter();
+                    }
+                  }}
+                  onClick={(e) => {
+                    if (e.target === e.currentTarget) {
+                      closeModalAfter();
+                    }
+                  }}
                   style={{
                     position: "fixed",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor: "rgba(0,0,0,0.5)",
+                    inset: 0,
+                    width: "100vw",
+                    height: "100vh",
+                    background: "rgba(15, 23, 42, 0.18)",
+                    backdropFilter: "blur(3px)",
+                    WebkitBackdropFilter: "blur(3px)",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    zIndex: 1000,
+                    zIndex: 999999,
+                    padding: "20px",
+                    boxSizing: "border-box",
                   }}
                 >
                   <div
+                    onClick={(e) => e.stopPropagation()}
                     style={{
-                      background: 'linear-gradient(to bottom, #edc5a7,#a5d8ed)',
-                      padding: "25px 30px",
-                      borderRadius: "12px",
-                      width: "450px",
-                      boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
-                      animation: "fadeIn 0.3s ease-in-out",
+                      width: "100%",
+                      maxWidth: "620px",
+                      background: "#ffffff",
+                      borderRadius: "18px",
+                      boxShadow: "0 18px 50px rgba(15, 23, 42, 0.18)",
+                      border: "1px solid rgba(148, 163, 184, 0.22)",
+                      overflow: "hidden",
+                      boxSizing: "border-box",
                     }}
                   >
-                    <h2
+                    <div
                       style={{
-                        textAlign: "center",
-                        marginBottom: "20px",
-                        fontWeight: "600",
-                        color: "#333",
-                        fontSize:"18px",
+                        padding: "18px 22px 14px",
+                        borderBottom: "1px solid #e5e7eb",
+                        background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
+                        position: "relative",
                       }}
                     >
-                      EXPENSE AFTER TAX
-                    </h2>
-
-                    {/* Expense Rows */}
-                    {[
-                    { label: Expense6, rate: "Exp_rate6", amount: "Exp6" },
-                    { label: Expense7, rate: "Exp_rate7", amount: "Exp7" },
-                    { label: Expense8, rate: "Exp_rate8", amount: "Exp8" },
-                    { label: Expense9, rate: "Exp_rate9", amount: "Exp9" },
-                    { label: Expense10, rate: "Exp_rate10", amount: "Exp10" },
-                  ].map((item, index) => {
-                    const rateIndex = index * 2;
-                    const amountIndex = index * 2 + 1;
-
-                    return (
                       <div
-                        key={index}
                         style={{
-                          display: "flex",
+                          fontSize: "19px",
+                          fontWeight: 800,
+                          color: "#0f172a",
+                          letterSpacing: "0.4px",
+                          textAlign: "center",
+                        }}
+                      >
+                        EXPENSE AFTER TAX
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#64748b",
+                          textAlign: "center",
+                          marginTop: 4,
+                        }}
+                      >
+                        Manage expense values after tax calculation
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={closeModalAfter}
+                        style={{
+                          position: "absolute",
+                          right: "14px",
+                          top: "14px",
+                          width: "34px",
+                          height: "34px",
+                          borderRadius: "10px",
+                          border: "1px solid #e2e8f0",
+                          background: "#ffffff",
+                          color: "#334155",
+                          cursor: "pointer",
+                          fontSize: "18px",
+                          fontWeight: 700,
+                          lineHeight: 1,
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    <div style={{ padding: "20px 22px 22px" }}>
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "170px 1fr 1fr",
+                          gap: "12px 14px",
                           alignItems: "center",
-                          marginBottom: "12px",
                         }}
                       >
                         <div
                           style={{
-                            flex: 1,
-                            fontWeight: "bold",
-                            color: "#444",
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            color: "#475569",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
                           }}
                         >
-                          {item.label}
+                          Expense
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            color: "#475569",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                            textAlign: "center",
+                          }}
+                        >
+                          Rate
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            color: "#475569",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                            textAlign: "center",
+                          }}
+                        >
+                          Amount
                         </div>
 
-                        {/* RATE */}
-                        <input
-                          ref={(el) => (expAfterRefs.current[rateIndex] = el)}
-                          id={item.rate}
-                          value={formData[item.rate]}
-                          onChange={handleNumberChange}
-                          onKeyDown={(e) => handleKeyDownAfterw2(e, rateIndex)}
-                          placeholder="Rate"
-                          style={{
-                            width: "90px",
-                            padding: "6px",
-                            borderRadius: "6px",
-                            border: "1px solid black",
-                            marginRight: "8px",
-                            textAlign: "right",
-                          }}
-                        />
+                        {[
+                          { label: Expense6, rate: "Exp_rate6", amount: "Exp6" },
+                          { label: Expense7, rate: "Exp_rate7", amount: "Exp7" },
+                          { label: Expense8, rate: "Exp_rate8", amount: "Exp8" },
+                          { label: Expense9, rate: "Exp_rate9", amount: "Exp9" },
+                          { label: Expense10, rate: "Exp_rate10", amount: "Exp10" },
+                        ].map((item, index) => {
+                          const rateIndex = index * 2;
+                          const amountIndex = index * 2 + 1;
 
-                        {/* AMOUNT */}
-                        <input
-                          ref={(el) => (expAfterRefs.current[amountIndex] = el)}
-                          id={item.amount}
-                          value={formData[item.amount]}
-                          onChange={handleNumberChange}
-                          onKeyDown={(e) => handleKeyDownAfterw2(e, amountIndex)}
-                          placeholder="Amount"
-                          style={{
-                            width: "90px",
-                            padding: "6px",
-                            borderRadius: "6px",
-                            border: "1px solid black",
-                            textAlign: "right",
-                          }}
-                        />
+                          return (
+                            <React.Fragment key={index}>
+                              <div
+                                style={{
+                                  fontSize: "13px",
+                                  fontWeight: 700,
+                                  color: "#1e293b",
+                                  paddingLeft: "4px",
+                                }}
+                              >
+                                {item.label}
+                              </div>
+
+                              <input
+                                ref={(el) => (expAfterRefs.current[rateIndex] = el)}
+                                id={item.rate}
+                                value={formData[item.rate] || ""}
+                                onChange={handleNumberChange}
+                                onKeyDown={(e) => handleKeyDownAfterw2(e, rateIndex)}
+                                placeholder="Rate"
+                                style={{
+                                  width: "100%",
+                                  height: "40px",
+                                  border: "1px solid #cbd5e1",
+                                  outline: "none",
+                                  padding: "0 12px",
+                                  textAlign: "right",
+                                  fontSize: "14px",
+                                  borderRadius: "10px",
+                                  background: "#ffffff",
+                                  color: "#0f172a",
+                                  boxSizing: "border-box",
+                                }}
+                              />
+
+                              <input
+                                ref={(el) => (expAfterRefs.current[amountIndex] = el)}
+                                id={item.amount}
+                                value={formData[item.amount] || ""}
+                                onChange={handleNumberChange}
+                                onKeyDown={(e) => handleKeyDownAfterw2(e, amountIndex)}
+                                placeholder="Amount"
+                                style={{
+                                  width: "100%",
+                                  height: "40px",
+                                  border: "1px solid #cbd5e1",
+                                  outline: "none",
+                                  padding: "0 12px",
+                                  textAlign: "right",
+                                  fontSize: "14px",
+                                  borderRadius: "10px",
+                                  background: "#ffffff",
+                                  color: "#0f172a",
+                                  boxSizing: "border-box",
+                                }}
+                              />
+                            </React.Fragment>
+                          );
+                        })}
                       </div>
-                    );
-                  })}
-                    {/* Close Button */}
-                    <div style={{ textAlign: "center", marginTop: "20px" }}>
-                      <Button
-                        ref={closeAfterRef}
-                        onClick={closeModalAfter}
+
+                      <div
                         style={{
-                          backgroundColor: "#ff4d4f",
-                          border: "none",
-                          padding: "8px 20px",
-                          borderRadius: "6px",
-                          fontWeight: "500",
+                          marginTop: "22px",
+                          display: "flex",
+                          justifyContent: "flex-end",
                         }}
                       >
-                        CLOSE
-                      </Button>
+                        <Button
+                          ref={closeAfterRef}
+                          onClick={closeModalAfter}
+                          style={{
+                            minWidth: "110px",
+                            background: "#ffffff",
+                            border: "1px solid #cbd5e1",
+                            color: "#0f172a",
+                            fontWeight: 700,
+                            borderRadius: "10px",
+                            padding: "9px 16px",
+                            boxShadow: "0 4px 14px rgba(15, 23, 42, 0.06)",
+                          }}
+                        >
+                          CLOSE
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </div>
             <TextField
@@ -5242,22 +5487,22 @@ const SaleService = () => {
                 maxLength: 48,
                 style: {
                   height: 20,
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                   color: "red",
                   fontWeight: "bold",
                 },
               }}
               size="small"
               variant="filled"
-              className="TOTALFIELDS custom-bordered-input"
+              className="sa-TOTALFIELDS sa-custom-bordered-input"
               // sx={{ width: 150 }}
             />
           </div>
         </div>
-        <div className="Buttonsgroupz">
+        <div className="sa-Buttonsgroupz">
           <Button
             ref={addButtonRef}
-            className="Buttonz"
+            className="sa-Buttonz"
             style={{ background: color }}
             onClick={handleAdd}
             disabled={!isAddEnabled}
@@ -5274,7 +5519,7 @@ const SaleService = () => {
             />
           )}
           <Button
-            className="Buttonz"
+            className="sa-Buttonz"
             style={{ background: color }}
             onClick={handleEditClick}
             disabled={!isAddEnabled}
@@ -5282,7 +5527,7 @@ const SaleService = () => {
             Edit
           </Button>
           <Button
-            className="Buttonz"
+            className="sa-Buttonz"
             style={{ background: color }}
             onClick={handlePrevious}
             disabled={!isPreviousEnabled}
@@ -5290,7 +5535,7 @@ const SaleService = () => {
             Previous
           </Button>
           <Button
-            className="Buttonz"
+            className="sa-Buttonz"
             style={{ background: color }}
             onClick={handleNext}
             disabled={!isNextEnabled}
@@ -5298,7 +5543,7 @@ const SaleService = () => {
             Next
           </Button>
           <Button
-            className="Buttonz"
+            className="sa-Buttonz"
             style={{ background: color }}
             onClick={handleFirst}
             disabled={!isFirstEnabled}
@@ -5306,7 +5551,7 @@ const SaleService = () => {
             First
           </Button>
           <Button
-            className="Buttonz"
+            className="sa-Buttonz"
             style={{ background: color }}
             onClick={handleLast}
             disabled={!isLastEnabled}
@@ -5314,7 +5559,7 @@ const SaleService = () => {
             Last
           </Button>
           <Button
-            className="Buttonz"
+            className="sa-Buttonz"
             style={{ background: color }}
             disabled={!isSearchEnabled}
             onClick={() => {
@@ -5327,7 +5572,7 @@ const SaleService = () => {
           </Button>
           <Button
             ref={printButtonRef}
-            className="Buttonz"
+            className="sa-Buttonz"
             // onClick={handleOpen}
             onClick={openPrintMenu}
             // onClick={handleViewFAVoucher}
@@ -5348,7 +5593,7 @@ const SaleService = () => {
           />
 
           <Button
-            className="delete"
+            className="sa-delete"
             style={{ background: color }}
             onClick={handleDeleteClick}
             disabled={!isDeleteEnabled}
@@ -5356,7 +5601,7 @@ const SaleService = () => {
             Delete
           </Button>
           <Button
-            className="Buttonz"
+            className="sa-Buttonz"
             style={{ background: color }}
             onClick={handleExit}
           >
@@ -5364,7 +5609,7 @@ const SaleService = () => {
           </Button>
           <Button
             ref={saveButtonRef}
-            className="Buttonz"
+            className="sa-Buttonz"
             onClick={handleDataSave}
             disabled={!isSubmitEnabled}
             style={{ background: color }}
@@ -5388,7 +5633,7 @@ const SaleService = () => {
         <Modal.Body>
           <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
             <TextField
-              className="custom-bordered-input"
+              className="sa-custom-bordered-input"
               size="small"
               variant="filled"
               label="Enter Bill No..."
@@ -5404,7 +5649,7 @@ const SaleService = () => {
             >
               {(props) => (
                 <TextField
-                  className="custom-bordered-input"
+                  className="sa-custom-bordered-input"
                   {...props}
                   label="DATE"
                   size="small"

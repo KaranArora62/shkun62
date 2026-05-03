@@ -192,7 +192,7 @@ const LedgerAcc = ({ onClose, onRefresh, ledgerId2}) => {
     }
   }, [formData.Ecc]);
 
-    // Modal For CustomerDetails
+    // Modal For Search
     const [pressedKey, setPressedKey] = useState(" "); // State to hold the pressed key
     const [productsCus, setProductsCus] = useState([]);
     const [showModalCus, setShowModalCus] = useState(false);
@@ -210,6 +210,7 @@ const LedgerAcc = ({ onClose, onRefresh, ledgerId2}) => {
       });
 
       setFormData(updatedFormData);
+      setData1(product);
       setShowModalCus(false);
       }
     };

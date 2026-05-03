@@ -1,19 +1,38 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Modal, Button, Form, Table } from "react-bootstrap";
-import "../IncomeTax.css"
+import "../IncomeTax.css";
 import axios from "axios";
 import { useReactToPrint } from "react-to-print";
 import PurSummPrint from "./PurSummPrint";
 import useCompanySetup from "../../Shared/useCompanySetup";
 import InputMask from "react-input-mask";
 import financialYear from "../../Shared/financialYear";
-import * as XLSX from 'sheetjs-style';
+import * as XLSX from "sheetjs-style";
+import {
+  TextField,
+  MenuItem,
+  FormControlLabel,
+  Checkbox,
+  Radio,
+  RadioGroup,
+  Paper,
+  Typography,
+  Box,
+  Stack,
+  Divider,
+  InputAdornment,
+} from "@mui/material";
+
+import SearchIcon from "@mui/icons-material/Search";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import FieldCustomizeModal from "../../Shared/FieldCustomizeModal";
 
 const tenant = "03AAYFG4472A1ZG_01042025_31032026";
 const API_URL = `https://www.shkunweb.com/shkunlive/${tenant}/tenant/api/purchase`;
+const LEDGER_API_URL = `https://www.shkunweb.com/shkunlive/${tenant}/tenant/api/ledgerAccount`;
 
 export default function PartyWiseSummPur({ show, onClose }) {
-  const {dateFrom, companyName, companyAdd, companyCity } = useCompanySetup();
+  const { dateFrom, companyName, companyAdd, companyCity } = useCompanySetup();
   // form state
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
@@ -53,14 +72,266 @@ export default function PartyWiseSummPur({ show, onClose }) {
   const [minValue, setMinValue] = useState("");
   const [maxValue, setMaxValue] = useState("");
   const [lessDrCrNote, setLessDrCrNote] = useState(false);
-  const [summaryType, setSummaryType] = useState("total"); 
+  const [summaryType, setSummaryType] = useState("total");
+
+  const [fieldModalOpen, setFieldModalOpen] = useState(false);
+
+  const DEFAULT_FIELD_DATA = [
+    {
+      id: 1,
+      checked: true,
+      fieldName: "supplierName",
+      description: "Supplier",
+      width: 180,
+      serialNo: 1,
+      total: false,
+      bold: false,
+    },
+    {
+      id: 2,
+      checked: true,
+      fieldName: "city",
+      description: "City",
+      width: 120,
+      serialNo: 2,
+      total: false,
+      bold: false,
+    },
+    {
+      id: 3,
+      checked: false,
+      fieldName: "gstno",
+      description: "GST No",
+      width: 150,
+      serialNo: 3,
+      total: false,
+      bold: false,
+    },
+    {
+      id: 4,
+      checked: false,
+      fieldName: "pan",
+      description: "PAN",
+      width: 120,
+      serialNo: 4,
+      total: false,
+      bold: false,
+    },
+    {
+      id: 5,
+      checked: true,
+      fieldName: "bags",
+      description: "Bags",
+      width: 90,
+      serialNo: 5,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 6,
+      checked: true,
+      fieldName: "qty",
+      description: "Qty",
+      width: 90,
+      serialNo: 6,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 7,
+      checked: true,
+      fieldName: "value",
+      description: "Value",
+      width: 120,
+      serialNo: 7,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 8,
+      checked: false,
+      fieldName: "igst",
+      description: "IGST",
+      width: 100,
+      serialNo: 8,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 9,
+      checked: false,
+      fieldName: "cgst",
+      description: "CGST",
+      width: 100,
+      serialNo: 9,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 10,
+      checked: false,
+      fieldName: "sgst",
+      description: "SGST",
+      width: 100,
+      serialNo: 10,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 11,
+      checked: false,
+      fieldName: "tax",
+      description: "Tax",
+      width: 100,
+      serialNo: 11,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 12,
+      checked: false,
+      fieldName: "grandtotal",
+      description: "Grand Total",
+      width: 130,
+      serialNo: 12,
+      total: true,
+      bold: false,
+    },
+    { id: 13, checked: false, fieldName: "email", description: "Email", width: 180, serialNo: 13, total: false, bold: false },
+    { id: 14, checked: false, fieldName: "phone", description: "Phone", width: 120, serialNo: 14, total: false, bold: false },
+    { id: 15, checked: false, fieldName: "address", description: "Address", width: 220, serialNo: 15, total: false, bold: false },
+    { id: 16, checked: false, fieldName: "pinCode", description: "Pin Code", width: 100, serialNo: 16, total: false, bold: false },
+    { id: 17, checked: false, fieldName: "contactPerson", description: "Contact Person", width: 160, serialNo: 17, total: false, bold: false },
+    { id: 18, checked: false, fieldName: "bsgroup", description: "BS Group", width: 160, serialNo: 18, total: false, bold: false },
+    { id: 19, checked: false, fieldName: "payLimit", description: "Pay Limit", width: 100, serialNo: 19, total: true, bold: false },
+    { id: 20, checked: false, fieldName: "payDuedays", description: "Due Days", width: 100, serialNo: 20, total: false, bold: false },
+  ];
+
+  const [fieldOptions, setFieldOptions] = useState(() => {
+    const saved = localStorage.getItem("purSumFieldOptions");
+    return saved ? JSON.parse(saved) : DEFAULT_FIELD_DATA;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      "purSumFieldOptions",
+      JSON.stringify(fieldOptions),
+    );
+  }, [fieldOptions]);
+
+  function updateLabel(key, newLabel) {
+    setFieldOptions((prev) =>
+      prev.map((f) => (f.key === key ? { ...f, label: newLabel } : f)),
+    );
+  }
+
+  const [selectedFields, setSelectedFields] = useState([
+    "supplierName",
+    "city",
+    "bags",
+    "qty",
+    "value",
+  ]);
+
+  function toggleField(key) {
+    setSelectedFields((prev) =>
+      prev.includes(key) ? prev.filter((x) => x !== key) : [...prev, key],
+    );
+  }
+
+  function getExtraFields(rec, ledgerMap) {
+  const supplier = rec.supplierdetails?.[0] || {};
+  const formData = rec.formData || {};
+
+  const vcode = String(supplier.Vcode || "").trim();
+  const ledger = ledgerMap?.get(vcode) || {};
+
+  const d = parseAnyDate(formData.date);
+
+  const formattedDate = d
+    ? `${String(d.getDate()).padStart(2, "0")}-${String(
+        d.getMonth() + 1
+      ).padStart(2, "0")}-${d.getFullYear()}`
+    : "";
+
+  const month = d
+    ? d.toLocaleString("en-IN", { month: "short", year: "numeric" })
+    : "";
+
+  return {
+    supplierName: supplier.vacode || ledger.ahead || "",
+    gstno: supplier.gstno || ledger.gstNo || "",
+    pan: supplier.pan || ledger.pan || "",
+    city: supplier.city || ledger.city || "",
+    state: supplier.state || ledger.state || "",
+
+    // Ledger API extra fields
+    email: ledger.email || "",
+    phone: ledger.phone || "",
+    address: ledger.add1 || "",
+    pinCode: ledger.pinCode || "",
+    contactPerson: ledger.cperson || "",
+    bsgroup: ledger.Bsgroup || "",
+    payLimit: ledger.payLimit || 0,
+    payDuedays: ledger.payDuedays || 0,
+
+    date: formattedDate,
+    month,
+
+    vtype: formData.vtype || "",
+    vno: formData.vno || "",
+    stype: formData.stype || "",
+    trpt: formData.trpt || "",
+
+    cgst: parseFloat(formData.cgst) || 0,
+    sgst: parseFloat(formData.sgst) || 0,
+    igst: parseFloat(formData.igst) || 0,
+    tax: parseFloat(formData.tax) || 0,
+    grandtotal: parseFloat(formData.grandtotal) || 0,
+  };
+}
+  // function getExtraFields(rec) {
+  //   const supplier = rec.supplierdetails?.[0] || {};
+  //   const formData = rec.formData || {};
+
+  //   const d = parseAnyDate(formData.date);
+  //   const formattedDate = d
+  //     ? `${String(d.getDate()).padStart(2, "0")}-${String(d.getMonth() + 1).padStart(2, "0")}-${d.getFullYear()}`
+  //     : "";
+
+  //   const month = d
+  //     ? d.toLocaleString("en-IN", { month: "short", year: "numeric" })
+  //     : "";
+
+  //   return {
+  //     supplierName: supplier.vacode || "",
+  //     gstno: supplier.gstno || "",
+  //     pan: supplier.pan || "",
+  //     city: supplier.city || "",
+  //     state: supplier.state || "",
+
+  //     date: formattedDate,
+  //     month,
+
+  //     vtype: formData.vtype || "",
+  //     vno: formData.vno || "",
+  //     stype: formData.stype || "",
+  //     trpt: formData.trpt || "",
+
+  //     cgst: parseFloat(formData.cgst) || 0,
+  //     sgst: parseFloat(formData.sgst) || 0,
+  //     igst: parseFloat(formData.igst) || 0,
+  //     tax: parseFloat(formData.tax) || 0,
+  //     grandtotal: parseFloat(formData.grandtotal) || 0,
+  //   };
+  // }
 
   // Ledger selection modal state
   const [ledgerModalOpen, setLedgerModalOpen] = useState(false);
-  const [ledgers, setLedgers] = useState([]);                 // All ledger names from API
+  const [ledgers, setLedgers] = useState([]); // All ledger names from API
   const [selectedLedgers, setSelectedLedgers] = useState([]); // Only checked
-  const [ledgerSearch, setLedgerSearch] = useState("");       // Search input
-  const [selectAll, setSelectAll] = useState(false);          // Select All toggle
+  const [ledgerSearch, setLedgerSearch] = useState(""); // Search input
+  const [selectAll, setSelectAll] = useState(false); // Select All toggle
 
   // Print preview modal state
   const [printOpen, setPrintOpen] = useState(false);
@@ -74,8 +345,8 @@ export default function PartyWiseSummPur({ show, onClose }) {
     content: () => printRef.current,
     documentTitle: "Purchase Summary",
   });
-  
-  // Date change handles 
+
+  // Date change handles
   const handleChange = (e) => {
     setRawValue(e.target.value);
 
@@ -104,8 +375,23 @@ export default function PartyWiseSummPur({ show, onClose }) {
     setPrintOpen(true); // open modal immediately (spinner shows)
 
     try {
-      const res = await axios.get(API_URL);
-      let arr = Array.isArray(res.data) ? res.data : [];
+      const [purchaseRes, ledgerRes] = await Promise.all([
+  axios.get(API_URL),
+  axios.get(LEDGER_API_URL),
+]);
+
+let arr = Array.isArray(purchaseRes.data) ? purchaseRes.data : [];
+
+const ledgerArr = Array.isArray(ledgerRes.data?.data)
+  ? ledgerRes.data.data
+  : [];
+
+const ledgerMap = new Map();
+
+ledgerArr.forEach((ledger) => {
+  const fd = ledger.formData || {};
+  ledgerMap.set(String(fd.acode || "").trim(), fd);
+});
 
       // ⭐ FILTER BY CITY & STATE (case-insensitive)
       const filterCity = city.trim().toLowerCase();
@@ -127,9 +413,9 @@ export default function PartyWiseSummPur({ show, onClose }) {
 
       // FILTER BY LEDGERS IF SELECTED
       if (selectedLedgers.length > 0) {
-        arr = arr.filter(rec => {
+        arr = arr.filter((rec) => {
           const supplier = rec.supplierdetails?.[0] || {};
-          const vcode = getVcode(supplier);   // ✅ FIX
+          const vcode = getVcode(supplier); // ✅ FIX
           return selectedLedgers.includes(vcode);
         });
       }
@@ -137,39 +423,45 @@ export default function PartyWiseSummPur({ show, onClose }) {
       // Agent Filter
       if (agent.trim() !== "") {
         const ag = agent.trim().toLowerCase();
-        arr = arr.filter(
-          (rec) =>
-            (rec.formData?.broker || "").toLowerCase().includes(ag)
+        arr = arr.filter((rec) =>
+          (rec.formData?.broker || "").toLowerCase().includes(ag),
         );
       }
-      
-    /* ⭐⭐⭐ TAX TYPE FILTER BASED ON DROPDOWN ⭐⭐⭐ */
-    if (taxType !== "All") {
-      const t = taxType.trim().toLowerCase();
 
-      arr = arr.filter((rec) => {
-        const apiTaxType =
-          (rec.formData?.stype || "").trim().toLowerCase();
-        return apiTaxType === t;
-      });
-    }
+      /* ⭐⭐⭐ TAX TYPE FILTER BASED ON DROPDOWN ⭐⭐⭐ */
+      if (taxType !== "All") {
+        const t = taxType.trim().toLowerCase();
+
+        arr = arr.filter((rec) => {
+          const apiTaxType = (rec.formData?.stype || "").trim().toLowerCase();
+          return apiTaxType === t;
+        });
+      }
+
+      const savedFieldData =
+        JSON.parse(localStorage.getItem("purSumFieldData")) ||
+        DEFAULT_FIELD_DATA;
+
+      const selectedFieldData = savedFieldData
+        .filter((f) => f.checked)
+        .sort((a, b) => Number(a.serialNo) - Number(b.serialNo));
 
       // GROUP AFTER FILTERING
-    let grouped = [];
+      let grouped = [];
 
-    if (summaryType === "total") {
-      grouped = groupBySupplier(arr, { minQty, maxQty, minValue, maxValue }, reportType);
-    }
-    else if (summaryType === "month") {
-      grouped = groupByMonth(arr, reportType);
-    }
-    else if (summaryType === "date") {
-      grouped = groupByDate(arr, reportType);
-    }
-    else if (summaryType === "account") {
-      grouped = groupBySupplier(arr, { minQty, maxQty, minValue, maxValue }, reportType)
-        .sort((a, b) => a.supplierName.localeCompare(b.supplierName));
-    }
+      if (summaryType === "total") {
+        grouped = groupBySupplier( arr, { minQty, maxQty, minValue, maxValue }, reportType, ledgerMap);
+      } else if (summaryType === "month") {
+        grouped = groupByMonth(arr, reportType, ledgerMap);
+      } else if (summaryType === "date") {
+        grouped = groupByDate(arr, reportType, ledgerMap);
+      } else if (summaryType === "account") {
+        grouped = groupBySupplier(
+          arr,
+          { minQty, maxQty, minValue, maxValue },
+          reportType,ledgerMap,
+        ).sort((a, b) => a.supplierName.localeCompare(b.supplierName));
+      }
       setGroupedData(grouped);
     } catch (err) {
       console.error(err);
@@ -180,7 +472,7 @@ export default function PartyWiseSummPur({ show, onClose }) {
   }
 
   // Grouping function
-  function groupBySupplier(apiArray = [], filters = {}, reportType) {
+  function groupBySupplier(apiArray = [], filters = {}, reportType, ledgerMap) {
     const map = new Map();
 
     apiArray.forEach((rec) => {
@@ -203,7 +495,7 @@ export default function PartyWiseSummPur({ show, onClose }) {
             acc.value += parseFloat(it.amount) || 0;
             return acc;
           },
-          { bags: 0, qty: 0, value: 0 }
+          { bags: 0, qty: 0, value: 0 },
         );
       } else {
         sums.bags = items.reduce((a, it) => a + (parseFloat(it.pkgs) || 0), 0);
@@ -222,8 +514,9 @@ export default function PartyWiseSummPur({ show, onClose }) {
 
       if (!map.has(vcode)) {
         map.set(vcode, {
-          supplierName: name, // display
-          vcode,              // internal
+          ...getExtraFields(rec, ledgerMap),
+          supplierName: name,
+          vcode,
           city,
           pan,
           bags: sums.bags,
@@ -241,10 +534,10 @@ export default function PartyWiseSummPur({ show, onClose }) {
     return Array.from(map.values());
   }
 
-  function groupByDate(apiArray = [], reportType) {
-    return apiArray.map(rec => {
+  function groupByDate(apiArray = [], reportType, ledgerMap) {
+    return apiArray.map((rec) => {
       const supplier = rec.supplierdetails?.[0] || {};
-      const vcode = getVcode(supplier);  // ✅ FIX
+      const vcode = getVcode(supplier); // ✅ FIX
 
       const items = rec.items ?? [];
 
@@ -258,13 +551,21 @@ export default function PartyWiseSummPur({ show, onClose }) {
         value = items.reduce((a, it) => a + (parseFloat(it.amount) || 0), 0);
       }
 
+      const d = parseAnyDate(rec.formData?.date);
+      const formattedDate = d
+        ? `${String(d.getDate()).padStart(2, "0")}-${String(
+            d.getMonth() + 1,
+          ).padStart(2, "0")}-${d.getFullYear()}`
+        : "";
       return {
-        date: rec.formData?.date?.substring(0, 10),
+        ...getExtraFields(rec, ledgerMap),
+        date: formattedDate,
         bags,
         qty,
         value,
         supplier: supplier.vacode || "",
-        vcode, // ✅ added
+        supplierName: supplier.vacode || "",
+        vcode,
       };
     });
   }
@@ -272,36 +573,44 @@ export default function PartyWiseSummPur({ show, onClose }) {
   // helper: parse DD/MM/YYYY or ISO -> Date object (returns null if invalid)
   function parseAnyDate(dateStr) {
     if (!dateStr) return null;
-    // If already a Date object
+
     if (dateStr instanceof Date) {
       return isNaN(dateStr.getTime()) ? null : dateStr;
     }
 
-    // Trim
     const s = String(dateStr).trim();
 
-    // Case 1: DD/MM/YYYY  (e.g. 28/11/2025)
-    const ddmmyyyy = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/;
-    const m1 = s.match(ddmmyyyy);
-    if (m1) {
-      const d = parseInt(m1[1], 10);
-      const m = parseInt(m1[2], 10) - 1;
-      const y = parseInt(m1[3], 10);
-      const dt = new Date(y, m, d);
+    // ✅ DD-MM-YYYY or DD/MM/YYYY
+    const dmy = /^(\d{1,2})[-/](\d{1,2})[-/](\d{4})$/;
+    const dmyMatch = s.match(dmy);
+
+    if (dmyMatch) {
+      const day = Number(dmyMatch[1]);
+      const month = Number(dmyMatch[2]) - 1;
+      const year = Number(dmyMatch[3]);
+
+      const dt = new Date(year, month, day);
       return isNaN(dt.getTime()) ? null : dt;
     }
 
-    // Case 2: ISO-ish (YYYY-MM-DD or full ISO)
-    const iso = Date.parse(s);
-    if (!isNaN(iso)) return new Date(iso);
+    // ✅ ISO format: 2026-04-29T00:00:00.000Z
+    const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})/;
+    const isoMatch = s.match(iso);
 
-    // fallback: try Date constructor once more
-    const dt2 = new Date(s);
-    return isNaN(dt2.getTime()) ? null : dt2;
+    if (isoMatch) {
+      const year = Number(isoMatch[1]);
+      const month = Number(isoMatch[2]) - 1;
+      const day = Number(isoMatch[3]);
+
+      const dt = new Date(year, month, day);
+      return isNaN(dt.getTime()) ? null : dt;
+    }
+
+    return null;
   }
 
   // GROUP BY MONTH + Supplier Name + City
-  function groupByMonth(apiArray = [], reportType) {
+  function groupByMonth(apiArray = [], reportType, ledgerMap) {
     const map = new Map();
 
     apiArray.forEach((rec) => {
@@ -309,13 +618,13 @@ export default function PartyWiseSummPur({ show, onClose }) {
       const d = parseAnyDate(dateStr);
       if (!d) return;
 
-      const monthKey = d.toLocaleString("default", {
+      const monthKey = d.toLocaleString("en-IN", {
         month: "short",
         year: "numeric",
       });
 
       const supplier = rec.supplierdetails?.[0] || {};
-      const vcode = getVcode(supplier);  // ✅ FIX
+      const vcode = getVcode(supplier); // ✅ FIX
       const supplierName = (supplier.vacode || "Unknown Supplier").trim();
       const city = supplier.city || "";
 
@@ -335,6 +644,7 @@ export default function PartyWiseSummPur({ show, onClose }) {
 
       if (!map.has(key)) {
         map.set(key, {
+          ...getExtraFields(rec, ledgerMap),
           month: monthKey,
           supplierName,
           vcode,
@@ -368,17 +678,16 @@ export default function PartyWiseSummPur({ show, onClose }) {
   useEffect(() => {
     axios.get(API_URL).then((res) => {
       if (Array.isArray(res.data)) {
-
         const list = res.data
-          .map(r => {
+          .map((r) => {
             const supplier = r.supplierdetails?.[0] || {};
             return {
-              vcode: getVcode(supplier),   // ✅ FIX
+              vcode: getVcode(supplier), // ✅ FIX
               vacode: supplier.vacode || "",
-              city: supplier.city || ""
+              city: supplier.city || "",
             };
           })
-          .filter(x => x.vcode !== "");
+          .filter((x) => x.vcode !== "");
 
         // remove duplicates by vcode
         const unique = [];
@@ -394,7 +703,7 @@ export default function PartyWiseSummPur({ show, onClose }) {
         setLedgers(unique);
 
         // select all default
-        setSelectedLedgers(unique.map(x => x.vcode));
+        setSelectedLedgers(unique.map((x) => x.vcode));
         setSelectAll(true);
       }
     });
@@ -403,9 +712,7 @@ export default function PartyWiseSummPur({ show, onClose }) {
   // Toggle single ledger
   function toggleLedger(vcode) {
     setSelectedLedgers((prev) =>
-      prev.includes(vcode)
-        ? prev.filter((x) => x !== vcode)
-        : [...prev, vcode]
+      prev.includes(vcode) ? prev.filter((x) => x !== vcode) : [...prev, vcode],
     );
   }
 
@@ -415,7 +722,7 @@ export default function PartyWiseSummPur({ show, onClose }) {
     return ledgers.filter(
       (x) =>
         x.vacode.toLowerCase().includes(q) ||
-        (x.city || "").toLowerCase().includes(q)
+        (x.city || "").toLowerCase().includes(q),
     );
   }
 
@@ -424,23 +731,23 @@ export default function PartyWiseSummPur({ show, onClose }) {
     const visible = getVisibleLedgers();
 
     // ✅ USE VCODE (NOT vacode)
-    const visibleVcodes = visible.map(x => x.vcode);
+    const visibleVcodes = visible.map((x) => x.vcode);
 
     const allVisibleSelected =
       visibleVcodes.length > 0 &&
-      visibleVcodes.every(v => selectedLedgers.includes(v));
+      visibleVcodes.every((v) => selectedLedgers.includes(v));
 
     if (allVisibleSelected) {
       // ❌ remove visible vcodes
-      setSelectedLedgers(prev =>
-        prev.filter(v => !visibleVcodes.includes(v))
+      setSelectedLedgers((prev) =>
+        prev.filter((v) => !visibleVcodes.includes(v)),
       );
       setSelectAll(false);
     } else {
       // ✅ add visible vcodes
-      setSelectedLedgers(prev => {
+      setSelectedLedgers((prev) => {
         const set = new Set(prev);
-        visibleVcodes.forEach(v => set.add(v));
+        visibleVcodes.forEach((v) => set.add(v));
         return Array.from(set);
       });
       setSelectAll(true);
@@ -455,473 +762,706 @@ export default function PartyWiseSummPur({ show, onClose }) {
       return;
     }
 
-    const visibleVcodes = visible.map(x => x.vcode);
+    const visibleVcodes = visible.map((x) => x.vcode);
 
-    const allVisibleSelected = visibleVcodes.every(v =>
-      selectedLedgers.includes(v)
+    const allVisibleSelected = visibleVcodes.every((v) =>
+      selectedLedgers.includes(v),
     );
 
     setSelectAll(allVisibleSelected);
   }, [ledgerSearch, ledgers, selectedLedgers]);
 
+  const numericFields = [
+  "bags",
+  "qty",
+  "value",
+  "cgst",
+  "sgst",
+  "igst",
+  "tax",
+  "grandtotal",
+];
+
+const qtyFields = ["bags", "qty"];
+  // function exportToExcel(filename, jsonData) {
+  //   if (!jsonData || jsonData.length === 0) {
+  //     alert("No data to export");
+  //     return;
+  //   }
+
+  //   // ⭐ 1️⃣ CUSTOM HEADER NAMES
+  //   const customHeaders = {
+  //     supplierName: "Supplier",
+  //     city: "City",
+  //     pan: "PAN No",
+  //     bags: "Bags",
+  //     qty: "Quantity",
+  //     value: "Total Value",
+  //     month: "Month",
+  //     date: "Date",
+  //     supplier: "Supplier",
+  //   };
+
+  //   // Convert keys → readable headers
+  //   const finalData = jsonData.map((row) => {
+  //     const newRow = {};
+  //     Object.keys(row).forEach((k) => {
+  //       newRow[customHeaders[k] || k] = row[k];
+  //     });
+  //     return newRow;
+  //   });
+
+  //   let header = Object.keys(finalData[0]);
+
+  //   if (summaryType === "date") {
+  //     // Reorder columns: put Supplier right after Date
+  //     const newOrder = ["Date", "Supplier"];
+
+  //     // Keep all other columns in original order
+  //     const remaining = header.filter((h) => !newOrder.includes(h));
+
+  //     header = [...newOrder, ...remaining]; // ✅ Now allowed
+  //   }
+
+  //   // 2️⃣ COMPANY & PERIOD TOP ROWS
+  //   const sheetData = [
+  //     [companyName || "Company Name"],
+  //     [companyAdd || "Company Address"],
+  //     [`PURCHASE SUMMARY - Period From: ${fromDate}  To: ${toDate}`],
+  //     [],
+  //     header,
+  //     ...finalData.map((row) => header.map((h) => row[h])),
+  //   ];
+
+  //   // 3️⃣ SUBTOTAL TOTAL ROW (BOTTOM)
+  //   const numericColumns = ["Bags", "Quantity", "Total Value"];
+  //   const totals = {};
+
+  //   header.forEach((h, index) => {
+  //     if (index === 0) {
+  //       totals[h] = "Total";
+  //     } else if (numericColumns.includes(h)) {
+  //       const colLetter = XLSX.utils.encode_col(index);
+  //       const firstRow = 5;
+  //       const lastDataRow = 4 + finalData.length;
+  //       totals[h] = {
+  //         f: `SUBTOTAL(9,${colLetter}${firstRow + 1}:${colLetter}${lastDataRow + 1})`,
+  //       };
+  //     } else {
+  //       totals[h] = "";
+  //     }
+  //   });
+
+  //   sheetData.push(header.map((h) => totals[h]));
+
+  //   // Build worksheet
+  //   const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+  //   // ⭐ APPLY STYLING TO TOP ROWS
+
+  //   const totalColumns = header.length - 1;
+
+  //   // A1 → Company Name (Font 16, Bold, Center)
+  //   if (ws["A1"]) {
+  //     ws["A1"].s = {
+  //       font: { bold: true, sz: 16 },
+  //       alignment: { horizontal: "center", vertical: "center" },
+  //     };
+  //   }
+
+  //   // A2 → Company Address (Font 12, Bold, Center)
+  //   if (ws["A2"]) {
+  //     ws["A2"].s = {
+  //       font: { bold: true, sz: 12 },
+  //       alignment: { horizontal: "center", vertical: "center" },
+  //     };
+  //   }
+
+  //   // A3 → Period Row (Font 12, Bold, Center)
+  //   if (ws["A3"]) {
+  //     ws["A3"].s = {
+  //       font: { bold: true, sz: 12 },
+  //       alignment: { horizontal: "center", vertical: "center" },
+  //     };
+  //   }
+
+  //   // Merge Top 3 Rows
+  //   ws["!merges"] = [
+  //     { s: { r: 0, c: 0 }, e: { r: 0, c: totalColumns } }, // Company Name
+  //     { s: { r: 1, c: 0 }, e: { r: 1, c: totalColumns } }, // Address
+  //     { s: { r: 2, c: 0 }, e: { r: 2, c: totalColumns } }, // Period
+  //   ];
+
+  //   // 4️⃣ COLUMN WIDTHS (AUTO-FIT)
+
+  //   ws["!cols"] = header.map((h) => {
+  //     const maxLen = Math.max(
+  //       h.length,
+  //       ...finalData.map((row) => (row[h] ? row[h].toString().length : 0)),
+  //     );
+  //     return { wch: maxLen + 3 };
+  //   });
+
+  //   const HEADER_BG = "4F81BD";
+
+  //   // 5️⃣ HEADER STYLE
+  //   header.forEach((_, colIdx) => {
+  //     const addr = XLSX.utils.encode_cell({ r: 4, c: colIdx });
+  //     if (ws[addr]) {
+  //       ws[addr].s = {
+  //         font: { bold: true, color: { rgb: "FFFFFF" } },
+  //         fill: { patternType: "solid", fgColor: { rgb: HEADER_BG } },
+  //         alignment: { horizontal: "center" },
+  //         border: {
+  //           top: { style: "thin" },
+  //           bottom: { style: "thin" },
+  //           left: { style: "thin" },
+  //           right: { style: "thin" },
+  //         },
+  //       };
+  //     }
+  //   });
+
+  //   // 6️⃣ NUMERIC ALIGNMENT & BORDERS
+  //   const range = XLSX.utils.decode_range(ws["!ref"]);
+
+  //   for (let R = 5; R <= range.e.r; R++) {
+  //     for (let C = 0; C < header.length; C++) {
+  //       const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
+  //       if (!cell) continue;
+
+  //       const isNumeric = numericColumns.includes(header[C]);
+
+  //       cell.s = {
+  //         alignment: {
+  //           horizontal: isNumeric ? "right" : "left",
+  //           vertical: "center",
+  //         },
+  //       };
+
+  //       if (isNumeric && !isNaN(cell.v)) {
+  //         cell.t = "n";
+  //         cell.z = "0.00";
+  //       }
+  //     }
+  //   }
+
+  //   // 7️⃣ TOTAL ROW STYLE
+  //   const totalRowIndex = finalData.length + 5;
+
+  //   header.forEach((_, colIdx) => {
+  //     const addr = XLSX.utils.encode_cell({ r: totalRowIndex, c: colIdx });
+  //     if (ws[addr]) {
+  //       ws[addr].s = {
+  //         font: { bold: true },
+  //         fill: { patternType: "solid", fgColor: { rgb: "D9D9D9" } },
+  //         alignment: { horizontal: colIdx === 0 ? "left" : "right" },
+  //       };
+  //     }
+  //   });
+
+  //   // 8️⃣ MERGE COMPANY NAME / ADD / PERIOD ROWS
+  //   ws["!merges"] = [
+  //     { s: { r: 0, c: 0 }, e: { r: 0, c: header.length - 1 } },
+  //     { s: { r: 1, c: 0 }, e: { r: 1, c: header.length - 1 } },
+  //     { s: { r: 2, c: 0 }, e: { r: 2, c: header.length - 1 } },
+  //   ];
+
+  //   // 9️⃣ CREATE FILE
+  //   const wb = XLSX.utils.book_new();
+  //   XLSX.utils.book_append_sheet(wb, ws, "Purchase Summary");
+
+  //   XLSX.writeFile(wb, filename + ".xlsx");
+  // }
   function exportToExcel(filename, jsonData) {
-    if (!jsonData || jsonData.length === 0) {
-      alert("No data to export");
-      return;
+  if (!jsonData || jsonData.length === 0) {
+    alert("No data to export");
+    return;
+  }
+
+  const savedFieldData =
+    JSON.parse(localStorage.getItem("purSumFieldData")) ||
+    DEFAULT_FIELD_DATA;
+
+  let visibleFields = savedFieldData
+    .filter((f) => f.checked)
+    .sort((a, b) => Number(a.serialNo || 0) - Number(b.serialNo || 0))
+    .map((f) => ({
+      key: f.fieldName,
+      label: f.description,
+      width: Number(f.width) || 100,
+      total: f.total,
+      bold: f.bold,
+    }));
+
+  // Auto add Month / Date according to summaryType
+  if (summaryType === "month") {
+    visibleFields = [
+      { key: "month", label: "Month", width: 100, total: false, bold: true },
+      ...visibleFields.filter((f) => f.key !== "month" && f.key !== "date"),
+    ];
+  }
+
+  if (summaryType === "date") {
+    visibleFields = [
+      { key: "date", label: "Date", width: 100, total: false, bold: true },
+      ...visibleFields.filter((f) => f.key !== "month" && f.key !== "date"),
+    ];
+  }
+
+  if (summaryType !== "month" && summaryType !== "date") {
+    visibleFields = visibleFields.filter(
+      (f) => f.key !== "month" && f.key !== "date"
+    );
+  }
+
+  const header = visibleFields.map((f) => f.label);
+
+  const sheetData = [
+    [companyName || "Company Name"],
+    [companyAdd || "Company Address"],
+    [`PURCHASE SUMMARY - Period From: ${fromDate} To: ${toDate}`],
+    [],
+    header,
+    ...jsonData.map((row) =>
+      visibleFields.map((field) => row[field.key] ?? "")
+    ),
+  ];
+
+  // Total row
+  const totalRow = visibleFields.map((field, index) => {
+    if (index === 0) return "TOTAL";
+
+    if (field.total) {
+      const total = jsonData.reduce(
+        (sum, row) => sum + (parseFloat(row[field.key]) || 0),
+        0
+      );
+      return total;
     }
 
-    // ⭐ 1️⃣ CUSTOM HEADER NAMES
-    const customHeaders = {
-      supplierName: "Supplier",
-      city: "City",
-      pan: "PAN No",
-      bags: "Bags",
-      qty: "Quantity",
-      value: "Total Value",
-      month: "Month",
-      date: "Date",
-      supplier: "Supplier"
+    return "";
+  });
+
+  sheetData.push(totalRow);
+
+  const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+  ws["!merges"] = [
+    { s: { r: 0, c: 0 }, e: { r: 0, c: header.length - 1 } },
+    { s: { r: 1, c: 0 }, e: { r: 1, c: header.length - 1 } },
+    { s: { r: 2, c: 0 }, e: { r: 2, c: header.length - 1 } },
+  ];
+
+  // Column width from modal
+  ws["!cols"] = visibleFields.map((field) => ({
+    wch: Math.max(8, Math.round((Number(field.width) || 100) / 8)),
+  }));
+
+  const HEADER_ROW = 4;
+  const DATA_START_ROW = 5;
+  const TOTAL_ROW = sheetData.length - 1;
+
+  // Top rows style
+  ["A1", "A2", "A3"].forEach((cell, i) => {
+    if (ws[cell]) {
+      ws[cell].s = {
+        font: { bold: true, sz: i === 0 ? 16 : 12 },
+        alignment: { horizontal: "center", vertical: "center" },
+      };
+    }
+  });
+
+  // Header style
+  visibleFields.forEach((field, colIdx) => {
+    const addr = XLSX.utils.encode_cell({ r: HEADER_ROW, c: colIdx });
+
+    if (ws[addr]) {
+      ws[addr].s = {
+        font: {
+          bold: true,
+          color: { rgb: "FFFFFF" },
+        },
+        fill: {
+          patternType: "solid",
+          fgColor: { rgb: "4F81BD" },
+        },
+        alignment: {
+          horizontal: numericFields.includes(field.key) ? "right" : "left",
+        },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+    }
+  });
+
+  // Body style
+  for (let r = DATA_START_ROW; r < TOTAL_ROW; r++) {
+    visibleFields.forEach((field, c) => {
+      const addr = XLSX.utils.encode_cell({ r, c });
+      const cell = ws[addr];
+
+      if (!cell) return;
+
+      const isNumeric = numericFields.includes(field.key);
+
+      cell.s = {
+        font: {
+          bold: field.bold || false,
+        },
+        alignment: {
+          horizontal: isNumeric ? "right" : "left",
+          vertical: "center",
+        },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+
+      if (isNumeric && !isNaN(Number(cell.v))) {
+        cell.t = "n";
+        cell.z = qtyFields.includes(field.key) ? "0.000" : "0.00";
+      }
+    });
+  }
+
+  // Total row style
+  visibleFields.forEach((field, c) => {
+    const addr = XLSX.utils.encode_cell({ r: TOTAL_ROW, c });
+    const cell = ws[addr];
+
+    if (!cell) return;
+
+    cell.s = {
+      font: { bold: true },
+      fill: {
+        patternType: "solid",
+        fgColor: { rgb: "D9D9D9" },
+      },
+      alignment: {
+        horizontal: numericFields.includes(field.key) ? "right" : "left",
+      },
+      border: {
+        top: { style: "thin" },
+        bottom: { style: "thin" },
+        left: { style: "thin" },
+        right: { style: "thin" },
+      },
     };
 
-    // Convert keys → readable headers
-    const finalData = jsonData.map((row) => {
-      const newRow = {};
-      Object.keys(row).forEach((k) => {
-        newRow[customHeaders[k] || k] = row[k];
-      });
-      return newRow;
-    });
-
-    let header = Object.keys(finalData[0]);
-
-    if (summaryType === "date") {
-      // Reorder columns: put Supplier right after Date
-      const newOrder = ["Date", "Supplier"];
-
-      // Keep all other columns in original order
-      const remaining = header.filter(h => !newOrder.includes(h));
-
-      header = [...newOrder, ...remaining]; // ✅ Now allowed
+    if (field.total && numericFields.includes(field.key)) {
+      cell.t = "n";
+      cell.z = qtyFields.includes(field.key) ? "0.000" : "0.00";
     }
+  });
 
-    // 2️⃣ COMPANY & PERIOD TOP ROWS
-    const sheetData = [
-      [companyName || "Company Name"],
-      [companyAdd || "Company Address"],
-      [`PURCHASE SUMMARY - Period From: ${fromDate}  To: ${toDate}`],
-      [],
-      header,
-      ...finalData.map(row => header.map(h => row[h]))
-    ];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "Purchase Summary");
 
-    // 3️⃣ SUBTOTAL TOTAL ROW (BOTTOM)
-    const numericColumns = ["Bags", "Quantity", "Total Value"];
-    const totals = {};
+  XLSX.writeFile(wb, filename + ".xlsx");
+}
 
-    header.forEach((h, index) => {
-      if (index === 0) {
-        totals[h] = "Total";
-      } else if (numericColumns.includes(h)) {
-        const colLetter = XLSX.utils.encode_col(index);
-        const firstRow = 5;
-        const lastDataRow = 4 + finalData.length;
-        totals[h] = { f: `SUBTOTAL(9,${colLetter}${firstRow + 1}:${colLetter}${lastDataRow + 1})` };
-      } else {
-        totals[h] = "";
-      }
-    });
-
-    sheetData.push(header.map(h => totals[h]));
-
-    // Build worksheet
-    const ws = XLSX.utils.aoa_to_sheet(sheetData);
-
-    // ⭐ APPLY STYLING TO TOP ROWS
-
-    const totalColumns = header.length - 1;
-
-    // A1 → Company Name (Font 16, Bold, Center)
-    if (ws["A1"]) {
-      ws["A1"].s = {
-        font: { bold: true, sz: 16 },
-        alignment: { horizontal: "center", vertical: "center" }
-      };
-    }
-
-    // A2 → Company Address (Font 12, Bold, Center)
-    if (ws["A2"]) {
-      ws["A2"].s = {
-        font: { bold: true, sz: 12 },
-        alignment: { horizontal: "center", vertical: "center" }
-      };
-    }
-
-    // A3 → Period Row (Font 12, Bold, Center)
-    if (ws["A3"]) {
-      ws["A3"].s = {
-        font: { bold: true, sz: 12 },
-        alignment: { horizontal: "center", vertical: "center" }
-      };
-    }
-
-    // Merge Top 3 Rows
-    ws["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: totalColumns } }, // Company Name
-      { s: { r: 1, c: 0 }, e: { r: 1, c: totalColumns } }, // Address
-      { s: { r: 2, c: 0 }, e: { r: 2, c: totalColumns } }, // Period
-    ];
-
-    // 4️⃣ COLUMN WIDTHS (AUTO-FIT)
-
-    ws["!cols"] = header.map((h) => {
-      const maxLen = Math.max(
-        h.length,
-        ...finalData.map((row) => (row[h] ? row[h].toString().length : 0))
-      );
-      return { wch: maxLen + 3 };
-    });
-
-    const HEADER_BG = "4F81BD";
-
-    // 5️⃣ HEADER STYLE
-    header.forEach((_, colIdx) => {
-      const addr = XLSX.utils.encode_cell({ r: 4, c: colIdx });
-      if (ws[addr]) {
-        ws[addr].s = {
-          font: { bold: true, color: { rgb: "FFFFFF" } },
-          fill: { patternType: "solid", fgColor: { rgb: HEADER_BG } },
-          alignment: { horizontal: "center" },
-          border: {
-            top: { style: "thin" },
-            bottom: { style: "thin" },
-            left: { style: "thin" },
-            right: { style: "thin" }
-          }
-        };
-      }
-    });
-
-    // 6️⃣ NUMERIC ALIGNMENT & BORDERS
-    const range = XLSX.utils.decode_range(ws["!ref"]);
-
-    for (let R = 5; R <= range.e.r; R++) {
-      for (let C = 0; C < header.length; C++) {
-        const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
-        if (!cell) continue;
-
-        const isNumeric = numericColumns.includes(header[C]);
-
-        cell.s = {
-          alignment: {
-            horizontal: isNumeric ? "right" : "left",
-            vertical: "center"
-          },
-        };
-
-        if (isNumeric && !isNaN(cell.v)) {
-          cell.t = "n";
-          cell.z = "0.00";
-        }
-      }
-    }
-
-    // 7️⃣ TOTAL ROW STYLE
-    const totalRowIndex = finalData.length + 5;
-
-    header.forEach((_, colIdx) => {
-      const addr = XLSX.utils.encode_cell({ r: totalRowIndex, c: colIdx });
-      if (ws[addr]) {
-        ws[addr].s = {
-          font: { bold: true },
-          fill: { patternType: "solid", fgColor: { rgb: "D9D9D9" } },
-          alignment: { horizontal: colIdx === 0 ? "left" : "right" }
-        };
-      }
-    });
-
-    // 8️⃣ MERGE COMPANY NAME / ADD / PERIOD ROWS
-    ws["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: header.length - 1 } },
-      { s: { r: 1, c: 0 }, e: { r: 1, c: header.length - 1 } },
-      { s: { r: 2, c: 0 }, e: { r: 2, c: header.length - 1 } }
-    ];
-
-    // 9️⃣ CREATE FILE
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Purchase Summary");
-
-    XLSX.writeFile(wb, filename + ".xlsx");
-  }
-  
   function handleExport() {
     if (summaryType === "total") {
       exportToExcel("Purchase_Total_Summary", groupedData);
-    } 
-    else if (summaryType === "month") {
+    } else if (summaryType === "month") {
       exportToExcel("Purchase_Month_Wise", groupedData);
-    } 
-    else if (summaryType === "date") {
+    } else if (summaryType === "date") {
       exportToExcel("Purchase_Date_Wise", groupedData);
-    } 
-    else if (summaryType === "account") {
+    } else if (summaryType === "account") {
       exportToExcel("Purchase_Account_Wise", groupedData);
     }
   }
 
+  const fieldSx = {
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "12px",
+      backgroundColor: "#fff",
+    },
+  };
+
+  const cardSx = {
+    flex: 1,
+    p: 2,
+    borderRadius: "20px",
+    boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
+    border: "1px solid #eef2f7",
+  };
+
   return (
     <>
       {/* MAIN FILTER MODAL */}
-      <Modal show={show} onHide={onClose} size="xl" centered backdrop="static" keyboard={true} >
-      
-        <Modal.Body style={{ background: "#f7f9fc" }}>
-          <h2 className="header" style={{marginTop:0,marginLeft:"35%",fontSize:"22px"}}>PURCHASE SUMMARY PARTY WISE</h2>
-          <Form>
-            <div
-              style={{
-                display: "flex",
-                gap: "25px",
-                padding: "10px 5px",
-              }}
-            >
-              {/* LEFT SIDE */}
-              <div
-                style={{
-                  flex: 1,
-                  background: "white",
-                  padding: "18px",
-                  borderRadius: "12px",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.09)",
-                }}
-              >
-                {/* DATE FIELDS */}
-                <div style={rowStyle}>
-                  <label style={labelStyle}>From</label>
-                    <InputMask
-                      mask="99-99-9999"
+      <Modal
+        show={show}
+        onHide={onClose}
+        size="xl"
+        centered
+        backdrop="static"
+        keyboard
+      >
+        <Modal.Body
+          style={{
+            background: "linear-gradient(135deg, #f8fbff 0%, #eef4ff 100%)",
+            padding: "24px",
+            borderRadius: "18px",
+          }}
+        >
+          <Box sx={{ mb: 3, textAlign: "center" }}>
+            <Typography variant="h5" fontWeight={800} color="#1e293b">
+              Purchase Summary Party Wise
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Filter purchase records and generate party-wise summary reports
+            </Typography>
+          </Box>
+
+          <Box sx={{ display: "flex", gap: 3 }}>
+            <Paper sx={cardSx}>
+              <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
+                Basic Filters
+              </Typography>
+
+              <Stack spacing={2}>
+                <InputMask
+                  mask="99-99-9999"
+                  value={rawValue}
+                  onChange={handleChange}
+                >
+                  {(inputProps) => (
+                    <TextField
+                      {...inputProps}
+                      label="From Date"
                       placeholder="dd-mm-yyyy"
-                      value={rawValue}
-                      onChange={handleChange}
-                    >
-                      {(inputProps) => (
-                        <input {...inputProps} className="form-control" />
-                      )}
-                    </InputMask>
-                </div>
+                      fullWidth
+                      size="small"
+                      sx={fieldSx}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <CalendarMonthIcon fontSize="small" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  )}
+                </InputMask>
 
-                <div style={rowStyle}>
-                  <label style={labelStyle}>Upto</label>
-                  <InputMask
-                    mask="99-99-9999"
-                    placeholder="dd-mm-yyyy"
-                    value={toRaw}
-                    onChange={handleToChange}
-                  >
-                    {(inputProps) => <input {...inputProps} className="form-control" />}
-                  </InputMask>
-                </div>
+                <InputMask
+                  mask="99-99-9999"
+                  value={toRaw}
+                  onChange={handleToChange}
+                >
+                  {(inputProps) => (
+                    <TextField
+                      {...inputProps}
+                      label="Upto Date"
+                      placeholder="dd-mm-yyyy"
+                      fullWidth
+                      size="small"
+                      sx={fieldSx}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <CalendarMonthIcon fontSize="small" />
+                          </InputAdornment>
+                        ),
+                      }}
+                    />
+                  )}
+                </InputMask>
 
-                {/* CITY & STATE */}
-                <div style={rowStyle}>
-                  <label style={labelStyle}>City</label>
-                  <Form.Control
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
+                <TextField
+                  label="City"
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  fullWidth
+                  size="small"
+                  sx={fieldSx}
+                />
+
+                <TextField
+                  label="State"
+                  value={stateName}
+                  onChange={(e) => setStateName(e.target.value)}
+                  fullWidth
+                  size="small"
+                  sx={fieldSx}
+                />
+
+                <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={isB2B}
+                        onChange={(e) => setIsB2B(e.target.checked)}
+                      />
+                    }
+                    label="B2B"
                   />
-                </div>
 
-                <div style={rowStyle}>
-                  <label style={labelStyle}>State</label>
-                  <Form.Control
-                    value={stateName}
-                    onChange={(e) => setStateName(e.target.value)}
-                  />
-                </div>
-
-                {/* B2B Checkbox */}
-                <div style={rowStyle}>
-                  <label>Agent</label>
-                  <div>
-                  <input
-                    style={{ transform: "scale(1.2)", marginRight: "5px",marginLeft:"5px" }}
-                    type="checkbox"
-                    checked={isB2B}
-                    onChange={(e) => setIsB2B(e.target.checked)}
-                  />
-                  <label style={{marginRight:"10px"}}>B2B</label>
-                  </div>
-                  <div>
-                  <Form.Control
+                  <TextField
+                    label="Agent"
                     value={agent}
                     onChange={(e) => setAgent(e.target.value)}
+                    fullWidth
+                    size="small"
+                    sx={fieldSx}
                   />
-                  </div>
-                </div>
+                </Box>
 
-                {/* Report Type */}
-                <div style={rowStyle}>
-                  <label style={{}}>Report Type</label>
-                  <Form.Select
-                    className="reportType"
-                    value={reportType}
-                    onChange={(e) => setReportType(e.target.value)}
-                  >
-                    <option>With GST</option>
-                    <option>Without GST</option>
-                  </Form.Select>
-                </div>
-                {/* Tax Type */}
-                <div style={rowStyle}>
-                  <label style={{}}>Tax Type</label>
-                  <Form.Select
-                    className="taxType"
-                    value={taxType}
-                    onChange={(e) => setTaxType(e.target.value)}
-                  >
-                    <option>All</option>
-                    <option value="GST Sale (RD)">GST Sale (RD)</option>
-                    <option value="IGST Sale (RD)">IGST Sale (RD)</option>
-                    <option value="GST (URD)">GST (URD)</option>
-                    <option value="IGST (URD)">IGST (URD)</option>
-                    <option value="Tax Free Within State">Tax Free Within State</option>
-                    <option value="Tax Free Interstate">Tax Free Interstate</option>
-                    <option value="Export Sale">Export Sale</option>
-                    <option value="Export Sale(IGST)">Export Sale(IGST)</option>
-                    <option value="Including GST">Including GST</option>
-                    <option value="Including IGST">Including IGST</option>
-                    <option value="Not Applicable">Not Applicable</option>
-                    <option value="Exempted Sale">Exempted Sale</option>
-                  </Form.Select>
-                </div>
-              </div>
-
-              {/* RIGHT SIDE */}
-              <div
-                style={{
-                  flex: 1,
-                  background: "white",
-                  padding: "18px",
-                  borderRadius: "12px",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.09)",
-                }}
-              >
-                {/* SUMMARY TYPE RADIO BUTTONS */}
-                <div style={{ padding: "10px"}}>
-                  <div className="form-check">
-                    <input
-                      type="radio"
-                      className="form-check-input"
-                      name="summaryType"
-                      value="total"
-                      checked={summaryType === "total"}
-                      onChange={(e) => setSummaryType(e.target.value)}
-                    />
-                    <label className="form-check-label">Total Summary</label>
-                  </div>
-
-                  <div className="form-check">
-                    <input
-                      type="radio"
-                      className="form-check-input"
-                      name="summaryType"
-                      value="month"
-                      checked={summaryType === "month"}
-                      onChange={(e) => setSummaryType(e.target.value)}
-                    />
-                    <label className="form-check-label">Month Wise</label>
-                  </div>
-
-                  <div className="form-check">
-                    <input
-                      type="radio"
-                      className="form-check-input"
-                      name="summaryType"
-                      value="date"
-                      checked={summaryType === "date"}
-                      onChange={(e) => setSummaryType(e.target.value)}
-                    />
-                    <label className="form-check-label">Date Wise</label>
-                  </div>
-
-                  <div className="form-check">
-                    <input
-                      type="radio"
-                      className="form-check-input"
-                      name="summaryType"
-                      value="account"
-                      checked={summaryType === "account"}
-                      onChange={(e) => setSummaryType(e.target.value)}
-                    />
-                    <label className="form-check-label">Account Wise</label>
-                  </div>
-                </div>
-
-                {/* Min Max Qty */}
-                <div style={rowStyle}>
-                  <label style={labelStyle}>Min Qty</label>
-                  <Form.Control
-                    value={minQty}
-                    onChange={(e) => setMinQty(e.target.value)}
-                  />
-                </div>
-
-                <div style={rowStyle}>
-                  <label style={labelStyle}>Max Qty</label>
-                  <Form.Control
-                    value={maxQty}
-                    onChange={(e) => setMaxQty(e.target.value)}
-                  />
-                </div>
-
-                {/* Min Max Value */}
-                <div style={rowStyle}>
-                  <label style={labelStyle}>Min Value</label>
-                  <Form.Control
-                    value={minValue}
-                    onChange={(e) => setMinValue(e.target.value)}
-                  />
-                </div>
-
-                <div style={rowStyle}>
-                  <label style={labelStyle}>Max Value</label>
-                  <Form.Control
-                    value={maxValue}
-                    onChange={(e) => setMaxValue(e.target.value)}
-                  />
-                </div>
-
-                {/* Checkbox */}
-                <div style={rowStyle}>
-                  <label style={labelStyle}>Less Dr/Cr Note</label>
-                  <Form.Check
-                    checked={lessDrCrNote}
-                    onChange={(e) => setLessDrCrNote(e.target.checked)}
-                  />
-                </div>
-
-                {/* Buttons */}
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "flex-end",
-                    gap: "10px",
-                  }}
+                <TextField
+                  select
+                  label="Report Type"
+                  value={reportType}
+                  onChange={(e) => setReportType(e.target.value)}
+                  fullWidth
+                  size="small"
+                  sx={fieldSx}
                 >
-                <Button variant="outline-secondary" onClick={() => setLedgerModalOpen(true)}>
-                  Select Ledger Accounts
+                  <MenuItem value="With GST">With GST</MenuItem>
+                  <MenuItem value="Without GST">Without GST</MenuItem>
+                </TextField>
+
+                <TextField
+                  select
+                  label="Tax Type"
+                  value={taxType}
+                  onChange={(e) => setTaxType(e.target.value)}
+                  fullWidth
+                  size="small"
+                  sx={fieldSx}
+                >
+                  <MenuItem value="All">All</MenuItem>
+                  <MenuItem value="GST Sale (RD)">GST Sale (RD)</MenuItem>
+                  <MenuItem value="IGST Sale (RD)">IGST Sale (RD)</MenuItem>
+                  <MenuItem value="GST (URD)">GST (URD)</MenuItem>
+                  <MenuItem value="IGST (URD)">IGST (URD)</MenuItem>
+                  <MenuItem value="Tax Free Within State">
+                    Tax Free Within State
+                  </MenuItem>
+                  <MenuItem value="Tax Free Interstate">
+                    Tax Free Interstate
+                  </MenuItem>
+                  <MenuItem value="Export Sale">Export Sale</MenuItem>
+                  <MenuItem value="Export Sale(IGST)">
+                    Export Sale(IGST)
+                  </MenuItem>
+                  <MenuItem value="Including GST">Including GST</MenuItem>
+                  <MenuItem value="Including IGST">Including IGST</MenuItem>
+                  <MenuItem value="Not Applicable">Not Applicable</MenuItem>
+                  <MenuItem value="Exempted Sale">Exempted Sale</MenuItem>
+                </TextField>
+              </Stack>
+            </Paper>
+
+            <Paper sx={cardSx}>
+              <Typography variant="subtitle1" fontWeight={700}>
+                Summary Options
+              </Typography>
+
+              <RadioGroup
+                row // ✅ makes everything in one line
+                value={summaryType}
+                onChange={(e) => setSummaryType(e.target.value)}
+              >
+                <FormControlLabel
+                  value="total"
+                  control={<Radio />}
+                  label="Total Summary"
+                />
+                <FormControlLabel
+                  value="month"
+                  control={<Radio />}
+                  label="Month Wise"
+                />
+                <FormControlLabel
+                  value="date"
+                  control={<Radio />}
+                  label="Date Wise"
+                />
+                <FormControlLabel
+                  value="account"
+                  control={<Radio />}
+                  label="Account Wise"
+                />
+              </RadioGroup>
+
+              <Stack spacing={1}>
+                <TextField
+                  label="Min Qty"
+                  value={minQty}
+                  onChange={(e) => setMinQty(e.target.value)}
+                  size="small"
+                  fullWidth
+                  sx={fieldSx}
+                />
+                <TextField
+                  label="Max Qty"
+                  value={maxQty}
+                  onChange={(e) => setMaxQty(e.target.value)}
+                  size="small"
+                  fullWidth
+                  sx={fieldSx}
+                />
+                <TextField
+                  label="Min Value"
+                  value={minValue}
+                  onChange={(e) => setMinValue(e.target.value)}
+                  size="small"
+                  fullWidth
+                  sx={fieldSx}
+                />
+                <TextField
+                  label="Max Value"
+                  value={maxValue}
+                  onChange={(e) => setMaxValue(e.target.value)}
+                  size="small"
+                  fullWidth
+                  sx={fieldSx}
+                />
+
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={lessDrCrNote}
+                      onChange={(e) => setLessDrCrNote(e.target.checked)}
+                    />
+                  }
+                  label="Less Dr/Cr Note"
+                />
+              </Stack>
+
+              <Box
+                sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5 }}
+              >
+                <Button
+                  variant="outline-secondary"
+                  onClick={() => setLedgerModalOpen(true)}
+                >
+                  Select Ledgers
                 </Button>
-
-                  {/* <Button variant="warning" onClick={handleExport}> Export </Button> */}
-                  <Button variant="primary" onClick={onOpenPrint}>
-                    PRINT
-                  </Button>
-
-                  <Button variant="secondary" onClick={onClose}>
-                    EXIT
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </Form>
+                <Button
+                  variant="outline-primary"
+                  onClick={() => setFieldModalOpen(true)}
+                >
+                  Customize Fields
+                </Button>
+                <Button variant="primary" onClick={onOpenPrint}>
+                  PRINT
+                </Button>
+                <Button variant="secondary" onClick={onClose}>
+                  EXIT
+                </Button>
+              </Box>
+            </Paper>
+          </Box>
         </Modal.Body>
       </Modal>
 
@@ -932,9 +1472,12 @@ export default function PartyWiseSummPur({ show, onClose }) {
         fullscreen
         className="custom-modal"
         style={{ marginTop: 20 }}
-        backdrop="static" keyboard={true}
+        backdrop="static"
+        keyboard={true}
       >
-        <Modal.Body style={{ maxHeight: "calc(100vh - 120px)", overflowY: "auto" }}>
+        <Modal.Body
+          style={{ maxHeight: "calc(100vh - 120px)", overflowY: "auto" }}
+        >
           {fetching ? (
             <div className="text-center">Loading...</div>
           ) : error ? (
@@ -945,6 +1488,11 @@ export default function PartyWiseSummPur({ show, onClose }) {
                 <PurSummPrint
                   ref={printRef}
                   groupedData={groupedData}
+                  fieldData={
+                    JSON.parse(localStorage.getItem("purSumFieldData")) ||
+                    DEFAULT_FIELD_DATA
+                  }
+                  summaryType={summaryType}
                   periodFrom={format(fromDate)}
                   periodTo={format(toDate)}
                   companyName={companyName}
@@ -957,7 +1505,9 @@ export default function PartyWiseSummPur({ show, onClose }) {
         </Modal.Body>
 
         <Modal.Footer>
-          <Button variant="warning" onClick={handleExport}>EXPORT</Button>
+          <Button variant="warning" onClick={handleExport}>
+            EXPORT
+          </Button>
           <Button
             variant="primary"
             onClick={handlePrint}
@@ -972,96 +1522,127 @@ export default function PartyWiseSummPur({ show, onClose }) {
       </Modal>
 
       {/* LEDGER SELECTION MODAL */}
-    <Modal show={ledgerModalOpen} onHide={() => setLedgerModalOpen(false)} centered size="lg">
-      <Modal.Header closeButton>
-        <Modal.Title>Select Ledger Accounts</Modal.Title>
-      </Modal.Header>
-
-      <Modal.Body>
-
-        {/* LEDGER TABLE */}
-        <div
-          style={{
-            maxHeight: "350px",
-            overflowY: "auto",
-            padding: "10px",
-          }}
-        >
-          <Table className="custom-table" size="sm">
-            <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>
-              <tr>
-                <th style={{ width: "50px", textAlign: "center" }}>Select</th>
-                <th>Account Name</th>
-                <th>City</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {ledgers
-                .filter(
-                  (x) =>
-                    x.vacode.toLowerCase().includes(ledgerSearch.toLowerCase()) ||
-                    x.city.toLowerCase().includes(ledgerSearch.toLowerCase())
-                )
-                .map((x, idx) => (
-                  <tr key={idx}>
-                    <td style={{ textAlign: "center" }}>
-                      <input
-                        type="checkbox"
-                        checked={selectedLedgers.includes(x.vcode)}
-                        onChange={() => toggleLedger(x.vcode)}
-                      />
-                    </td>
-                    <td>{x.vacode}</td>
-                    <td>{x.city}</td>
-                  </tr>
-                ))}
-            </tbody>
-          </Table>
-        </div>
-
-      </Modal.Body>
-
-      <Modal.Footer
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          width: "100%",
-        }}
+      <Modal
+        show={ledgerModalOpen}
+        onHide={() => setLedgerModalOpen(false)}
+        centered
+        size="lg"
+        dialogClassName="ledger-modern-modal"
       >
-        {/* SEARCH BAR ON LEFT */}
-        <input
-          type="text"
-          className="form-control"
-          placeholder="Search ledger..."
-          style={{ width: "300px" }}
-          value={ledgerSearch}
-          onChange={(e) => setLedgerSearch(e.target.value)}
-        />
+        <Modal.Header closeButton className="ledger-modal-header">
+          <div>
+            <Modal.Title className="ledger-modal-title">
+              Select Ledger Accounts
+            </Modal.Title>
+            <div className="ledger-modal-subtitle">
+              Search and select ledger accounts to include in the report.
+            </div>
+          </div>
+        </Modal.Header>
 
-        {/* BUTTONS ON RIGHT */}
-        <div>
-          <Button
-            variant={selectAll ? "warning" : "success"}
-            onClick={toggleSelectAll}
-          >
-            {selectAll ? "Unselect All" : "Select All"}
-          </Button>{" "}
-          <Button variant="secondary" onClick={() => setLedgerModalOpen(false)}>
-            Close
-          </Button>{" "}
-          <Button variant="primary" onClick={() => setLedgerModalOpen(false)}>
-            Apply
-          </Button>
-        </div>
-      </Modal.Footer>
+        <Modal.Body className="ledger-modal-body">
+          <div className="ledger-search-box">
+            <div className="ledger-search-wrapper">
+              <span className="search-icon">🔍</span>
 
-    </Modal>
+              <input
+                type="text"
+                className="ledger-search-input-modern"
+                placeholder="Search by account name or city..."
+                value={ledgerSearch}
+                onChange={(e) => setLedgerSearch(e.target.value)}
+              />
+
+              {ledgerSearch && (
+                <span
+                  className="clear-icon"
+                  onClick={() => setLedgerSearch("")}
+                >
+                  ✖
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="ledger-table-wrapper">
+            <Table className="ledger-modern-table" size="sm">
+              <thead>
+                <tr>
+                  <th className="text-center" style={{ width: "70px" }}>
+                    Select
+                  </th>
+                  <th>Account Name</th>
+                  <th>City</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {ledgers
+                  .filter(
+                    (x) =>
+                      x.vacode
+                        .toLowerCase()
+                        .includes(ledgerSearch.toLowerCase()) ||
+                      x.city.toLowerCase().includes(ledgerSearch.toLowerCase()),
+                  )
+                  .map((x, idx) => (
+                    <tr key={idx}>
+                      <td className="text-center">
+                        <input
+                          type="checkbox"
+                          className="ledger-checkbox"
+                          checked={selectedLedgers.includes(x.vcode)}
+                          onChange={() => toggleLedger(x.vcode)}
+                        />
+                      </td>
+                      <td className="ledger-name">{x.vacode}</td>
+                      <td>
+                        <span className="ledger-city-badge">{x.city}</span>
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </Table>
+          </div>
+        </Modal.Body>
+
+        <Modal.Footer className="ledger-modal-footer">
+          <div className="ledger-selected-count">
+            {selectedLedgers.length} ledger selected
+          </div>
+
+          <div className="ledger-footer-buttons">
+            <Button
+              variant={selectAll ? "warning" : "success"}
+              onClick={toggleSelectAll}
+            >
+              {selectAll ? "Unselect All" : "Select All"}
+            </Button>
+
+            <Button
+              variant="secondary"
+              onClick={() => setLedgerModalOpen(false)}
+            >
+              Close
+            </Button>
+
+            <Button variant="primary" onClick={() => setLedgerModalOpen(false)}>
+              Apply
+            </Button>
+          </div>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Select Fields */}
+      <FieldCustomizeModal
+        show={fieldModalOpen}
+        onHide={() => setFieldModalOpen(false)}
+        defaultFieldData={DEFAULT_FIELD_DATA}
+        storageKey="purSumFieldData"
+      />
     </>
   );
 }
-
 
 const rowStyle = {
   display: "flex",

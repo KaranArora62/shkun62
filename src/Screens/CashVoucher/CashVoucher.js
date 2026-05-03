@@ -2136,7 +2136,7 @@ const MaskedInput = forwardRef(({ value, onChange, onBlur }, ref) => (
 ));
 
 const CashVoucher = () => {
-  const companySetup = useCompanySetup();
+  const {fsize} = useCompanySetup();
   const { decimals } = useCashBankSetup();
   const location = useLocation();
   const cashId = location.state?.cashId;
@@ -2332,11 +2332,15 @@ const CashVoucher = () => {
   }, [searchBillNo, searchDate, allBills]);
 
   const handleSelectBill = (bill) => {
-    setFormData({
+    const updatedFormData = {
       ...bill.formData,
       date: bill.formData.date,
-    });
+    };
+
+    setFormData(updatedFormData);
     setItems(normalizeItems(bill.items));
+    setData1({ ...bill, formData: updatedFormData });
+    setIndex(bill?.formData?.vno || 0);
     setShowSearch(false);
     setSearchBillNo("");
     setSearchDate("");
@@ -3245,8 +3249,6 @@ const CashVoucher = () => {
     return fields;
   }, []);
 
-  const [fontSize, setFontSize] = useState(18);
-
   const handleEnterKeyPress = (currentRef, nextRef) => (event) => {
     if (event.key === "Enter" || event.key === "Tab") {
       event.preventDefault();
@@ -3593,7 +3595,7 @@ const handleNumericValue = (event) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     fontWeight: "bold",
                   },
                   readOnly: !isEditMode || isDisabled,
@@ -3613,7 +3615,7 @@ const handleNumericValue = (event) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     fontWeight: "bold",
                   },
                   readOnly: !isEditMode || isDisabled,
@@ -3680,7 +3682,7 @@ const handleNumericValue = (event) => {
                         }}
                         ref={(el) => (accountNameRefs.current[index] = el)}
                         onFocus={(e) => e.target.select()}
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                       />
                     </td>
 
@@ -3697,7 +3699,7 @@ const handleNumericValue = (event) => {
                           handleKeyDown(e, index, "narration");
                         }}
                         onFocus={(e) => e.target.select()}
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                       />
                       {showNarrationSuggestions && (
                         <datalist id="narrationList">
@@ -3719,7 +3721,7 @@ const handleNumericValue = (event) => {
                         onKeyDown={(e) => handleKeyDown(e, index, "payment_debit")}
                         onBlur={() => handlePkgsBlur(index)}
                         onFocus={(e) => e.target.select()}
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                       />
                     </td>
 
@@ -3734,7 +3736,7 @@ const handleNumericValue = (event) => {
                         onKeyDown={(e) => handleKeyDown(e, index, "receipt_credit")}
                         onBlur={() => handleWeightBlur(index)}
                         onFocus={(e) => e.target.select()}
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                       />
                     </td>
 
@@ -3749,7 +3751,7 @@ const handleNumericValue = (event) => {
                         onKeyDown={(e) => handleKeyDown(e, index, "discount")}
                         onBlur={() => handleRateBlur(index)}
                         onFocus={(e) => e.target.select()}
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                       />
                     </td>
 
@@ -3776,9 +3778,9 @@ const handleNumericValue = (event) => {
               <tfoot>
                 <tr>
                   <td colSpan={2}></td>
-                  <td style={{fontSize: `${fontSize}px`}}>{Number(formData.totalpayment) === 0 ? "" : formData.totalpayment}</td>
-                  <td style={{fontSize: `${fontSize}px`}}>{Number(formData.totalreceipt) === 0 ? "" : formData.totalreceipt}</td>
-                  <td style={{fontSize: `${fontSize}px`}}>{Number(formData.totaldiscount) === 0 ? "" : formData.totaldiscount}</td>
+                  <td style={{fontSize: `${fsize}px`}}>{Number(formData.totalpayment) === 0 ? "" : formData.totalpayment}</td>
+                  <td style={{fontSize: `${fsize}px`}}>{Number(formData.totalreceipt) === 0 ? "" : formData.totalreceipt}</td>
+                  <td style={{fontSize: `${fsize}px`}}>{Number(formData.totaldiscount) === 0 ? "" : formData.totaldiscount}</td>
                   {isEditMode && <td></td>}
                 </tr>
               </tfoot>

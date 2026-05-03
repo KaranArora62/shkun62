@@ -6700,8 +6700,8 @@ const DebitNote = () => {
  const saleWinFromState = location.state?.saleWin;
 
   // Load from localStorage if refresh
-  const saleWinFromStorage = localStorage.getItem("saleWin")
-    ? JSON.parse(localStorage.getItem("saleWin"))
+  const saleWinFromStorage = localStorage.getItem("saleWinDN")
+    ? JSON.parse(localStorage.getItem("saleWinDN"))
     : null;
 
   // Final object (state first, then storage)
@@ -8622,7 +8622,7 @@ const DebitNote = () => {
     items[currentIndex]?.RateCal,
   ]);
 
-  const [fontSize, setFontSize] = useState(17); // Initial font size in pixels
+  const [fontSize, setFontSize] = useState(14); // Initial font size in pixels
   const increaseFontSize = () => {
     setFontSize((prevSize) => (prevSize < 20 ? prevSize + 2 : prevSize)); // Increase font size up to 20 pixels
   };
@@ -9104,7 +9104,7 @@ const DebitNote = () => {
 
   useEffect(() => {
     if (saleWinFromState) {
-      localStorage.setItem("saleWin", JSON.stringify(saleWinFromState));
+      localStorage.setItem("saleWinDN", JSON.stringify(saleWinFromState));
     }
   }, [saleWinFromState]);
 
@@ -9553,8 +9553,8 @@ return (
                   InputProps={{
                     readOnly: !isEditMode || isDisabled,
                     style: {
-                      height: 100,
-                      fontSize: `${fontSize}px`,
+                      height: 85,
+                      fontSize: 12,
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
@@ -9562,7 +9562,7 @@ return (
                   }}
                   inputProps={{
                     maxLength: 150,
-                    fontSize: `${fontSize}px`,
+                    fontSize: 12,
                   }}
                   onKeyDown={(e) => {
                     handleOpenModal(e, index, "shippedto");
@@ -9628,6 +9628,9 @@ return (
                     size="small"
                     variant="filled"
                     fullWidth
+                    InputProps={{
+                      style: { fontSize: `${fontSize}px` }
+                    }}
                     onKeyDown={handleEnterKeyPress( termsRef,
                       () => setOpenModalCr(true)
                     )}
@@ -10658,7 +10661,10 @@ return (
                   size="small"
                   variant="filled"
                   fullWidth
-                  style={{ width: 225}}
+                  InputProps={{
+                    style: { fontSize: `${fontSize}px` }
+                  }}
+                  style={{ width: 214, height: 45}}
                 />
               )}
             </InputMask>
@@ -10725,7 +10731,7 @@ return (
             <TextField className="sa-CTDS sa-custom-bordered-input" value={formData.Tds2} label="TOTAL" size="small" variant="filled" inputProps={{ style: { height: 20, fontSize: `${fontSize}px`, backgroundColor: "white", borderRadius: 5 } }} />
           </div>
         </div>
-        <div className="sa-totals sa-footer-col sa-footer-totalcol" style={{ display: "flex", flexDirection: "column", marginLeft: "auto", marginRight: "12px" }}>
+        <div className="sa-totals" style={{ display: "flex", flexDirection: "column", marginLeft: "auto", marginRight: "12px" }}>
           <TextField
             className="sa-TOTALFIELDS sa-custom-bordered-input"
             id="tax"

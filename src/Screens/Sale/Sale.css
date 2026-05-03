@@ -1004,7 +1004,7 @@ color: red;
 }
 
 .MuiInputLabel-root {
-  font-weight: 800 !important;
+  font-weight: 600 ;
 }
 .custom-bordered-input .MuiFilledInput-root {
   border: 1px solid #969494;
@@ -2536,7 +2536,7 @@ body,
 
 .sa-sale-main-title {
   font-size: var(--sa-header-title-font-size);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 2.4px;
   text-transform: uppercase;
   color: #0f172a;
@@ -2558,7 +2558,7 @@ body,
 
 .sa-sale-main-title1 {
   font-size: var(--sa-header-subtitle-font-size);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 1.3px;
   text-transform: uppercase;
   color: #475569;
@@ -2721,16 +2721,14 @@ body,
   position: absolute;
   top: 7px;
   left: 10px;
-  font-size: var(--sa-header-label-font-size);
   color: #475569;
-  font-weight: 800;
+  font-weight: 600;
   pointer-events: none;
   z-index: 2;
 }
 
 .sa-custom-style3 {
   border: 1px solid #bfc8d6;
-  font-size: var(--sa-header-input-font-size);
   font-weight: 700;
   width: 165px;
   height: 48px;
@@ -2759,7 +2757,6 @@ body,
 .sa-custom-datepickerr {
   border: 1px solid #bcc7d7;
   padding: 5px;
-  font-size: var(--sa-header-input-font-size);
   outline: none;
   font-weight: bold;
   width: 125px;
@@ -2776,7 +2773,6 @@ body,
 
 .sa-headerPUR {
   font-family: "Times New Roman", Times, serif;
-  font-size: var(--sa-header-big-font-size);
   margin-left: 15%;
   background-color: #000000;
   -webkit-background-clip: text;
@@ -2789,7 +2785,6 @@ body,
   border: 1px solid #bfc8d6;
   padding: 10px;
   border-radius: 8px;
-  font-size: var(--sa-header-input-font-size);
   outline: none;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.08);
   background: linear-gradient(to bottom, #ffffff, #f8fbff);
@@ -2952,9 +2947,9 @@ body,
 
 .sa-margin { margin-top: 0px; }
 .sa-mac {
-  margin-top: 0 !important;
-  height: 100dvh !important;
-  overflow: hidden !important;
+  margin-top: 0 ;
+  height: 100dvh ;
+  overflow: hidden ;
 }
 .sa-plus {
   margin-left: 90%;
@@ -3063,7 +3058,7 @@ body,
 /* =========================
    COMMON FILLED INPUTS / MUI
 ========================= */
-.MuiInputLabel-root { font-weight: 800 !important; }
+.MuiInputLabel-root { font-weight: 600 ; }
 
 .sa-custom-bordered-input .MuiFilledInput-root {
   border: 1px solid #bfc8d6;
@@ -3103,8 +3098,8 @@ body,
 
 .sa-Remz    { width: 300px; }
 .sa-TOTALFIELD { width: 200px; }
-.sa-TCSRATE { width: 80px; }
-.sa-TCSPER  { width: 145px; }
+.sa-TCSRATE { width: 100px; }
+.sa-TCSPER  { width: 133px; }
 .sa-CTDS    { width: 120px; }
 
 /* =========================
@@ -3129,7 +3124,7 @@ body,
 .sa-custom-table thead th {
   border-bottom: 1px solid #aebed1;
   font-size: 13px;
-  font-weight: 800;
+  font-weight: 600;
   color: #334155;
   padding: 8px 6px;
   white-space: nowrap;
@@ -3145,7 +3140,7 @@ body,
 
 .sa-custom-table tfoot td {
   padding: 8px 6px;
-  font-weight: 800;
+  font-weight: 600;
   color: #1e293b;
   border-top: 1px solid #97a9c3;
   background: rgba(255, 255, 255, 0.92);
@@ -3159,7 +3154,6 @@ body,
 .sa-Amount, .sa-Disc, .sa-discount, .sa-CTax, .sa-STax,
 .sa-ITax, .sa-Hsn, .sa-Others {
   font-weight: bold;
-  font-size: 16px;
 }
 
 .sa-ItemCode:focus, .sa-desc:focus, .sa-PCS:focus, .sa-QTY:focus,
@@ -3438,12 +3432,12 @@ body,
   --sa-header-label-font-size:    calc(11px  * var(--sa-header-font-scale));
   --sa-header-input-font-size:    calc(13px  * var(--sa-header-font-scale));
   --sa-header-small-font-size:    calc(12px  * var(--sa-header-font-scale));
-  --sa-header-mui-label-font-size:calc(10px  * var(--sa-header-font-scale));
+  --sa-header-mui-label-font-size:calc(17px  * var(--sa-header-font-scale));
   --sa-header-input-height:       36px;
   --sa-header-multiline-height:   82px;
 
   --sa-footer-font-scale: 0.82;
-  --sa-footer-label-font-size:    calc(10.5px * var(--sa-footer-font-scale));
+  --sa-footer-label-font-size:    calc(17px * var(--sa-footer-font-scale));
   --sa-footer-input-font-size:    calc(12.5px * var(--sa-footer-font-scale));
   --sa-footer-input-height:       34px;
   --sa-footer-total-input-height: 35px;
@@ -3523,7 +3517,7 @@ body,
   box-shadow: 0 6px 14px rgba(15, 23, 42, 0.08);
   font-family: "Times New Roman", Times, serif;
   font-size: var(--sa-header-title-font-size);
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: 2px;
   color: #0f172a;
   white-space: nowrap;
@@ -3539,7 +3533,7 @@ body,
   min-width: 82px;
   height: 36px;
   padding: 0 12px;
-  font-size: var(--sa-header-small-font-size) !important;
+  font-size: var(--sa-header-small-font-size) ;
 }
 
 .sa-Setting {
@@ -3604,7 +3598,6 @@ body,
   height: var(--sa-header-input-height);
   margin-top: 0;
   padding: 6px 9px;
-  font-size: var(--sa-header-input-font-size) !important;
   color: #1e293b;
   border: 1px solid #bfc8d6;
   border-radius: 8px;
@@ -3627,41 +3620,25 @@ body,
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ MUI INPUT SIZING ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .sa-sale_toppart .sa-custom-bordered-input .MuiFilledInput-root,
 .sa-pur_toppart .sa-custom-bordered-input .MuiFilledInput-root {
-  min-height: var(--sa-header-input-height) !important;
+  min-height: var(--sa-header-input-height) ;
 }
 
 .sa-sale_toppart .sa-custom-bordered-input .MuiInputLabel-root,
 .sa-sale_toppart .sa-custom-bordered-input .MuiInputLabel-filled,
 .sa-pur_toppart .sa-custom-bordered-input .MuiInputLabel-root,
 .sa-pur_toppart .sa-custom-bordered-input .MuiInputLabel-filled {
-  font-size: var(--sa-header-mui-label-font-size) !important;
-}
-
-.sa-sale_toppart .sa-custom-bordered-input .MuiFilledInput-input,
-.sa-pur_toppart .sa-custom-bordered-input .MuiFilledInput-input {
-  font-size: var(--sa-header-input-font-size) !important;
-  padding-top: 15px !important;
-  padding-bottom: 4px !important;
+  font-size: var(--sa-header-mui-label-font-size) ;
 }
 
 .sa-shippedtoz .MuiFilledInput-root {
-  min-height: var(--sa-header-multiline-height) !important;
+  min-height: var(--sa-header-multiline-height) ;
   align-items: flex-start;
-}
-
-.sa-shippedtoz textarea,
-.sa-shippedtoz .MuiFilledInput-inputMultiline {
-  font-size: var(--sa-header-input-font-size) !important;
-  line-height: 1.2 !important;
-  white-space: pre-wrap !important;
-  overflow: auto !important;
-  padding-top: 22px !important;
 }
 
 .sa-Billss .MuiFilledInput-root,
 .sa-TAXtypez .MuiFilledInput-root,
 .sa-SupplyTYPE .MuiFilledInput-root {
-  min-height: var(--sa-header-input-height) !important;
+  min-height: var(--sa-header-input-height) ;
 }
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ TABLE CONTAINER ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
@@ -3672,7 +3649,7 @@ body,
   flex: 1;
   min-height: 200px;
   overflow: auto;
-  margin: 4px 8px 0 !important;
+  margin: 4px 8px 0 ;
   border: 1px solid #d5deea;
   border-radius: 12px;
   background: #ffffff;
@@ -3682,19 +3659,17 @@ body,
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ TABLE SIZING ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .sa-custom-table thead th {
   height: var(--sa-table-head-height);
-  padding: 4px 4px !important;
-  font-size: var(--sa-table-head-font-size) !important;
+  padding: 4px 4px ;
   line-height: 1.05;
 }
 
 .sa-custom-table tbody td {
-  height: var(--sa-table-row-height) !important;
+  height: var(--sa-table-row-height) ;
 }
 
 .sa-custom-table tfoot td {
-  padding: 4px 4px !important;
-  bottom: 0 !important;
-  font-size: var(--sa-table-foot-font-size) !important;
+  padding: 4px 4px ;
+  bottom: 0 ;
   line-height: 1.05;
 }
 
@@ -3702,18 +3677,17 @@ body,
 .sa-ItemCode, .sa-desc, .sa-PCS, .sa-QTY, .sa-Price,
 .sa-Amount, .sa-Disc, .sa-discount, .sa-CTax, .sa-STax,
 .sa-ITax, .sa-Hsn, .sa-Others {
-  height: var(--sa-table-row-height) !important;
-  min-height: var(--sa-table-row-height) !important;
-  padding: 3px 5px !important;
-  font-size: var(--sa-table-input-font-size) !important;
+  height: var(--sa-table-row-height) ;
+  min-height: var(--sa-table-row-height) ;
+  padding: 3px 5px ;
   line-height: 1.1;
 }
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ ADD ROW BUTTON ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .sa-addbutton {
   flex-shrink: 0;
-  margin-top: 4px !important;
-  margin-bottom: 2px !important;
+  margin-top: 4px ;
+  margin-bottom: 2px ;
   padding: 0 8px;
 }
 
@@ -3732,7 +3706,7 @@ body,
   zoom: 1.04;
   position: sticky;
   bottom: 0;
-  padding-top: 4px !important;
+  padding-top: 4px ;
   background: linear-gradient(
     to top,
     rgba(255, 255, 255, 0.99),
@@ -3744,7 +3718,7 @@ body,
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ FOOTER LAYOUT ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .sa-Parent {
-  display: flex !important;
+  display: flex ;
   align-items: flex-end;
   gap: 6px;
   padding: 0 8px 4px;
@@ -3758,53 +3732,41 @@ body,
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ FOOTER MUI SIZING ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .sa-Belowcontents .sa-custom-bordered-input .MuiFilledInput-root {
-  min-height: var(--sa-footer-input-height) !important;
+  min-height: var(--sa-footer-input-height) ;
 }
 
 .sa-Belowcontents .sa-custom-bordered-input .MuiInputLabel-root,
 .sa-Belowcontents .sa-custom-bordered-input .MuiInputLabel-filled {
-  font-size: var(--sa-footer-label-font-size) !important;
-}
-
-.sa-Belowcontents .sa-custom-bordered-input .MuiFilledInput-input {
-  font-size: var(--sa-footer-input-font-size) !important;
-  padding-top: 14px !important;
-  padding-bottom: 4px !important;
-}
-
-.sa-Belowcontents input:not([type="checkbox"]) {
-  font-size: var(--sa-footer-input-font-size) !important;
+  font-size: var(--sa-footer-label-font-size) ;
 }
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ FOOTER FIELD WIDTHS ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
-.sa-Belowcontents .sa-Remz        { width: 260px !important; }
+.sa-Belowcontents .sa-Remz        { width: 260px ; }
 .sa-Belowcontents .sa-duedatez,
-.sa-Belowcontents .sa-duedatez .MuiFormControl-root { width: 214px !important; }
-.sa-Belowcontents .sa-TCSRATE     { width: 70px !important; }
-.sa-Belowcontents .sa-TCSPER      { width: 118px !important; }
-.sa-Belowcontents .sa-CTDS        { width: 82px !important; }
+.sa-Belowcontents .sa-duedatez .MuiFormControl-root { width: 214px ; }
+.sa-Belowcontents .sa-TCSRATE     { width: 80px ; }
+.sa-Belowcontents .sa-TCSPER      { width: 133px ; }
+.sa-Belowcontents .sa-CTDS        { width: 100px ; }
 .sa-Belowcontents .sa-TOTALFIELDS,
-.sa-Belowcontents .sa-TOTALFIELD  { width: 160px !important; }
+.sa-Belowcontents .sa-TOTALFIELD  { width: 160px ; }
 
 .sa-Belowcontents .sa-TOTALFIELDS .MuiFilledInput-root,
 .sa-Belowcontents .sa-TOTALFIELD .MuiFilledInput-root {
-  min-height: var(--sa-footer-total-input-height) !important;
+  min-height: var(--sa-footer-total-input-height) ;
 }
-
-.sa-totals { gap: 4px; }
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ BUTTON GROUP ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 .sa-Buttonsgroupz {
-  padding: 5px 8px 8px !important;
+  padding: 5px 8px 8px ;
   gap: 5px;
 }
 
 .sa-Buttonz,
 .sa-delete {
-  height: 38px !important;
-  min-width: 90px !important;
-  padding: 0 12px !important;
-  font-size: 13px !important;
+  height: 38px ;
+  min-width: 90px ;
+  padding: 0 12px ;
+  font-size: 13px ;
 }
 
 /* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ RESPONSIVE BREAKPOINTS ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
@@ -3815,15 +3777,15 @@ body,
       minmax(0, 1.12fr)
       minmax(96px, 0.62fr)
       minmax(128px, 0.82fr)
-      minmax(0, 1.18fr) !important;
+      minmax(0, 1.18fr) ;
   }
 
-  .sa-Remz { width: 244px !important; }
+  .sa-Remz { width: 244px ; }
 }
 
 @media (max-width: 1280px) {
   .sa-Dated {
-    grid-template-columns: 104px 136px minmax(150px, 1fr) auto !important;
+    grid-template-columns: 104px 136px minmax(150px, 1fr) auto ;
   }
 
   .sa-sale-center-title-main {
@@ -3836,7 +3798,7 @@ body,
   .sa-footer-midcol   { width: 200px; }
 
   .sa-Belowcontents .sa-TOTALFIELDS,
-  .sa-Belowcontents .sa-TOTALFIELD { width: 150px !important; }
+  .sa-Belowcontents .sa-TOTALFIELD { width: 150px ; }
 }
 
 @media (max-width: 1180px) {
@@ -3924,14 +3886,14 @@ body,
   /* Top panel */
   .sa-sale_toppart,
   .sa-pur_toppart {
-    padding: 6px 10px 9px !important;
+    padding: 6px 10px 9px ;
   }
 
   /* Date picker */
   .sa-DatePICKER,
   .sa-DatePICKERP {
-    height: 40px !important;
-    font-size: var(--sa-header-input-font-size) !important;
+    height: 40px ;
+    font-size: var(--sa-header-input-font-size) ;
   }
 
   .sa-billdivz,
@@ -3947,9 +3909,9 @@ body,
 
   /* Setup buttons */
   .sa-Button {
-    height: 40px !important;
-    min-width: 86px !important;
-    font-size: var(--sa-header-small-font-size) !important;
+    height: 40px ;
+    min-width: 86px ;
+    font-size: var(--sa-header-small-font-size) ;
   }
 
   .sa-Setting {
@@ -3958,74 +3920,74 @@ body,
   }
 
   /* Top field gaps */
-  .sa-TopFields { gap: 8px !important; }
-  .sa-CUS, .sa-GST { gap: 8px !important; }
+  .sa-TopFields { gap: 8px ; }
+  .sa-CUS, .sa-GST { gap: 8px ; }
 
   /* MUI inputs */
   .sa-sale_toppart .sa-custom-bordered-input .MuiFilledInput-root,
   .sa-pur_toppart .sa-custom-bordered-input .MuiFilledInput-root {
-    min-height: 40px !important;
+    min-height: 40px ;
   }
 
   .sa-sale_toppart .sa-custom-bordered-input .MuiFilledInput-input,
   .sa-pur_toppart .sa-custom-bordered-input .MuiFilledInput-input {
-    font-size: var(--sa-header-input-font-size) !important;
-    padding-top: 16px !important;
-    padding-bottom: 4px !important;
+    font-size: var(--sa-header-input-font-size) ;
+    padding-top: 16px ;
+    padding-bottom: 4px ;
   }
 
-  .sa-shippedtoz .MuiFilledInput-root { min-height: 90px !important; }
+  .sa-shippedtoz .MuiFilledInput-root { min-height: 90px ; }
 
   .sa-Billss .MuiFilledInput-root,
   .sa-TAXtypez .MuiFilledInput-root,
-  .sa-SupplyTYPE .MuiFilledInput-root { min-height: 40px !important; }
+  .sa-SupplyTYPE .MuiFilledInput-root { min-height: 40px ; }
 
   /* Table inputs */
   .sa-custom-table tbody input,
   .sa-ItemCode, .sa-desc, .sa-PCS, .sa-QTY, .sa-Price,
   .sa-Amount, .sa-Disc, .sa-discount, .sa-CTax, .sa-STax,
   .sa-ITax, .sa-Hsn, .sa-Others {
-    height: 35px !important;
-    min-height: 35px !important;
-    font-size: var(--sa-table-input-font-size) !important;
-    padding: 3px 5px !important;
+    height: 35px ;
+    min-height: 35px ;
+    font-size: var(--sa-table-input-font-size) ;
+    padding: 3px 5px ;
   }
 
   /* Add row button */
   .sa-addbutton .btn {
-    height: 35px !important;
-    font-size: 12.5px !important;
-    padding: 0 13px !important;
+    height: 35px ;
+    font-size: 12.5px ;
+    padding: 0 13px ;
   }
 
   /* Footer MUI */
   .sa-Belowcontents .sa-custom-bordered-input .MuiFilledInput-root {
-    min-height: 37px !important;
+    min-height: 37px ;
   }
 
   .sa-Belowcontents .sa-custom-bordered-input .MuiFilledInput-input {
-    font-size: var(--sa-footer-input-font-size) !important;
-    padding-top: 14px !important;
-    padding-bottom: 4px !important;
+    font-size: var(--sa-footer-input-font-size) ;
+    padding-top: 14px ;
+    padding-bottom: 4px ;
   }
 
   .sa-Belowcontents input:not([type="checkbox"]) {
-    font-size: var(--sa-footer-input-font-size) !important;
+    font-size: var(--sa-footer-input-font-size) ;
   }
 
   /* Footer field widths ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â scale up ~10% */
-  .sa-Belowcontents .sa-Remz        { width: 286px !important; }
+  .sa-Belowcontents .sa-Remz        { width: 286px ; }
   .sa-Belowcontents .sa-duedatez,
-  .sa-Belowcontents .sa-duedatez .MuiFormControl-root { width: 235px !important; }
-  .sa-Belowcontents .sa-TCSRATE     { width: 77px !important; }
-  .sa-Belowcontents .sa-TCSPER      { width: 130px !important; }
-  .sa-Belowcontents .sa-CTDS        { width: 90px !important; }
+  .sa-Belowcontents .sa-duedatez .MuiFormControl-root { width: 235px ; }
+  .sa-Belowcontents .sa-TCSRATE     { width: 77px ; }
+  .sa-Belowcontents .sa-TCSPER      { width: 130px ; }
+  .sa-Belowcontents .sa-CTDS        { width: 90px ; }
   .sa-Belowcontents .sa-TOTALFIELDS,
-  .sa-Belowcontents .sa-TOTALFIELD  { width: 176px !important; }
+  .sa-Belowcontents .sa-TOTALFIELD  { width: 176px ; }
 
   .sa-Belowcontents .sa-TOTALFIELDS .MuiFilledInput-root,
   .sa-Belowcontents .sa-TOTALFIELD .MuiFilledInput-root {
-    min-height: 38px !important;
+    min-height: 38px ;
   }
 
   .sa-footer-leftcol  { width: 286px; }
@@ -4035,15 +3997,15 @@ body,
   /* Action buttons */
   .sa-Buttonz,
   .sa-delete {
-    height: 41px !important;
-    min-width: 93px !important;
-    font-size: 13.5px !important;
-    padding: 0 13px !important;
+    height: 41px ;
+    min-width: 93px ;
+    font-size: 13.5px ;
+    padding: 0 13px ;
   }
 
   .sa-Buttonsgroupz {
-    padding: 5px 9px 9px !important;
-    gap: 5px !important;
+    padding: 5px 9px 9px ;
+    gap: 5px ;
   }
 }
 /* =========================================================
@@ -4067,28 +4029,10 @@ body,
 .sa-Billss .MuiFilledInput-root,
 .sa-TAXtypez .MuiFilledInput-root,
 .sa-SupplyTYPE .MuiFilledInput-root {
-  min-height: var(--sa-header-input-height) !important;
-  height: var(--sa-header-input-height) !important;
-  box-sizing: border-box !important;
-}
-
-.sa-sale_toppart .sa-custom-bordered-input .MuiFilledInput-input,
-.sa-pur_toppart .sa-custom-bordered-input .MuiFilledInput-input,
-.sa-customerNAME .MuiFilledInput-input,
-.sa-cityName .MuiFilledInput-input,
-.sa-gstnoZ .MuiFilledInput-input,
-.sa-PANNoZ .MuiFilledInput-input,
-.sa-GRNOZ .MuiFilledInput-input,
-.sa-VEHICLE .MuiFilledInput-input,
-.sa-Billss .MuiFilledInput-input,
-.sa-TAXtypez .MuiFilledInput-input,
-.sa-SupplyTYPE .MuiFilledInput-input,
-.sa-sale_toppart .sa-custom-bordered-input input,
-.sa-pur_toppart .sa-custom-bordered-input input {
-  font-size: var(--sa-header-input-font-size) !important;
-  padding-top: 14px !important;
-  padding-bottom: 4px !important;
-  box-sizing: border-box !important;
+  min-height: var(--sa-header-input-height) ;
+  height: var(--sa-header-input-height) ;
+  box-sizing: border-box ;
+  padding-top: 2px;
 }
 
 .sa-custom-style3,
@@ -4097,14 +4041,14 @@ body,
 .sa-DatePICKER,
 .sa-DatePICKERP,
 .sa-VbillzNo {
-  height: var(--sa-header-input-height) !important;
-  min-height: var(--sa-header-input-height) !important;
-  box-sizing: border-box !important;
+  height: var(--sa-header-input-height) ;
+  min-height: var(--sa-header-input-height) ;
+  box-sizing: border-box ;
   border-radius: 8px;
 }
 
 .sa-custom-style3 {
-  padding: 18px 10px 6px 10px !important;
+  padding: 18px 10px 6px 10px ;
 }
 
 .sa-custom-datepickerr,
@@ -4112,36 +4056,36 @@ body,
 .sa-DatePICKER,
 .sa-DatePICKERP,
 .sa-VbillzNo {
-  line-height: calc(var(--sa-header-input-height) - 2px) !important;
+  line-height: calc(var(--sa-header-input-height) - 2px) ;
 }
 
 .sa-DatePICKER,
 .sa-DatePICKERP {
-  padding: 0 9px !important;
-  margin-top: 0 !important;
+  padding: 0 9px ;
+  margin-top: 0 ;
 }
 
 .sa-custom-datepickerr,
 .sa-inputfields,
 .sa-VbillzNo {
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
+  padding-top: 0 ;
+  padding-bottom: 0 ;
 }
 
 .sa-erp-label3 {
-  top: 5px !important;
+  top: 5px ;
 }
 
 .sa-shippedtoz .MuiFilledInput-root {
-  min-height: var(--sa-header-multiline-height) !important;
-  height: var(--sa-header-multiline-height) !important;
-  align-items: flex-start !important;
+  min-height: var(--sa-header-multiline-height) ;
+  height: var(--sa-header-multiline-height) ;
+  align-items: flex-start ;
 }
 
 .sa-shippedtoz textarea,
 .sa-shippedtoz .MuiFilledInput-inputMultiline {
-  padding-top: 22px !important;
-  line-height: 1.2 !important;
+  padding-top: 14px ;
+  line-height: 1.2 ;
 }
 
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
@@ -4157,27 +4101,27 @@ body,
    Only nudge Date and Bill No blocks a little to the right.
 ========================================================= */
 .sa-Dated > :first-child {
-  margin-left: 34px !important;
+  margin-left: 34px ;
 }
 
 .sa-Dated > :nth-child(2) {
-  margin-left: 8px !important;
+  margin-left: 8px ;
 }
 
 @media (max-width: 1280px) {
   .sa-Dated > :first-child {
-    margin-left: 24px !important;
+    margin-left: 24px ;
   }
 
   .sa-Dated > :nth-child(2) {
-    margin-left: 4px !important;
+    margin-left: 4px ;
   }
 }
 
 @media (max-width: 860px) {
   .sa-Dated > :first-child,
   .sa-Dated > :nth-child(2) {
-    margin-left: 0 !important;
+    margin-left: 0 ;
   }
 }
 
@@ -4186,27 +4130,27 @@ body,
    Move Date and Bill No a little more to the right.
 ========================================================= */
 .sa-Dated > :first-child {
-  margin-left: 36px !important;
+  margin-left: 36px ;
 }
 
 .sa-Dated > :nth-child(2) {
-  margin-left: 12px !important;
+  margin-left: 12px ;
 }
 
 @media (max-width: 1280px) {
   .sa-Dated > :first-child {
-    margin-left: 30px !important;
+    margin-left: 30px ;
   }
 
   .sa-Dated > :nth-child(2) {
-    margin-left: 6px !important;
+    margin-left: 6px ;
   }
 }
 
 @media (max-width: 860px) {
   .sa-Dated > :first-child,
   .sa-Dated > :nth-child(2) {
-    margin-left: 0 !important;
+    margin-left: 0 ;
   }
 }
 
@@ -4221,20 +4165,20 @@ body,
 .sa-custom-bordered-input .MuiFilledInput-root::after,
 .pu-custom-bordered-input .MuiFilledInput-root::before,
 .pu-custom-bordered-input .MuiFilledInput-root::after {
-  border-bottom: none !important;
-  display: none !important;
+  border-bottom: none ;
+  display: none ;
 }
 
 .sa-custom-bordered-input .MuiFilledInput-root:hover:not(.Mui-disabled, .Mui-error)::before,
 .pu-custom-bordered-input .MuiFilledInput-root:hover:not(.Mui-disabled, .Mui-error)::before,
 .sa-custom-bordered-input .MuiFilledInput-root.Mui-focused::after,
 .pu-custom-bordered-input .MuiFilledInput-root.Mui-focused::after {
-  border-bottom: none !important;
+  border-bottom: none ;
 }
 
 .sa-custom-bordered-input .MuiFilledInput-root,
 .pu-custom-bordered-input .MuiFilledInput-root {
-  background-image: none !important;
+  background-image: none ;
 }
 
 /* iPad portrait/landscape sale header fix */
@@ -4245,36 +4189,36 @@ body,
       minmax(0, 1.22fr)
       minmax(102px, 0.68fr)
       minmax(136px, 0.88fr)
-      minmax(0, 1.32fr) !important;
-    gap: 7px !important;
-    align-items: start !important;
+      minmax(0, 1.32fr) ;
+    gap: 7px ;
+    align-items: start ;
   }
 
   .sa-shippedTO {
-    grid-column: auto !important;
-    min-width: 0 !important;
-    max-width: 210px !important;
-    width: 100% !important;
-    align-self: start !important;
-    justify-self: stretch !important;
+    grid-column: auto ;
+    min-width: 0 ;
+    max-width: 210px ;
+    width: 100% ;
+    align-self: start ;
+    justify-self: stretch ;
   }
 
   .sa-shippedtoz,
   .sa-shippedTO .MuiFormControl-root,
   .sa-shippedTO .sa-custom-bordered-input,
   .sa-shippedTO .MuiFilledInput-root {
-    width: 100% !important;
-    max-width: 210px !important;
+    width: 100% ;
+    max-width: 210px ;
   }
 
   .sa-shippedtoz .MuiFilledInput-root {
-    min-height: var(--sa-header-multiline-height) !important;
-    height: var(--sa-header-multiline-height) !important;
+    min-height: var(--sa-header-multiline-height) ;
+    height: var(--sa-header-multiline-height) ;
   }
 
   .sa-shippedtoz textarea,
   .sa-shippedtoz .MuiFilledInput-inputMultiline {
-    overflow: auto !important;
-    white-space: pre-wrap !important;
+    overflow: auto ;
+    white-space: pre-wrap ;
   }
 }

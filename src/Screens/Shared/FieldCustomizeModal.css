@@ -1,0 +1,211 @@
+/* ===== MODAL SIZE FIX ===== */
+.field-customize-modal .modal-dialog {
+  max-width: 1100px;
+  height: 92vh;
+  margin: auto;
+}
+
+.field-customize-modal .modal-content {
+  height: 92vh;
+  border: 0;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #f5f7fb;
+  box-shadow: 0 30px 80px rgba(15, 23, 42, 0.25);
+}
+
+/* ===== BODY LAYOUT ===== */
+.field-modal-body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  background: #f5f7fb;
+}
+
+/* ===== HEADER ===== */
+.field-modal-header {
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #111827, #26364d);
+  color: white;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.field-modal-header h4 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.field-modal-header p {
+  margin: 6px 0 0;
+  color: #cbd5e1;
+  font-size: 13px;
+}
+
+/* Close button */
+.field-close-btn {
+  border: 0;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+/* ===== CARD CONTAINER ===== */
+.field-modal-card {
+  flex: 1;
+  min-height: 0;
+  margin: 16px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ===== TOOLBAR ===== */
+.field-toolbar {
+  flex-shrink: 0;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.field-count {
+  background: #eef2ff;
+  color: #3730a3;
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.field-reset-btn {
+  border: 1px solid #fecaca;
+  background: #fff5f5;
+  color: #dc2626;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+/* ===== TABLE WRAPPER (SCROLLABLE) ===== */
+.field-table-wrapper {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+/* ===== TABLE ===== */
+.field-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+/* Sticky header */
+.field-table th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: #f8fafc;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+/* Table cells */
+.field-table td {
+  padding: 6px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+/* Hover row */
+.field-table tr:hover {
+  background: #f9fafb;
+}
+
+/* Row index */
+.field-index {
+  text-align: center;
+  font-weight: 700;
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* ===== INPUT (FIXED CLEAN LOOK) ===== */
+.field-input {
+  width: 100%;
+  height: 30px;
+  border: none;
+  background: transparent;
+  padding: 4px 6px;
+  font-size: 13px;
+  color: #374151;
+}
+
+/* hover feel */
+.field-input:hover {
+  background: #f3f4f6;
+}
+
+/* focus */
+.field-input:focus {
+  outline: none;
+  background: #eef2f7;
+}
+
+/* readonly fieldName */
+.readonly-input {
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* center text */
+.text-center {
+  text-align: center;
+}
+
+/* ===== CHECKBOX ===== */
+.field-checkbox {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #111827;
+}
+
+/* ===== FOOTER ===== */
+.field-modal-footer {
+  flex-shrink: 0;
+  padding: 12px 18px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  background: white;
+}
+
+.field-add-btn {
+  border: 1px solid #d1fae5;
+  background: #ecfdf5;
+  color: #059669;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  font-weight: 600;
+}

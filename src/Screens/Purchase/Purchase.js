@@ -6319,7 +6319,7 @@ const Purchase = () => {
   const purId = location.state?.purId;
   const navigate = useNavigate();
   const { applicable194Q } = useTdsApplicable();
-  const { CompanyState, unitType } = useCompanySetup();
+  const { CompanyState, unitType, fsize } = useCompanySetup();
   const [selectedInvoice, setSelectedInvoice] = useState("InvoicePDFPur");
   const invoiceComponents = {
     InvoicePDFPur,
@@ -7326,14 +7326,18 @@ const Purchase = () => {
 
   // 🔹 Select bill
   const handleSelectBill = (bill) => {
-    setFormData({
+    const updatedFormData = {
       ...bill.formData,
       date: formatDateToDDMMYYYY(bill.formData.date),
       duedate: formatDateToDDMMYYYY(bill.formData.duedate),
       vbdate: formatDateToDDMMYYYY(bill.formData.vbdate),
-    });
+    };
+
+    setFormData(updatedFormData);
     setsupplierdetails(bill.supplierdetails);
     setItems(normalizeItems(bill.items));
+    setData1({ ...bill, formData: updatedFormData });
+    setIndex(bill?.formData?.vno || 0);
     setShowSearch(false);
     setFilteredBills([]);
     setSearchBillNo("");
@@ -7787,6 +7791,7 @@ const handleAdd = async () => {
           rem2: formData.rem2,
           v_tpt: formData.v_tpt,
           broker: formData.broker,
+          gr: formData.gr,
 
           // TDS/TCS
           srv_rate: formData.srv_rate,
@@ -8617,7 +8622,7 @@ const handleAdd = async () => {
       city:   product.city  || '',
       gstno:  product.gstNo  || '',
       pan:    product.pan    || '',
-      Add1: product.Add1 || '',
+      Add1: product.add1 || '',
       state: product.state    || '',
       bsGroup: product.Bsgroup || '',
       Tcs206c1H: product.Tcs206c1H    || '',
@@ -8855,13 +8860,6 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
     });
   };
 
-  const [fontSize, setFontSize] = useState(32); // Initial font size in pixels
-  const increaseFontSize = () => {
-    setFontSize((prevSize) => (prevSize < 20 ? prevSize + 2 : prevSize)); // Increase font size up to 20 pixels
-  };
-  const decreaseFontSize = () => {
-    setFontSize((prevSize) => (prevSize > 14 ? prevSize - 2 : prevSize)); // Decrease font size down to 14 pixels
-  };
   const [pressedKey, setPressedKey] = useState(""); // State to hold the pressed key
   const fieldOrder = [
     { name: "vcode",      refArray: itemCodeRefs },
@@ -9045,88 +9043,8 @@ const handleKeyDown = (event, index, field) => {
   const handleChange = (event) => {
     setColor(event.target.value);
   };
-  // const handleInputChange = (index, field, value) => {
-  //   const numericValue = value.replace(/[^0-9.-]/g, ""); // Allow only numbers, decimal points, and negative signs
-  //   const updatedItems = [...items];
-  //   updatedItems[index][field] = numericValue;
-
-  //   // Recalculate expenses when Exp_rate1 to Exp_rate6 change
-  //   const vamt = parseFloat(updatedItems[index].amount) || 0;
-  //   const expRates = [
-  //     parseFloat(updatedItems[index].Exp_rate1) || 0,
-  //     parseFloat(updatedItems[index].Exp_rate2) || 0,
-  //     parseFloat(updatedItems[index].Exp_rate3) || 0,
-  //     parseFloat(updatedItems[index].Exp_rate4) || 0,
-  //     parseFloat(updatedItems[index].Exp_rate5) || 0,
-  //   ];
-  //   const expFields = ["Exp1", "Exp2", "Exp3", "Exp4", "Exp5"];
-
-  //   let totalExpenses = 0;
-  //   expRates.forEach((rate, i) => {
-  //     const expense = (vamt * rate) / 100;
-  //     updatedItems[index][expFields[i]] = expense.toFixed(2);
-  //     totalExpenses += expense;
-  //   });
-  //   // Update the exp_before field with the total of all expenses
-  //   updatedItems[index].exp_before = totalExpenses.toFixed(2);
-
-  //   const gst = parseFloat(updatedItems[index].gst);
-  //   const totalAccordingWeight =
-  //     parseFloat(updatedItems[index].weight) *
-  //     parseFloat(updatedItems[index].rate);
-  //   const totalAccordingPkgs =
-  //     parseFloat(updatedItems[index].pkgs) *
-  //     parseFloat(updatedItems[index].rate);
-  //   let RateCal = updatedItems[index].RateCal;
-  //   let TotalAcc = totalAccordingWeight; // Set a default value
-
-  //   if (
-  //     RateCal === "Default" ||
-  //     RateCal === "" ||
-  //     RateCal === null ||
-  //     RateCal === undefined
-  //   ) {
-  //     TotalAcc = totalAccordingWeight;
-  //   } else if (RateCal === "Wt/Qty") {
-  //     TotalAcc = totalAccordingWeight;
-  //   } else if (RateCal === "Pc/Pkgs") {
-  //     TotalAcc = totalAccordingPkgs;
-  //   }
-
-  //   const others = parseFloat(updatedItems[index].exp_before) || 0;
-  //   let disc = parseFloat(updatedItems[index].disc) || 0;
-  //   let per = ((disc / 100) * TotalAcc).toFixed(2);
-  //   let Amounts = TotalAcc + others + parseFloat(per);
-
-  //   // Ensure TotalAcc is a valid number before calling toFixed()
-  //   TotalAcc = isNaN(TotalAcc) ? 0 : TotalAcc;
-  //   const gstNumber = "03";
-  //   const same = custGst.substring(0, 2);
-
-  //   let cgst = 0,
-  //     sgst = 0,
-  //     igst = 0;
-  //   if (CompanyState == supplierdetails[0].state) {
-  //     cgst = (Amounts * (gst / 2)) / 100;
-  //     sgst = (Amounts * (gst / 2)) / 100;
-  //   } else {
-  //     igst = (Amounts * gst) / 100;
-  //   }
-
-  //   const totalWithGST = Amounts + cgst + sgst + igst;
-
-  //   // Update tax and total fields
-  //   updatedItems[index]["ctax"] = cgst.toFixed(2);
-  //   updatedItems[index]["stax"] = sgst.toFixed(2);
-  //   updatedItems[index]["itax"] = igst.toFixed(2);
-  //   updatedItems[index]["discount"] = parseFloat(per).toFixed(2);
-  //   updatedItems[index]["vamt"] = totalWithGST.toFixed(2); // ✅ Update the total amount (vamt)
-
-  //   setItems(updatedItems);
-  //   calculateTotalGst(); // ✅ Recalculate the grand total
-  // };
  
-    const handleInputChange = (index, field, value) => {
+  const handleInputChange = (index, field, value) => {
     const numericValue =
       typeof value === "string" ? value.replace(/[^0-9.-]/g, "") : value;
 
@@ -9609,14 +9527,7 @@ const applyPurchaseRecordToState = (record) => {
   }, [purWinFromState]);
 
 return (
-    // <div
-    //   style={{
-    //     marginTop:-20,
-    //     zoom: isMacOs ? 1 : 1,
-    //     WebkitTextSizeAdjust: "100%",
-    //     transformOrigin: "top left",
-    //   }}
-    // >
+
     <div className={`pu-sale-page ${isMacOs ? "pu-mac" : ""}`}>
       <div style={{}}>
         <ToastContainer />
@@ -9634,15 +9545,7 @@ return (
           />
         )}
       </div>
-      {/* <div style={{ display: "flex", flexDirection: "row", marginTop: -30 }}>
-        <h1 className="pu-headerSale">
-          PURCHASE GST{" "}
-          <span className="text-black-500 font-semibold text-base sm:text-lg">
-            {title}
-          </span>
-        </h1>
-      </div> */}
-    
+     
       <div className="pu-pur_toppart"   style={{ zoom: isMacOs ? 1.1 : 1 }}>
         <div className="pu-Dated">
           <InputMask
@@ -9662,19 +9565,10 @@ return (
                 onKeyDown={(e) => {
                   handleEnterKeyPress(datePickerRef, voucherNoRef)(e);
                 }}
+                style={{fontSize: `${fsize}px`}}
               />
             )}
           </InputMask>
-          {/* <DatePicker
-            ref={datePickerRef}
-            selected={selectedDate || null}
-            openToDate={new Date()}
-            onCalendarClose={handleCalendarClose}
-            dateFormat="dd-MM-yyyy"
-            onChange={handleDateChange}
-            onBlur={() => validateDate(selectedDate)}
-            customInput={<MaskedInput />}
-          /> */}
           <div className="pu-billdivz">
             <TextField
               inputRef={voucherNoRef}
@@ -9692,7 +9586,7 @@ return (
                 maxLength: 48,
                 style: {
                   height: "20px",
-                  fontSize: `${fontSize}px`,
+                  fontSize: `${fsize}px`,
                   // padding: "0 8px"
                 },
                 readOnly: !isEditMode || isDisabled,
@@ -9995,7 +9889,6 @@ return (
               </Modal>
               
           </div>
-          {/* {isModalOpen && <PurchaseSetup onClose={closeModal} />} */}
         </div>
         <div className="pu-TopFields">
           {supplierdetails.map((item, index) => (
@@ -10004,7 +9897,7 @@ return (
                 <div className="pu-customerdiv">
                   <TextField
                     inputRef={customerNameRef}
-                    label="CUSTOMER NAME"
+                    label="SUPPLIER NAME"
                     variant="filled"
                     size="small"
                     value={item.vacode}
@@ -10022,7 +9915,7 @@ return (
                       maxLength: 48,
                       style: {
                         height: "20px",
-                        fontSize: `${fontSize}px`,
+                        fontSize: `${fsize}px`,
                       },
                       readOnly: !isEditMode || isDisabled,
                     }}
@@ -10039,8 +9932,7 @@ return (
                       maxLength: 48,
                       style: {
                         height: "20px",
-                        fontSize: `${fontSize}px`,
-                        // padding: "0 8px",
+                        fontSize: `${fsize}px`,
                       },
                       readOnly: !isEditMode || isDisabled,
                     }}
@@ -10051,7 +9943,7 @@ return (
                   />
                 </div>
               </div>
-              <div className="pu-GST">
+              <div className="pu-GST" style={{marginTop:5}}>
                 <div>
                   <TextField
                     className="pu-gstnoZ pu-custom-bordered-input"
@@ -10063,8 +9955,7 @@ return (
                       maxLength: 48,
                       style: {
                         height: "20px",
-                        fontSize: `${fontSize}px`,
-                        // padding: "0 8px",
+                        fontSize: `${fsize}px`,
                       },
                       readOnly: !isEditMode || isDisabled,
                     }}
@@ -10085,8 +9976,7 @@ return (
                       maxLength: 48,
                       style: {
                         height: "20px",
-                        fontSize: `${fontSize}px`,
-                        // padding: "0 8px",
+                        fontSize: `${fsize}px`,
                       },
                       readOnly: !isEditMode || isDisabled,
                     }}
@@ -10123,14 +10013,13 @@ return (
                 maxLength: 48,
                 style: {
                   height: "20px",
-                  fontSize: `${fontSize}px`,
-                  // padding: "0 8px"
+                  fontSize: `${fsize}px`,
                 },
                 readOnly: !isEditMode || isDisabled,
               }}
             />
             <div className={`pu-erp-input3 ${(!isEditMode || isDisabled) ? "pu-disabled" : ""}`}>
-              <span style={{marginTop:8}} className="pu-erp-label3">BILL DATE</span>
+              <span style={{paddingTop:"2px"}} className="pu-erp-label3">BILL DATE</span>
               <InputMask
                 mask="99-99-9999"
                 value={formData.vbdate}
@@ -10142,7 +10031,7 @@ return (
                 {(inputProps) => (
                   <input
                     {...inputProps}
-                    style={{marginTop:5}}
+                    style={{marginTop:5,fontSize: `${fsize}px`}}
                     ref={vbDateRef}
                     className="pu-custom-style3"
                     onKeyDown={handleEnterKeyPress(vbDateRef, grNoRef)}
@@ -10150,13 +10039,6 @@ return (
                 )}
               </InputMask>
               </div>
-            {/* <DatePicker
-              className="pu-DatePICKERP"
-              id="date"
-              selected={selectedDate}
-              onChange={(date) => setSelectedDate(date)}
-              dateFormat="dd-MM-yyyy"
-            /> */}
           </div>
           <div className="pu-GRNo">
             <TextField
@@ -10174,8 +10056,7 @@ return (
                 maxLength: 12,
                 style: {
                   height: "20px",
-                  fontSize: `${fontSize}px`,
-                  // padding: "0 8px"
+                  fontSize: `${fsize}px`,
                 },
                 readOnly: !isEditMode || isDisabled,
               }}
@@ -10197,12 +10078,10 @@ return (
                   maxLength: 10,
                   style: {
                     height: "20px",
-                    fontSize: `${fontSize}px`,
-                    // padding: "0 8px"
+                    fontSize: `${fsize}px`,
                   },
                   readOnly: !isEditMode || isDisabled,
                 }}
-                // sx={{ width: 128,mt:0.5 }}
               />
             </div>
           </div>
@@ -10222,8 +10101,7 @@ return (
                 maxLength: 48,
                 style: {
                   height: "20px",
-                  fontSize: `${fontSize}px`,
-                  // padding: "0 8px"
+                  fontSize: `${fsize}px`,
                 },
                 readOnly: !isEditMode || isDisabled,
               }}
@@ -10245,8 +10123,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: "20px",
-                    fontSize: `${fontSize}px`,
-                    // padding: "0 8px"
+                    fontSize: `${fsize}px`,
                   },
                   readOnly: !isEditMode || isDisabled,
                 }}
@@ -10261,7 +10138,7 @@ return (
                 variant="filled"
                 className="pu-custom-bordered-input"
                 sx={{
-                  fontSize: `${fontSize}px`,
+                  fontSize: `${fsize}px`,
                   "& .MuiFilledInput-root": {
                     height: 47, // adjust as needed (default ~56px for filled)
                   },
@@ -10307,7 +10184,7 @@ return (
                   }}
                   inputProps={{
                     sx: {
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       pointerEvents: (!isEditMode || isDisabled) ? "none" : "auto", // stop mouse clicks
                     },
                   }}
@@ -10341,7 +10218,7 @@ return (
                 className="pu-SupplyTYPE pu-custom-bordered-input"
                 sx={{
                   // width: '250px',
-                  fontSize: `${fontSize}px`,
+                  fontSize: `${fsize}px`,
                   "& .MuiFilledInput-root": {
                     height: 47, // adjust as needed (default ~56px for filled)
                   },
@@ -10386,7 +10263,7 @@ return (
                   displayEmpty
                   inputProps={{
                     sx: {
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       pointerEvents: (!isEditMode || isDisabled) ? "none" : "auto", // stop mouse clicks
                     },
                   }}
@@ -10406,14 +10283,12 @@ return (
         </div>
       </div>
       {/* Table content */}
-      {/* <div ref={tableContainerRef} className="pu-tablestylez">
-        <Table ref={tableRef} className="pu-custom-table"> */}
-        <div
-  ref={tableContainerRef}
-  className="pu-tablestylez"
-  style={{ zoom: isMacOs ? 1.4 : 1 }}
->
-  <Table ref={tableRef} className="pu-custom-table">
+      <div
+        ref={tableContainerRef}
+        className="pu-tablestylez"
+        style={{ zoom: isMacOs ? 1.4 : 1 }}
+      >
+        <Table ref={tableRef} className="pu-custom-table">
           <thead
             style={{
               background: color,
@@ -10422,7 +10297,7 @@ return (
               top: 0,
             }}
           >
-            <tr style={{ color: "#575a5a" }}>
+            <tr style={{ color: "#575a5a",}}>
             {tableData.itemcode && <th>ITEMCODE</th>}
             {tableData.sdisc && <th>DESCRIPTION</th>}
             {tableData.hsncode && <th>HSNCODE</th>}
@@ -10446,11 +10321,11 @@ return (
                 {tableData.itemcode && (
                 <td style={{ padding: 0, width: 30 }}>
                   <input
-                   disabled={!canEditRow(index)}
+                  disabled={!canEditRow(index)}
                     className="pu-ItemCode"
                     style={{
                       height: 40,
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -10465,7 +10340,7 @@ return (
                       handleOpenModalBack(e, index, "vcode");
                     }}
                     onDoubleClick={(e) => {
-                     handleDoubleClickAfter(e,"vcode", index)
+                    handleDoubleClickAfter(e,"vcode", index)
                     }}
                     ref={(el) => (itemCodeRefs.current[index] = el)}
                     onFocus={(e) => e.target.select()} // Select text on focus
@@ -10479,7 +10354,7 @@ return (
                     className="pu-desc"
                     style={{
                       height: 40,
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -10506,7 +10381,7 @@ return (
                     className="pu-Hsn"
                     style={{
                       height: 40,
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -10539,7 +10414,7 @@ return (
                       border: "none",
                       padding: 5,
                       textAlign: "right",
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                     }}
                     maxLength={48}
                     readOnly={!isEditMode || isDisabled}
@@ -10568,7 +10443,7 @@ return (
                       border: "none",
                       padding: 5,
                       textAlign: "right",
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                     }}
                     maxLength={48}
                     readOnly={!isEditMode || isDisabled}
@@ -10597,7 +10472,7 @@ return (
                       border: "none",
                       padding: 5,
                       textAlign: "right",
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                     }}
                     maxLength={48}
                     readOnly={!isEditMode || isDisabled}
@@ -10621,7 +10496,7 @@ return (
                     className="pu-Amount"
                     style={{
                       height: 40,
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -10656,7 +10531,7 @@ return (
                     className="pu-Disc"
                     style={{
                       height: 40,
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -10684,7 +10559,7 @@ return (
                     className="pu-discount"
                     style={{
                       height: 40,
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -10712,7 +10587,7 @@ return (
                     className="pu-Others"
                     style={{
                       height: 40,
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -10732,7 +10607,7 @@ return (
                     className="pu-Others"
                     style={{
                       height: 40,
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -10749,7 +10624,7 @@ return (
                     // onChange={(e) => handleItemChange(index, "exp_before", e.target.value)}
                     onKeyDown={(e) => {
                       handleKeyDown(e, index, "exp_before");
-                       handleKeyDownExp(e, "exp_before", index)
+                      handleKeyDownExp(e, "exp_before", index)
                     }}
                     onFocus={(e) => {
                       e.target.select(); // Select the entire text when the field is focused
@@ -11073,7 +10948,7 @@ return (
                     className="pu-CTax"
                     style={{
                       height: 40,
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -11101,7 +10976,7 @@ return (
                     className="pu-STax"
                     style={{
                       height: 40,
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -11130,7 +11005,7 @@ return (
                     className="pu-ITax"
                     style={{
                       height: 40,
-                      fontSize: `${fontSize}px`,
+                      fontSize: `${fsize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -11179,50 +11054,50 @@ return (
               </tr>
             ))}
           </tbody>
-          <tfoot style={{ background: color, position: "sticky", bottom: -6, fontSize: `${fontSize}px`,borderTop:"1px solid black" }}>
-          <tr style={{ fontWeight: "bold", textAlign: "right" }}>
+          <tfoot style={{ background: color, position: "sticky", bottom: -6, fontSize: `${fsize}px`,borderTop:"1px solid black" }}>
+          <tr style={{ textAlign: "right"}}>
             {tableData.itemcode && <td></td>}
-            {tableData.sdisc && <td>TOTAL</td>}
+            {tableData.sdisc && <td style={{fontSize: `${fsize}px`}}>TOTAL</td>}
             {tableData.hsncode && <td></td>}
             {tableData.pcs && (
-              <td>{items.reduce((sum, item) => sum + parseFloat(item.pkgs || 0), 0).toFixed(pkgsValue)}</td>
+              <td style={{fontSize: `${fsize}px`}}>{items.reduce((sum, item) => sum + parseFloat(item.pkgs || 0), 0).toFixed(pkgsValue)}</td>
             )}
             {tableData.qty && (
-              <td>{items.reduce((sum, item) => sum + parseFloat(item.weight || 0), 0).toFixed(weightValue)}</td>
+              <td style={{fontSize: `${fsize}px`}}>{items.reduce((sum, item) => sum + parseFloat(item.weight || 0), 0).toFixed(weightValue)}</td>
             )}
             {tableData.rate && <td></td>}
             {tableData.amount && (
-              <td>{items.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0).toFixed(2)}</td>
+              <td style={{fontSize: `${fsize}px`}}>{items.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0).toFixed(2)}</td>
             )}
             {tableData.discount && (
               <>
-                <td>{items.reduce((sum, item) => sum + parseFloat(item.disc || 0), 0).toFixed(2)}</td>
-                <td>{items.reduce((sum, item) => sum + parseFloat(item.discount || 0), 0).toFixed(2)}</td>
+                <td style={{fontSize: `${fsize}px`}}>{items.reduce((sum, item) => sum + parseFloat(item.disc || 0), 0).toFixed(2)}</td>
+                <td style={{fontSize: `${fsize}px`}}>{items.reduce((sum, item) => sum + parseFloat(item.discount || 0), 0).toFixed(2)}</td>
               </>
             )}
             {tableData.gst && <td></td>}
             {tableData.others && (
-              <td>{items.reduce((sum, item) => sum + parseFloat(item.exp_before || 0), 0).toFixed(2)}</td>
+              <td style={{fontSize: `${fsize}px`}}>{items.reduce((sum, item) => sum + parseFloat(item.exp_before || 0), 0).toFixed(2)}</td>
             )}
             {tableData.cgst && (
-              <td>{items.reduce((sum, item) => sum + parseFloat(item.ctax || 0), 0).toFixed(2)}</td>
+              <td style={{fontSize: `${fsize}px`}}>{items.reduce((sum, item) => sum + parseFloat(item.ctax || 0), 0).toFixed(2)}</td>
             )}
             {tableData.sgst && (
-              <td>{items.reduce((sum, item) => sum + parseFloat(item.stax || 0), 0).toFixed(2)}</td>
+              <td style={{fontSize: `${fsize}px`}}>{items.reduce((sum, item) => sum + parseFloat(item.stax || 0), 0).toFixed(2)}</td>
             )}
             {tableData.igst && (
-              <td>{items.reduce((sum, item) => sum + parseFloat(item.itax || 0), 0).toFixed(2)}</td>
+              <td style={{fontSize: `${fsize}px`}}>{items.reduce((sum, item) => sum + parseFloat(item.itax || 0), 0).toFixed(2)}</td>
             )}
             {isEditMode && <td></td>}
           </tr>
           </tfoot>
         </Table>
       </div>
-       {isModalOpen && (
-    <PurchaseSetup
-      onClose={closeModal}
-    />
-  )}
+      {isModalOpen && (
+        <PurchaseSetup
+          onClose={closeModal}
+        />
+      )}
 
       {showModal && (
       <ProductModal
@@ -11254,7 +11129,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                   },
                 }}
                 size="small"
@@ -11278,7 +11153,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     readOnly: !isEditMode || isDisabled,
                   },
                 }}
@@ -11303,7 +11178,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     readOnly: !isEditMode || isDisabled,
                   },
                 }}
@@ -11321,11 +11196,9 @@ return (
               <FormControl
                 variant="filled"
                 size="small"
-                // disabled={!isEditMode || isDisabled}
                 sx={{
-                  // width: '100%', // Let width be controlled by content or parent
                   "& .MuiFilledInput-root": {
-                    height: 48, // Match your original height
+                    height: 42,
                   },
                 }}
                 className="pu-TDSon pu-custom-bordered-input"
@@ -11359,7 +11232,7 @@ return (
                   sx={{
                     color: "red",
                     fontWeight: "bold",
-                    fontSize: `${fontSize}px`, // 👈 Dynamic font size
+                    fontSize: `${fsize}px`, // 👈 Dynamic font size
                     backgroundColor: (!isEditMode || isDisabled) ? "#f0f0f0" : "white", // mimic disabled style
                     pointerEvents: (!isEditMode || isDisabled) ? "none" : "auto", // stop mouse clicks
                   }}
@@ -11390,7 +11263,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     color: 'red',
                   },
                 }}
@@ -11423,7 +11296,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     color: "red",
                   },
                 }}
@@ -11443,7 +11316,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     color: "red",
                   },
                 }}
@@ -11472,7 +11345,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     color: "red",
                   },
                 }}
@@ -11493,7 +11366,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     color: "red",
                   },
                 }}
@@ -11506,6 +11379,19 @@ return (
           </div>
           {/* C/S/I/TDS */}
           <div style={{ display: "flex", flexDirection: "column", marginLeft: 5,marginTop:"auto"}}>
+            {formData.Tds2 && Number(formData.Tds2) > 0 && (
+              <TextField
+                className="pu-CTDS sa-custom-bordered-input"
+                id="tax"
+                value={"2%"}
+                label="GST. TDS"
+                inputProps={{ maxLength: 48, style: { height: 20, fontSize: `${fsize}px` } }}
+                onFocus={(e) => e.target.select()}
+                size="small"
+                variant="filled"
+                sx={{ width: 120 }}
+              />
+            )}
             <div className="pu-tdstax" style={{ display: "flex", flexDirection: "row" }}>
               <TextField
                 className="pu-CTDS pu-custom-bordered-input"
@@ -11516,7 +11402,7 @@ return (
                 inputProps={{
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     backgroundColor: "white",
                     borderRadius: 5,
                   },
@@ -11538,7 +11424,7 @@ return (
                 inputProps={{
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     backgroundColor: "white",
                     borderRadius: 5,
                   },
@@ -11560,7 +11446,7 @@ return (
                 inputProps={{
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     backgroundColor: "white",
                     borderRadius: 5,
                   },
@@ -11583,7 +11469,7 @@ return (
                 inputProps={{
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     backgroundColor: "white",
                     borderRadius: 5,
                   },
@@ -11599,7 +11485,7 @@ return (
             </div>
           </div>
           {/* Due Date */}
-          <div style={{ display: "flex", flexDirection: "column",marginLeft:"auto",marginRight:5 }}>
+          <div style={{ display: "flex", flexDirection: "column",marginLeft:"auto"}}>
             <div className="pu-duedatez">
               <div className={`pu-erp-input3 ${(!isEditMode || isDisabled) ? "pu-disabled" : ""}`}>
                 <span className="pu-erp-label3">DUE DATE</span>
@@ -11619,6 +11505,7 @@ return (
                       onKeyDown={(e) => {
                         handleKeyDowndown(e, expAfterGSTRef);
                       }}
+                      style={{fontSize: `${fsize}px`, paddingTop:"24px"}}
                     />
                   )}
                 </InputMask>
@@ -11633,7 +11520,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                   },
                 }}
                 size="small"
@@ -11651,7 +11538,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                   },
                 }}
                 size="small"
@@ -11675,7 +11562,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                   },
                 }}
                 onFocus={(e) => e.target.select()}
@@ -11706,7 +11593,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                   },
                   readOnly: !isEditMode || isDisabled,
                 }}
@@ -11966,7 +11853,7 @@ return (
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     color: "red",
                     fontWeight: "bold",
                   },
@@ -11974,7 +11861,6 @@ return (
                 size="small"
                 variant="filled"
                 className="pu-TOTALFIELD pu-custom-bordered-input"
-                // sx={{ width: 150 }}
               />
             </div>
           </div>

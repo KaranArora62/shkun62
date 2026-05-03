@@ -2592,7 +2592,7 @@ import { Modal } from "react-bootstrap";
 import BankWinModal from "../BankVoucher/BankWinModal";
 
 const BankVoucher = () => {
-  const companySetup = useCompanySetup();
+  const {fsize} = useCompanySetup();
   const location = useLocation();
   const bankId = location.state?.bankId;
   const navigate = useNavigate();
@@ -2642,7 +2642,6 @@ const BankVoucher = () => {
     "#8FBC8F",
   ];
   const [buttonColors, setButtonColors] = useState(initialColors);
-  const [fontSize, setFontSize] = useState(17);
 
   const [formData, setFormData] = useState({
     vtype: "B",
@@ -4199,11 +4198,15 @@ const BankVoucher = () => {
   }, [searchBillNo, searchDate, allBills]);
 
   const handleSelectBill = (bill) => {
-    setFormData({
+    const updatedFormData = {
       ...bill.formData,
       date: bill.formData.date,
-    });
+    };
+
+    setFormData(updatedFormData);
     setItems(normalizeItems(bill.items));
+    setData1({ ...bill, formData: updatedFormData });
+    setIndex(bill?.formData?.vno || 0);
     setShowSearch(false);
     setFilteredBills([]);
     setSearchBillNo("");
@@ -4343,6 +4346,7 @@ const BankVoucher = () => {
                       onKeyDown={(e) => {
                         handleEnterKeyPress(datePickerRef, VoucherRef)(e);
                       }}
+                      style={{ fontSize: `${fsize}px`,}}
                     />
                   )}
                 </InputMask>
@@ -4363,7 +4367,7 @@ const BankVoucher = () => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     fontWeight: "bold",
                   },
                   readOnly: !isEditMode || isDisabled,
@@ -4383,7 +4387,7 @@ const BankVoucher = () => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fontSize}px`,
+                    fontSize: `${fsize}px`,
                     fontWeight: "bold",
                   },
                   readOnly: !isEditMode || isDisabled,
@@ -4412,7 +4416,7 @@ const BankVoucher = () => {
                       maxLength: 48,
                       style: {
                         height: 20,
-                        fontSize: `${fontSize}px`,
+                        fontSize: `${fsize}px`,
                         fontWeight: "bold",
                       },
                       readOnly: !isEditMode || isDisabled,
@@ -4432,7 +4436,7 @@ const BankVoucher = () => {
                       maxLength: 48,
                       style: {
                         height: 20,
-                        fontSize: `${fontSize}px`,
+                        fontSize: `${fsize}px`,
                         fontWeight: "bold",
                       },
                       readOnly: !isEditMode || isDisabled,
@@ -4493,7 +4497,7 @@ const BankVoucher = () => {
                   <tr key={index}>
                     <td style={{ padding: 0 }}>
                       <input
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                         disabled={!canEditRow(index)}
                         className="Account"
                         type="text"
@@ -4510,7 +4514,7 @@ const BankVoucher = () => {
 
                     <td style={{ padding: 0 }}>
                       <input
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                         className="Payments"
                         readOnly={!isEditMode || isDisabled}
                         value={Number(item.payment_debit) === 0 ? "" : item.payment_debit}
@@ -4525,7 +4529,7 @@ const BankVoucher = () => {
 
                     <td style={{ padding: 0 }}>
                       <input
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                         className="Receipts"
                         readOnly={!isEditMode || isDisabled}
                         value={Number(item.receipt_credit) === 0 ? "" : item.receipt_credit}
@@ -4540,7 +4544,7 @@ const BankVoucher = () => {
 
                     <td style={{ padding: 0 }}>
                       <input
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                         disabled={!canEditRow(index)}
                         className="Discounts"
                         readOnly={!isEditMode || isDisabled}
@@ -4555,7 +4559,7 @@ const BankVoucher = () => {
 
                     <td style={{ padding: 0 }}>
                       <input
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                         disabled={!canEditRow(index)}
                         className="Totals"
                         readOnly
@@ -4569,7 +4573,7 @@ const BankVoucher = () => {
 
                     <td style={{ padding: 0 }}>
                       <input
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                         disabled={!canEditRow(index)}
                         className="Bankcharges"
                         readOnly={!isEditMode || isDisabled}
@@ -4584,7 +4588,7 @@ const BankVoucher = () => {
 
                     <td style={{ padding: 0 }}>
                       <input
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                         disabled={!canEditRow(index)}
                         className="TDSrs"
                         readOnly={!isEditMode || isDisabled}
@@ -4599,7 +4603,7 @@ const BankVoucher = () => {
 
                     <td style={{ padding: 0 }}>
                       <input  
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                         disabled={!canEditRow(index)}
                         className="chnqBank"
                         readOnly={!isEditMode || isDisabled}
@@ -4614,7 +4618,7 @@ const BankVoucher = () => {
 
                     <td style={{ padding: 0 }}>
                       <input 
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                         disabled={!canEditRow(index)}
                         className="REM"
                         list={showNarrationSuggestions ? "narrationList" : undefined}
@@ -4658,11 +4662,11 @@ const BankVoucher = () => {
               <tfoot>
                 <tr>
                   <td></td>
-                  <td style={{fontSize: `${fontSize}px`}}>{Number(formData.totalpayment) === 0 ? "" : formData.totalpayment}</td>
-                  <td style={{fontSize: `${fontSize}px`}}>{Number(formData.totalreceipt) === 0 ? "" : formData.totalreceipt}</td>
-                  <td style={{fontSize: `${fontSize}px`}}>{Number(formData.totaldiscount) === 0 ? "" : formData.totaldiscount}</td>
+                  <td style={{fontSize: `${fsize}px`}}>{Number(formData.totalpayment) === 0 ? "" : formData.totalpayment}</td>
+                  <td style={{fontSize: `${fsize}px`}}>{Number(formData.totalreceipt) === 0 ? "" : formData.totalreceipt}</td>
+                  <td style={{fontSize: `${fsize}px`}}>{Number(formData.totaldiscount) === 0 ? "" : formData.totaldiscount}</td>
                   <td></td>
-                  <td style={{fontSize: `${fontSize}px`}}>{Number(formData.totalbankcharges) === 0 ? "" : formData.totalbankcharges}</td>
+                  <td style={{fontSize: `${fsize}px`}}>{Number(formData.totalbankcharges) === 0 ? "" : formData.totalbankcharges}</td>
                   <td colSpan={3}></td>
                   {isEditMode && <td></td>}
                 </tr>

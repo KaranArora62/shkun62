@@ -2140,8 +2140,11 @@ import PrintChoiceModal from "../Shared/PrintChoiceModal";
 import FAVoucherModal from "../Shared/FAVoucherModal";
 import SearchModal from "../Shared/SearchModal";
 import useShortcuts from "../Shared/useShortcuts";
+import useCompanySetup from "../Shared/useCompanySetup";
 
 const JournalVoucher = () => {
+
+  const {fsize} = useCompanySetup();
   const location = useLocation();
   const journalId = location.state?.journalId;
   const navigate = useNavigate();
@@ -2231,7 +2234,7 @@ const JournalVoucher = () => {
 
   const fetchNarrations = async () => {
     try {
-      const res = await fetch(`https://www.shk.com/shkl/${tenant}/tenant/api/journal`);
+      const res = await fetch(`https://www.shkunweb.com/shkunlive/${tenant}/tenant/api/journal`);
       const data = await res.json();
 
       const narrs = data
@@ -2327,7 +2330,7 @@ const handleNumericValue = (event) => {
 
   const fetchCustomers = async () => {
     try {
-      const response = await fetch(`https://www.shk.com/shkl/${tenant}/tenant/api/ledgerAccount`);
+      const response = await fetch(`https://www.shkunweb.com/shkunlive/${tenant}/tenant/api/ledgerAccount`);
       if (!response.ok) {
         throw new Error("Failed to fetch products");
       }
@@ -2501,9 +2504,9 @@ const handleNumericValue = (event) => {
     try {
       let response;
       if (journalId) {
-        response = await axios.get(`https://www.shk.com/shkl/${tenant}/tenant/journalget/${journalId}`);
+        response = await axios.get(`https://www.shkunweb.com/shkunlive/${tenant}/tenant/journalget/${journalId}`);
       } else {
-        response = await axios.get(`https://www.shk.com/shkl/${tenant}/tenant/journal/last`);
+        response = await axios.get(`https://www.shkunweb.com/shkunlive/${tenant}/tenant/journal/last`);
       }
 
       if (response.status === 200 && response.data.data) {
@@ -2668,7 +2671,7 @@ const handleNumericValue = (event) => {
     try {
       if (data1) {
         const response = await axios.get(
-          `https://www.shk.com/shkl/${tenant}/tenant/journal/next/${data1._id}`
+          `https://www.shkunweb.com/shkunlive/${tenant}/tenant/journal/next/${data1._id}`
         );
         if (response.status === 200 && response.data) {
           const nextData = response.data.data;
@@ -2694,7 +2697,7 @@ const handleNumericValue = (event) => {
     try {
       if (data1) {
         const response = await axios.get(
-          `https://www.shk.com/shkl/${tenant}/tenant/journal/previous/${data1._id}`
+          `https://www.shkunweb.com/shkunlive/${tenant}/tenant/journal/previous/${data1._id}`
         );
         if (response.status === 200 && response.data) {
           setData1(response.data.data);
@@ -2719,7 +2722,7 @@ const handleNumericValue = (event) => {
     setTitle("View");
     try {
       const response = await axios.get(
-        `https://www.shk.com/shkl/${tenant}/tenant/journal/first`
+        `https://www.shkunweb.com/shkunlive/${tenant}/tenant/journal/first`
       );
       if (response.status === 200 && response.data) {
         const firstData = response.data.data;
@@ -2744,7 +2747,7 @@ const handleNumericValue = (event) => {
 
     try {
       const response = await axios.get(
-        `https://www.shk.com/shkl/${tenant}/tenant/journal/last`
+        `https://www.shkunweb.com/shkunlive/${tenant}/tenant/journal/last`
       );
       if (response.status === 200 && response.data) {
         const lastData = response.data.data;
@@ -2939,7 +2942,7 @@ const handleNumericValue = (event) => {
         };
       }
 
-      const apiEndpoint = `https://www.shk.com/shkl/${tenant}/tenant/journal${isAbcmode ? `/${data1._id}` : ""}`;
+      const apiEndpoint = `https://www.shkunweb.com/shkunlive/${tenant}/tenant/journal${isAbcmode ? `/${data1._id}` : ""}`;
       const method = isAbcmode ? "put" : "post";
       const response = await axios({
         method,
@@ -2996,7 +2999,7 @@ const handleNumericValue = (event) => {
 
     setIsSaving(true);
     try {
-      const apiEndpoint = `https://www.shk.com/shkl/${tenant}/tenant/journal/${data1._id}`;
+      const apiEndpoint = `https://www.shkunweb.com/shkunlive/${tenant}/tenant/journal/${data1._id}`;
       const response = await axios.delete(apiEndpoint);
 
       if (response.status === 200) {
@@ -3043,7 +3046,7 @@ const handleNumericValue = (event) => {
     }
     try {
       const response = await axios.get(
-        `https://www.shk.com/shkl/${tenant}/tenant/journal/last`
+        `https://www.shkunweb.com/shkunlive/${tenant}/tenant/journal/last`
       );
 
       if (response.status === 200 && response.data.data) {
@@ -3379,7 +3382,7 @@ const handleNumericValue = (event) => {
 
   const fetchAllBills = async () => {
     try {
-      const res = await axios.get(`https://www.shk.com/shkl/${tenant}/tenant/api/journal`);
+      const res = await axios.get(`https://www.shkunweb.com/shkunlive/${tenant}/tenant/api/journal`);
       if (Array.isArray(res.data)) {
         setAllBills(res.data);
         setFilteredBills(res.data);
@@ -3417,11 +3420,15 @@ const handleNumericValue = (event) => {
   }, [searchBillNo, searchDate, allBills]);
 
   const handleSelectBill = (bill) => {
-    setFormData({
+    const updatedFormData = {
       ...bill.formData,
       date: bill.formData.date,
-    });
+    };
+
+    setFormData(updatedFormData);
     setItems(normalizeItems(bill.items));
+    setData1({ ...bill, formData: updatedFormData });
+    setIndex(bill?.formData?.vno || 0);
     setShowSearch(false);
     setFilteredBills([]);
     setSearchBillNo("");
@@ -3579,7 +3586,7 @@ const handleNumericValue = (event) => {
             maxLength: 48,
             style: {
               height: 20,
-              fontSize: `${fontSize}px`,
+              fontSize: `${fsize}px`,
               fontWeight: "bold",
             },
             readOnly: !isEditMode || isDisabled,
@@ -3601,7 +3608,7 @@ const handleNumericValue = (event) => {
             maxLength: 48,
             style: {
               height: 20,
-              fontSize: `${fontSize}px`,
+              fontSize: `${fsize}px`,
               fontWeight: "bold",
             },
             readOnly: !isEditMode || isDisabled,
@@ -3660,13 +3667,13 @@ const handleNumericValue = (event) => {
                         }}
                         ref={(el) => (accountNameRefs.current[index] = el)}
                         onFocus={(e) => e.target.select()}
-                        style={{fontSize: `${fontSize}px`}}
+                        style={{fontSize: `${fsize}px`}}
                       />
                     </td>
 
                     <td style={{ padding: 0, position: "relative" }}>
                       <input
-                      style={{fontSize: `${fontSize}px`}}
+                      style={{fontSize: `${fsize}px`}}
                         disabled={!canEditRow(index)}
                         className="Narration"
                         list={showNarrationSuggestions ? "narrationList" : undefined}
@@ -3744,7 +3751,7 @@ const handleNumericValue = (event) => {
 
                     <td style={{ padding: 0, width: 250 }}>
                       <input
-                      style={{fontSize: `${fontSize}px`}}
+                      style={{fontSize: `${fsize}px`}}
                         className="Debit"
                         readOnly={!isEditMode || isDisabled}
                         value={Number(item.debit) === 0 ? "" : item.debit}
@@ -3773,7 +3780,7 @@ const handleNumericValue = (event) => {
 
                     <td style={{ padding: 0, width: 250 }}>
                       <input
-                      style={{fontSize: `${fontSize}px`}}
+                      style={{fontSize: `${fsize}px`}}
                         className="Credits"
                         readOnly={!isEditMode || isDisabled}
                         value={Number(item.credit) === 0 ? "" : item.credit}
@@ -3823,8 +3830,8 @@ const handleNumericValue = (event) => {
               <tfoot>
                 <tr>
                   <td colSpan={2}></td>
-                  <td style={{fontSize: `${fontSize}px`}}>{formData.totaldebit}</td>
-                  <td style={{fontSize: `${fontSize}px`}}>{formData.totalcredit}</td>
+                  <td style={{fontSize: `${fsize}px`}}>{formData.totaldebit}</td>
+                  <td style={{fontSize: `${fsize}px`}}>{formData.totalcredit}</td>
                   {isEditMode && <td></td>}
                 </tr>
               </tfoot>

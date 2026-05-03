@@ -16,6 +16,7 @@ export default function useCompanySetup() {
   const [unitType, setunitType] = useState(null);
   const [dateFrom, setdateFrom] = useState(null);
   const [cPin, setCPin] = useState(null);
+  const [fsize, setFsize] = useState(null);
   const [decimals, setDecimals] = useState(3);
 
   const normalizeDecimals = (value) => {
@@ -47,6 +48,7 @@ export default function useCompanySetup() {
           setunitType(formDataFromAPI.unitType);
           setdateFrom(formDataFromAPI.Afrom);
           setCPin(formDataFromAPI.pin);
+          setFsize(formDataFromAPI.fsize);
           setDecimals(normalizeDecimals(formDataFromAPI.Decimals));
         } else {
           throw new Error("Invalid response structure");
@@ -59,5 +61,5 @@ export default function useCompanySetup() {
     fetchCompanySetup();
   }, []);
 
-  return { companyName, companyAdd, companyCity, companyPhn, companyPhn2, companyGST, companyPAN, companyDesc, companyEmail, CompanyState, unitType, dateFrom, cPin, decimals };
+  return { companyName, companyAdd, companyCity, companyPhn, companyPhn2, companyGST, companyPAN, companyDesc, companyEmail, CompanyState, unitType, dateFrom, cPin, decimals, fsize };
 }

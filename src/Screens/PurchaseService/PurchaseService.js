@@ -8,6 +8,7 @@ import Button from "react-bootstrap/Button";
 import ProductModal from "../Modals/ProductModal";
 import ProductModalCustomer from "../Modals/ProductModalCustomer";
 import axios from "axios";
+import ReactDOM from "react-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { FaCog, FaTimes } from "react-icons/fa";
@@ -30,6 +31,7 @@ import useTdsApplicable from "../Shared/useTdsApplicable";
 import { useNavigate, useLocation } from "react-router-dom";
 import FAVoucherModal from "../Shared/FAVoucherModal";
 import useShortcuts from "../Shared/useShortcuts";
+import { isMacOs } from "react-device-detect";
 
 const LOCAL_STORAGE_KEY = "TABLEdataPS";
 
@@ -58,6 +60,7 @@ const PurchaseService = () => {
     // console.error("No tenant selected!");
   }
 
+  const [fontSize, setFontSize] = useState(17); // Initial font size in pixels
   const [selectedCopies, setSelectedCopies] = useState([]);
   const [title, setTitle] = useState("(View)");
   const [currentIndex, setCurrentIndex] = useState(null);
@@ -2794,13 +2797,6 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
     });
   };
 
-  const [fsize, setfsize] = useState(16.5); // Initial font size in pixels
-  const increaseFontSize = () => {
-    setfsize((prevSize) => (prevSize < 20 ? prevSize + 2 : prevSize)); // Increase font size up to 20 pixels
-  };
-  const decreaseFontSize = () => {
-    setfsize((prevSize) => (prevSize > 14 ? prevSize - 2 : prevSize)); // Decrease font size down to 14 pixels
-  };
   const [pressedKey, setPressedKey] = useState(""); // State to hold the pressed key
   const fieldOrder = [
     { name: "vcode",      refArray: itemCodeRefs },
@@ -3421,7 +3417,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
     }
   }, [purWinFromState]);
   return (
-    <div>
+    <div className={`pu-sale-page ${isMacOs ? "pu-mac" : ""}`}>
       <div>
         <ToastContainer />
       </div>
@@ -3438,16 +3434,8 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
           />
         )}
       </div>
-      <div style={{ display: "flex", flexDirection: "row", marginTop: -30 }}>
-        <h1 className="headerSale">
-          PURCHASE GST SERVICES{" "}
-          <span className="text-black-500 font-semibold text-base sm:text-lg">
-            {title}
-          </span>
-        </h1>
-      </div>
-      <div className="pur_toppart ">
-        <div className="Dated ">
+      <div className="pu-pur_toppart"   style={{ zoom: isMacOs ? 1.1 : 1 }}>
+        <div className="pu-Dated">
           <InputMask
             mask="99-99-9999"
             placeholder="dd-mm-yyyy"
@@ -3460,7 +3448,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
             {(inputProps) => (
               <input
                 {...inputProps}
-                className="DatePICKER"
+                className="pu-DatePICKER"
                 ref={datePickerRef}
                 onKeyDown={(e) => {
                   handleEnterKeyPress(datePickerRef, voucherNoRef)(e);
@@ -3468,111 +3456,72 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
               />
             )}
           </InputMask>
-          <div className="billdivz">
+          <div className="pu-billdivz">
             <TextField
               inputRef={voucherNoRef}
-              className="billzNo custom-bordered-input"
+              className="pu-billzNo pu-custom-bordered-input"
               id="vno"
               value={formData.vno}
               variant="filled"
+              style={{marginLeft:30}}
               size="small"
               label="V.NO"
               onKeyDown={(e) => {
-                handleEnterKeyPress(voucherNoRef,convRef )(e);
+                handleEnterKeyPress(voucherNoRef,customerNameRef )(e);
               }}
               inputProps={{
                 maxLength: 48,
                 style: {
                   height: "20px",
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                   // padding: "0 8px"
                 },
                 readOnly: !isEditMode || isDisabled,
               }}
             />
           </div>
-          <div className="ConvPS">
-            <FormControl
-              variant="outlined"
-              sx={{
-                minWidth: 150, // optional
-                "& .MuiOutlinedInput-root": {
-                  height: 46,
-                  backgroundColor: "white",
-                  
-                  "& fieldset": {
-                    borderColor: "#918e8e",
-                  },
-                  borderBottom: "2px solid #918e8e",
 
-                  "&:hover fieldset": {
-                    borderColor: "#918e8e",
-                  },
-                  "&.Mui-focused fieldset": {
-                    borderColor: "#1976d2",
-                  },
-                },
-                "& .MuiSelect-select": {
-                  display: "flex",
-                  alignItems: "center", // 👈 vertical center text
-                  height: "100%",
-                  padding: "0 12px", // adjust spacing
-                  backgroundColor: "white",
-                  fontSize: `${fsize}px`,
-                  fontWeight: "bold"
-                },
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 10,
+              minWidth: 0,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              padding: "0 6px",
+            }}
+          >
+            <span
+              style={{
+                fontSize: 20,
+                fontWeight: 800,
+                letterSpacing: "1.6px",
+                textTransform: "uppercase",
+                color: "#0f172a",
+                fontFamily: '"Times New Roman", Times, serif',
+                lineHeight: 1,
               }}
             >
-              <Select
-              inputRef={convRef}
-                id="conv"
-                value={formData.conv}
-                onChange={(e) => {
-                  if (!isEditMode || isDisabled) return; // prevent changing
-                  handleConv(e);
-                }}
-                onOpen={(e) => {
-                  if (!isEditMode || isDisabled) {
-                    e.preventDefault(); // prevent dropdown opening
-                  }
-                }}
-                onKeyDownCapture={(e) => {
-                  if (e.key === "Enter") {
-                    const menuOpen = document.querySelector(".MuiMenu-paper");
+              PURCHASE GST SERVICES
+            </span>
 
-                    // ✅ CLOSED → move next (block opening)
-                    if (!menuOpen) {
-                      e.preventDefault();
-                      e.stopPropagation();
-
-                      handleEnterKeyPress(convRef, customerNameRef)(e);
-                    }
-                  }
-                  if (e.key === "ArrowDown") return;
-                }}
-                displayEmpty
-                inputProps={{
-                  sx: {
-                    fontSize: `${fsize}px`,
-                    pointerEvents:
-                      !isEditMode || isDisabled ? "none" : "auto", // stop mouse clicks
-                  },
-                }}
-                MenuProps={{ disablePortal: true }}
-              >
-                <MenuItem value="">
-                  <em></em>
-                </MenuItem>
-                <MenuItem value="Goods">
-                  Goods
-                </MenuItem>
-                <MenuItem value="Services">Services</MenuItem>
-              </Select>
-            </FormControl>
+            <span
+              style={{
+                fontSize: 18,
+                fontWeight: 700,
+                color: "#475569",
+                lineHeight: 1,
+              }}
+            >
+              {title}
+            </span>
           </div>
-          <div className="SetupPS">
+
+          <div className="pu-Setup">
               <button
-                className="Button"
+                className="pu-Button"
                 style={{ backgroundColor: "blue", color: "white", fontWeight: "bold" }}
                 onClick={openModal}
               >
@@ -3583,7 +3532,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
               <button
                 type="button"
                 onClick={() => setSettingsOpen(true)}
-                className="Setting text-xl text-blue-700"
+                className="pu-Setting text-xl text-blue-700"
                 style={{
                   cursor: "pointer",
                   border: "none",
@@ -3823,22 +3772,24 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                     </div>
                   </div>
                 </Modal.Body>
+
               </Modal>
+              
           </div>
-          {isModalOpen && <PurchaseSetup onClose={closeModal} />}
+          {/* {isModalOpen && <PurchaseSetup onClose={closeModal} />} */}
         </div>
-        <div className="TopFields">
+        <div className="pu-TopFields">
           {supplierdetails.map((item, index) => (
             <div key={item.vacode}>
-              <div className="CUS">
-                <div className="customerdiv">
+              <div className="pu-CUS">
+                <div className="pu-customerdiv">
                   <TextField
                     inputRef={customerNameRef}
-                    label="SUPPLIER NAME"
+                    label="CUSTOMER NAME"
                     variant="filled"
                     size="small"
                     value={item.vacode}
-                    className="customerNAME custom-bordered-input"
+                    className="pu-customerNAME pu-custom-bordered-input"
                     onKeyDown={(e) => {
                       handleEnterKeyPress(customerNameRef, vBillNoRef)(e);
                       handleKeyDown(e, index, "accountname");
@@ -3852,15 +3803,15 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                       maxLength: 48,
                       style: {
                         height: "20px",
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                       },
                       readOnly: !isEditMode || isDisabled,
                     }}
                   />
                 </div>
-                <div className="citydivZ">
+                <div className="pu-citydivZ">
                   <TextField
-                    className="cityName custom-bordered-input"
+                    className="pu-cityName pu-custom-bordered-input"
                     value={item.city}
                     variant="filled"
                     label="CITY"
@@ -3869,7 +3820,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                       maxLength: 48,
                       style: {
                         height: "20px",
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         // padding: "0 8px",
                       },
                       readOnly: !isEditMode || isDisabled,
@@ -3881,10 +3832,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   />
                 </div>
               </div>
-              <div className="GST">
+              <div className="pu-GST">
                 <div>
                   <TextField
-                    className="gstnoZ custom-bordered-input"
+                    className="pu-gstnoZ pu-custom-bordered-input"
                     value={item.gstno}
                     variant="filled"
                     size="small"
@@ -3893,7 +3844,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                       maxLength: 48,
                       style: {
                         height: "20px",
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         // padding: "0 8px",
                       },
                       readOnly: !isEditMode || isDisabled,
@@ -3904,9 +3855,9 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                     onFocus={(e) => e.target.select()}
                   />
                 </div>
-                <div className="pandivZ">
+                <div className="pu-pandivZ">
                   <TextField
-                    className="PANNoZ custom-bordered-input"
+                    className="pu-PANNoZ pu-custom-bordered-input"
                     value={item.pan}
                     variant="filled"
                     size="small"
@@ -3915,7 +3866,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                       maxLength: 48,
                       style: {
                         height: "20px",
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         // padding: "0 8px",
                       },
                       readOnly: !isEditMode || isDisabled,
@@ -3938,10 +3889,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
             tenant={tenant}
           />
           )}
-          <div className="BillDate">
+          <div className="pu-BillDate">
             <TextField
               inputRef={vBillNoRef}
-              className="VbillzNo custom-bordered-input"
+              className="pu-VbillzNo pu-custom-bordered-input"
               id="vbillno"
               value={formData.vbillno}
               variant="filled"
@@ -3953,49 +3904,45 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 maxLength: 48,
                 style: {
                   height: "20px",
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                   // padding: "0 8px"
                 },
                 readOnly: !isEditMode || isDisabled,
               }}
             />
-          <div style={{marginTop:3}}>
-          <InputMask
-            mask="99-99-9999"
-            value={formData.vbdate}
-            onChange={(e) =>
-              setFormData({ ...formData, vbdate: e.target.value })
-            }
-          >
-            {(props) => (
-              <TextField
-                {...props}
-                inputRef={vbDateRef}
-                label="BILL DATE"
-                size="small"
-                variant="filled"
-                fullWidth
-                className="custom-bordered-input"
-                sx={{
-                  fontSize: `${fsize}px`,
-                  width: 165,
-                  "& .MuiFilledInput-root": {
-                    height: 48,
-                  },
-                  "& .MuiInputBase-input": {
-                    paddingTop: "20px",
-                  },
-                }}
-                onKeyDown={handleEnterKeyPress(vbDateRef, grNoRef)}
-              />
-            )}
-          </InputMask>
+            <div className={`pu-erp-input3 ${(!isEditMode || isDisabled) ? "pu-disabled" : ""}`}>
+              <span style={{marginTop:8}} className="pu-erp-label3">BILL DATE</span>
+              <InputMask
+                mask="99-99-9999"
+                value={formData.vbdate}
+                readOnly={!isEditMode || isDisabled}
+                onChange={(e) =>
+                  setFormData({ ...formData, vbdate: e.target.value })
+                }
+              >
+                {(inputProps) => (
+                  <input
+                    {...inputProps}
+                    style={{marginTop:5}}
+                    ref={vbDateRef}
+                    className="pu-custom-style3"
+                    onKeyDown={handleEnterKeyPress(vbDateRef, grNoRef)}
+                  />
+                )}
+              </InputMask>
+              </div>
+            {/* <DatePicker
+              className="pu-DatePICKERP"
+              id="date"
+              selected={selectedDate}
+              onChange={(date) => setSelectedDate(date)}
+              dateFormat="dd-MM-yyyy"
+            /> */}
           </div>
-          </div>
-          <div className="GRNo">
+          <div className="pu-GRNo">
             <TextField
               inputRef={grNoRef}
-              className="GRNOZ custom-bordered-input"
+              className="pu-GRNOZ pu-custom-bordered-input"
               id="gr"
               label="GR NO"
               value={formData.gr}
@@ -4008,21 +3955,22 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 maxLength: 12,
                 style: {
                   height: "20px",
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                   // padding: "0 8px"
                 },
                 readOnly: !isEditMode || isDisabled,
               }}
             />
-            <div className="ExFor">
+            <div className="pu-ExFor">
               <TextField
                 inputRef={termsRef}
-                className="custom-bordered-input"
+                className="pu-custom-bordered-input"
                 id="exfor"
                 value={formData.exfor}
                 variant="filled"
                 label="TERMS"
                 size="small"
+                fullWidth
                 onChange={HandleInputsChanges}
                 onKeyDown={handleEnterKeyPress(termsRef, vehicleNoRef)}
                 onFocus={(e) => e.target.select()}
@@ -4030,7 +3978,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 10,
                   style: {
                     height: "20px",
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     // padding: "0 8px"
                   },
                   readOnly: !isEditMode || isDisabled,
@@ -4039,10 +3987,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
               />
             </div>
           </div>
-          <div className="VehicleDiv">
+          <div className="pu-VehicleDiv">
             <TextField
               inputRef={vehicleNoRef}
-              className="VEHICLE custom-bordered-input"
+              className="pu-VEHICLE pu-custom-bordered-input"
               id="trpt"
               value={formData.trpt}
               variant="filled"
@@ -4055,21 +4003,22 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 maxLength: 48,
                 style: {
                   height: "20px",
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                   // padding: "0 8px"
                 },
                 readOnly: !isEditMode || isDisabled,
               }}
             />
-            <div className="SELFinv">
+            <div className="pu-SELFinv">
               <TextField
                 inputRef={selfInvRef}
-                className="custom-bordered-input"
+                className="pu-custom-bordered-input"
                 id="p_entry"
                 value={formData.p_entry}
                 variant="filled"
                 label="SELF INV#"
                 size="small"
+                fullWidth
                 onChange={HandleInputsChanges}
                 onKeyDown={handleEnterKeyPress(selfInvRef, taxTypreRef)}
                 onFocus={(e) => e.target.select()}
@@ -4077,7 +4026,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 48,
                   style: {
                     height: "20px",
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     // padding: "0 8px"
                   },
                   readOnly: !isEditMode || isDisabled,
@@ -4085,15 +4034,15 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
               />
             </div>
           </div>
-          <div className="TAXDiv">
+          <div className="pu-TAXDiv">
             <div>
               <FormControl
                 fullWidth
                 size="small"
                 variant="filled"
-                className="custom-bordered-input"
+                className="pu-custom-bordered-input"
                 sx={{
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                   "& .MuiFilledInput-root": {
                     height: 47, // adjust as needed (default ~56px for filled)
                   },
@@ -4102,7 +4051,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 <InputLabel id="taxtype-label">TAX TYPE</InputLabel>
                 <Select
                 inputRef={taxTypreRef}
-                  className="TAXtypez custom-bordered-input"
+                  className="pu-TAXtypez pu-custom-bordered-input"
                   labelId="taxtype-label"
                   id="stype"
                   value={formData.stype}
@@ -4139,7 +4088,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   }}
                   inputProps={{
                     sx: {
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       pointerEvents: (!isEditMode || isDisabled) ? "none" : "auto", // stop mouse clicks
                     },
                   }}
@@ -4168,12 +4117,12 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 </Select>
               </FormControl>
             </div>
-            <div style={{ marginTop: 3 }}>
+            <div>
               <FormControl
-                className="SupplyTYPE custom-bordered-input"
+                className="pu-SupplyTYPE pu-custom-bordered-input"
                 sx={{
                   // width: '250px',
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                   "& .MuiFilledInput-root": {
                     height: 47, // adjust as needed (default ~56px for filled)
                   },
@@ -4181,14 +4130,14 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 size="small"
                 variant="filled"
               >
-                <InputLabel id="supply-label">BILL / CASH</InputLabel>
+                <InputLabel id="supply-label">SUPPLY TYPE</InputLabel>
                 <Select
                 inputRef={supplyRef}
-                  className="SupplyTYPE custom-bordered-input"
+                  className="pu-SupplyTYPE pu-custom-bordered-input"
                   labelId="supply-label"
                   id="supply"
-                  value={formData.btype}
-                   onChange={(e) => {
+                  value={formData.conv}
+                  onChange={(e) => {
                   if (!isEditMode || isDisabled) return; // prevent changing
                     handleSupply(e);
                   }}
@@ -4214,11 +4163,11 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                     // ArrowDown → let MUI open normally
                     if (e.key === "ArrowDown") return;
                   }}
-                  label="BILL / CASH"
+                  label="SUPPLY TYPE"
                   displayEmpty
                   inputProps={{
                     sx: {
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       pointerEvents: (!isEditMode || isDisabled) ? "none" : "auto", // stop mouse clicks
                     },
                   }}
@@ -4227,10 +4176,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   <MenuItem value="">
                     <em></em>
                   </MenuItem>
-                  <MenuItem value="Bill">
-                    Bill
+                  <MenuItem value="Manufacturing Sale">
+                    1. Manufacturing Sale
                   </MenuItem>
-                  <MenuItem value="Cash">Cash Memo</MenuItem>
+                  <MenuItem value="Trading Sale">2. Trading Sale</MenuItem>
                 </Select>
               </FormControl>
             </div>
@@ -4238,8 +4187,11 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
         </div>
       </div>
       {/* Table content */}
-      <div ref={tableContainerRef} className="tablestylez">
-        <Table ref={tableRef} className="custom-table">
+      <div ref={tableContainerRef}
+        className="pu-tablestylez"
+        style={{ zoom: isMacOs ? 1.4 : 1 }}
+       >
+        <Table ref={tableRef} className="pu-custom-table">
           <thead
             style={{
               background: color,
@@ -4273,10 +4225,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 <td style={{ padding: 0, width: 300 }}>
                   <input
                    disabled={!canEditRow(index)}
-                    className="ItemCode"
+                    className="pu-ItemCode"
                     style={{
                       height: 40,
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -4302,10 +4254,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 <td style={{ padding: 0, width: 250 }}>
                   <input
                   disabled={!canEditRow(index)}
-                    className="desc"
+                    className="pu-desc"
                     style={{
                       height: 40,
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -4329,10 +4281,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 <td style={{ padding: 0 }}>
                   <input
                   disabled={!canEditRow(index)}
-                    className="Hsn"
+                    className="pu-Hsn"
                     style={{
                       height: 40,
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -4357,7 +4309,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 <td style={{ padding: 0 }}>
                   <input
                   disabled={!canEditRow(index)}
-                    className="PCS"
+                    className="pu-PCS"
                     style={{
                       height: 40,
                       width: "100%",
@@ -4365,7 +4317,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                       border: "none",
                       padding: 5,
                       textAlign: "right",
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                     }}
                     maxLength={48}
                     readOnly={!isEditMode || isDisabled}
@@ -4386,7 +4338,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 <td style={{ padding: 0 }}>
                   <input
                   disabled={!canEditRow(index)}
-                    className="QTY"
+                    className="pu-QTY"
                     style={{
                       height: 40,
                       width: "100%",
@@ -4394,7 +4346,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                       border: "none",
                       padding: 5,
                       textAlign: "right",
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                     }}
                     maxLength={48}
                     readOnly={!isEditMode || isDisabled}
@@ -4415,7 +4367,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 <td style={{ padding: 0 }}>
                   <input
                   disabled={!canEditRow(index)}
-                    className="Price"
+                    className="pu-Price"
                     style={{
                       height: 40,
                       width: "100%",
@@ -4423,7 +4375,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                       border: "none",
                       padding: 5,
                       textAlign: "right",
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                     }}
                     maxLength={48}
                     readOnly={!isEditMode || isDisabled}
@@ -4444,10 +4396,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 <td style={{ padding: 0 }}>
                   <input
                   disabled={!canEditRow(index)}
-                    className="Amount"
+                    className="pu-Amount"
                     style={{
                       height: 40,
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -4479,10 +4431,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 <td style={{ padding: 0 }}>
                   <input
                   disabled={!canEditRow(index)}
-                    className="Disc"
+                    className="pu-Disc"
                     style={{
                       height: 40,
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -4507,10 +4459,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 <td style={{ padding: 0 }}>
                   <input
                   disabled={!canEditRow(index)}
-                    className="discount"
+                    className="pu-discount"
                     style={{
                       height: 40,
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -4535,10 +4487,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 <td style={{ padding: 0 }}>
                   <input
                   disabled={!canEditRow(index)}
-                    className="Others"
+                    className="pu-Others"
                     style={{
                       height: 40,
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -4569,108 +4521,306 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 </td>
                 )}
                 {isModalOpenExp && currentIndex !== null && (
-                  <div className="Modalz">
-                    <div className="Modal-content">
-                      <h1 className="headingE">ADD/LESS BEFORE GST</h1>
-                      <div className="form-group">
-                        <input
-                          type="checkbox"
-                          id="gross"
-                          checked={items[currentIndex]?.gross || false}
-                          onChange={(e) =>
-                            handleInputChange(
-                              currentIndex,
-                              "gross",
-                              e.target.checked,
-                            )
-                          }
-                        />
-                        <label
-                          style={{ marginLeft: 5 }}
-                          className="label"
-                          htmlFor="Gross"
-                        >
-                          GROSS
-                        </label>
-                      </div>
-                      {[
-                        { label: Expense1, rate: "Exp_rate1", value: "Exp1" },
-                        { label: Expense2, rate: "Exp_rate2", value: "Exp2" },
-                        { label: Expense3, rate: "Exp_rate3", value: "Exp3" },
-                        { label: Expense4, rate: "Exp_rate4", value: "Exp4" },
-                        { label: Expense5, rate: "Exp_rate5", value: "Exp5" },
-                        ].map((field, idx) => {
-                          const rateIndex = idx * 2;
-                          const valueIndex = idx * 2 + 1;
-
-                          return (
-                            <div key={idx} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "10px", marginBottom: "10px" }}>
-                              
-                              <label style={{ width: "100px", fontWeight: "bold" }}>
-                                {field.label}
-                              </label>
-
-                              {/* RATE FIELD */}
-                              <input
-                                ref={(el) => (expRateRefs.current[rateIndex] = el)}
-                                value={items[currentIndex][field.rate]}
-                                style={{
-                                  border: "1px solid black",
-                                  padding: "5px",
-                                  width: "120px",
-                                  textAlign: "right",
-                                  borderRadius: "4px",
-                                }}
-                                onChange={(e) =>
-                                  handleInputChange(currentIndex, field.rate, e.target.value)
-                                }
-                                onKeyDown={(e) => handleKeyDownModal(e, rateIndex)}
-                              />
-
-                              {/* VALUE FIELD */}
-                              <input
-                                ref={(el) => (expRateRefs.current[valueIndex] = el)}
-                                value={items[currentIndex][field.value]}
-                                style={{
-                                  border: "1px solid black",
-                                  padding: "5px",
-                                  width: "120px",
-                                  textAlign: "right",
-                                  borderRadius: "4px",
-                                }}
-                                onBlur={() =>
-                                  handleExpenseBlur(currentIndex, field.value)
-                                }
-                                onChange={(e) =>
-                                  handleInputChange(currentIndex, field.value, e.target.value)
-                                }
-                                onKeyDown={(e) => handleKeyDownModal(e, valueIndex)}
-                              />
-                            </div>
-                          );
-                      })}
-                      <Button
-                        ref={closeButtonRef}
-                        onClick={() => {
-                          const idx = currentIndex; // store before reset
-
-                          setIsModalOpenExp(false);
-                          setCurrentIndex(null);
-
-                          // restore focus to Others field
-                          setTimeout(() => {
-                            othersRefs.current[idx]?.focus();
-                            othersRefs.current[idx]?.select();
-                          }, 0);
-                        }}
+                  <div
+                    tabIndex={-1}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") {
+                        const idx = currentIndex;
+                        setIsModalOpenExp(false);
+                        setCurrentIndex(null);
+                        setTimeout(() => {
+                          othersRefs.current[idx]?.focus();
+                          othersRefs.current[idx]?.select();
+                        }, 0);
+                      }
+                    }}
+                    onClick={(e) => {
+                      if (e.target === e.currentTarget) {
+                        const idx = currentIndex;
+                        setIsModalOpenExp(false);
+                        setCurrentIndex(null);
+                        setTimeout(() => {
+                          othersRefs.current[idx]?.focus();
+                          othersRefs.current[idx]?.select();
+                        }, 0);
+                      }
+                    }}
+                    style={{
+                      position: "fixed",
+                      inset: 0,
+                      background: "rgba(15, 23, 42, 0.18)",
+                      backdropFilter: "blur(3px)",
+                      WebkitBackdropFilter: "blur(3px)",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      zIndex: 2000,
+                      padding: "20px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: "100%",
+                        maxWidth: "620px",
+                        background: "#ffffff",
+                        borderRadius: "18px",
+                        boxShadow: "0 18px 50px rgba(15, 23, 42, 0.18)",
+                        border: "1px solid rgba(148, 163, 184, 0.22)",
+                        overflow: "hidden",
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div
                         style={{
-                          borderColor: "transparent",
-                          backgroundColor: "red",
-                          marginTop: 10,
+                          padding: "18px 22px 14px",
+                          borderBottom: "1px solid #e5e7eb",
+                          background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
+                          position: "relative",
                         }}
                       >
-                        CLOSE
-                      </Button>
+                        <div
+                          style={{
+                            fontSize: "19px",
+                            fontWeight: 800,
+                            color: "#0f172a",
+                            letterSpacing: "0.4px",
+                            textAlign: "center",
+                          }}
+                        >
+                          ADD / LESS BEFORE GST
+                        </div>
+
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            color: "#64748b",
+                            textAlign: "center",
+                            marginTop: 4,
+                          }}
+                        >
+                          Manage expense values before GST calculation
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const idx = currentIndex;
+                            setIsModalOpenExp(false);
+                            setCurrentIndex(null);
+                            setTimeout(() => {
+                              othersRefs.current[idx]?.focus();
+                              othersRefs.current[idx]?.select();
+                            }, 0);
+                          }}
+                          style={{
+                            position: "absolute",
+                            right: "14px",
+                            top: "14px",
+                            width: "34px",
+                            height: "34px",
+                            borderRadius: "10px",
+                            border: "1px solid #e2e8f0",
+                            background: "#ffffff",
+                            color: "#334155",
+                            cursor: "pointer",
+                            fontSize: "18px",
+                            fontWeight: 700,
+                            lineHeight: 1,
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+
+                      <div style={{ padding: "20px 22px 22px" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "10px",
+                            marginBottom: "18px",
+                            padding: "12px 14px",
+                            background: "#f8fafc",
+                            border: "1px solid #e2e8f0",
+                            borderRadius: "12px",
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            id={`gross-${currentIndex}`}
+                            checked={items[currentIndex]?.gross || false}
+                            onChange={(e) =>
+                              handleInputChange(currentIndex, "gross", e.target.checked)
+                            }
+                            style={{
+                              width: "16px",
+                              height: "16px",
+                              cursor: "pointer",
+                              accentColor: "#2563eb",
+                            }}
+                          />
+                          <label
+                            htmlFor={`gross-${currentIndex}`}
+                            style={{
+                              fontSize: "14px",
+                              fontWeight: 700,
+                              color: "#0f172a",
+                              cursor: "pointer",
+                            }}
+                          >
+                            GROSS
+                          </label>
+                        </div>
+
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateColumns: "170px 1fr 1fr",
+                            gap: "12px 14px",
+                            alignItems: "center",
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: 800,
+                              color: "#475569",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.5px",
+                            }}
+                          >
+                            Expense
+                          </div>
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: 800,
+                              color: "#475569",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.5px",
+                              textAlign: "center",
+                            }}
+                          >
+                            Rate
+                          </div>
+                          <div
+                            style={{
+                              fontSize: "12px",
+                              fontWeight: 800,
+                              color: "#475569",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.5px",
+                              textAlign: "center",
+                            }}
+                          >
+                            Value
+                          </div>
+
+                          {[
+                            { label: Expense1, rate: "Exp_rate1", value: "Exp1" },
+                            { label: Expense2, rate: "Exp_rate2", value: "Exp2" },
+                            { label: Expense3, rate: "Exp_rate3", value: "Exp3" },
+                            { label: Expense4, rate: "Exp_rate4", value: "Exp4" },
+                            { label: Expense5, rate: "Exp_rate5", value: "Exp5" },
+                          ].map((field, idx) => {
+                            const rateIndex = idx * 2;
+                            const valueIndex = idx * 2 + 1;
+
+                            return (
+                              <React.Fragment key={idx}>
+                                <div
+                                  style={{
+                                    fontSize: "13px",
+                                    fontWeight: 700,
+                                    color: "#1e293b",
+                                    paddingLeft: "4px",
+                                  }}
+                                >
+                                  {field.label}
+                                </div>
+
+                                <input
+                                  ref={(el) => (expRateRefs.current[rateIndex] = el)}
+                                  value={items[currentIndex][field.rate] || ""}
+                                  onChange={(e) =>
+                                    handleInputChange(currentIndex, field.rate, e.target.value)
+                                  }
+                                  onKeyDown={(e) => handleKeyDownModal(e, rateIndex)}
+                                  style={{
+                                    width: "100%",
+                                    height: "40px",
+                                    border: "1px solid #cbd5e1",
+                                    outline: "none",
+                                    padding: "0 12px",
+                                    textAlign: "right",
+                                    fontSize: "14px",
+                                    borderRadius: "10px",
+                                    background: "#ffffff",
+                                    color: "#0f172a",
+                                    boxSizing: "border-box",
+                                  }}
+                                />
+
+                                <input
+                                  ref={(el) => (expRateRefs.current[valueIndex] = el)}
+                                  value={items[currentIndex][field.value] || ""}
+                                  onBlur={() => handleExpenseBlur(currentIndex, field.value)}
+                                  onChange={(e) =>
+                                    handleInputChange(currentIndex, field.value, e.target.value)
+                                  }
+                                  onKeyDown={(e) => handleKeyDownModal(e, valueIndex)}
+                                  style={{
+                                    width: "100%",
+                                    height: "40px",
+                                    border: "1px solid #cbd5e1",
+                                    outline: "none",
+                                    padding: "0 12px",
+                                    textAlign: "right",
+                                    fontSize: "14px",
+                                    borderRadius: "10px",
+                                    background: "#ffffff",
+                                    color: "#0f172a",
+                                    boxSizing: "border-box",
+                                  }}
+                                />
+                              </React.Fragment>
+                            );
+                          })}
+                        </div>
+
+                        <div
+                          style={{
+                            marginTop: "22px",
+                            display: "flex",
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          <Button
+                            ref={closeButtonRef}
+                            onClick={() => {
+                              const idx = currentIndex;
+                              setIsModalOpenExp(false);
+                              setCurrentIndex(null);
+                              setTimeout(() => {
+                                othersRefs.current[idx]?.focus();
+                                othersRefs.current[idx]?.select();
+                              }, 0);
+                            }}
+                            style={{
+                              minWidth: "110px",
+                              background: "#ffffff",
+                              border: "1px solid #cbd5e1",
+                              color: "#0f172a",
+                              fontWeight: 700,
+                              borderRadius: "10px",
+                              padding: "9px 16px",
+                              boxShadow: "0 4px 14px rgba(15, 23, 42, 0.06)",
+                            }}
+                          >
+                            CLOSE
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -4678,11 +4828,11 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   <td style={{ padding: 0 }}>
                    <input
                       disabled={!canEditRow(index)}
-                      className="Others"
+                      className="pu-Others"
                       id="gst"
                       style={{
                         height: 40,
-                        fontSize: `${fsize}px`,
+                        fontSize: `${fontSize}px`,
                         width: "100%",
                         boxSizing: "border-box",
                         border: "none",
@@ -4706,10 +4856,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 {tableData.cgst && (
                 <td style={{ padding: 0 }}>
                   <input
-                    className="CTax"
+                    className="pu-CTax"
                     style={{
                       height: 40,
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -4734,10 +4884,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 {tableData.sgst && (
                 <td style={{ padding: 0 }}>
                   <input
-                    className="STax"
+                    className="pu-STax"
                     style={{
                       height: 40,
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -4763,10 +4913,10 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 {tableData.igst && (
                 <td style={{ padding: 0 }}>
                   <input
-                    className="ITax"
+                    className="pu-ITax"
                     style={{
                       height: 40,
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       width: "100%",
                       boxSizing: "border-box",
                       border: "none",
@@ -4815,7 +4965,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
               </tr>
             ))}
           </tbody>
-          <tfoot style={{ background: color, position: "sticky", bottom: -6, fontSize: `${fsize}px`,borderTop:"1px solid black" }}>
+          <tfoot style={{ background: color, position: "sticky", bottom: -6, fontSize: `${fontSize}px`,borderTop:"1px solid black" }}>
           <tr style={{ fontWeight: "bold", textAlign: "right" }}>
             {tableData.itemcode && <td></td>}
             {tableData.sdisc && <td>TOTAL</td>}
@@ -4868,8 +5018,8 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
         <span style={{fontWeight:"bold"}}>SUPPLIER DETAILS IF ANY</span>
       </div>
 
-      <div className="Belowcontents">
-        <div className="bottomcontainer1">
+      <div className="pu-Belowcontents">
+        <div className="pu-bottomcontainer1">
           <div style={{ display: "flex", flexDirection: "column", marginLeft: 5 }}>
             <TextField
             inputRef={cNameRef}
@@ -4885,13 +5035,13 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
               maxLength: 48,
               style: {
                 height: 20,
-                fontSize: `${fsize}px`,
+                fontSize: `${fontSize}px`,
                 readOnly: !isEditMode || isDisabled,
               },
             }}
             size="small"
             variant="filled"
-            className="Remz custom-bordered-input"
+            className="pu-Remz pu-custom-bordered-input"
             sx={{ width: 400 }}
             />
             <TextField
@@ -4907,13 +5057,13 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 maxLength: 48,
                 style: {
                   height: 20,
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                   readOnly: !isEditMode || isDisabled,
                 },
               }}
               size="small"
               variant="filled"
-              className="Remz custom-bordered-input"
+              className="pu-Remz pu-custom-bordered-input"
               sx={{ width: 400 }}
             />
           <div style={{ display: "flex", flexDirection: "row" }}>
@@ -4930,13 +5080,13 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 maxLength: 48,
                 style: {
                   height: 20,
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                   readOnly: !isEditMode || isDisabled,
                 },
               }}
               size="small"
               variant="filled"
-              className="Remz custom-bordered-input"
+              className="pu-Remz pu-custom-bordered-input"
               sx={{ width: 200 }}
             />
             <TextField
@@ -4952,13 +5102,13 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 maxLength: 48,
                 style: {
                   height: 20,
-                  fontSize: `${fsize}px`,
+                  fontSize: `${fontSize}px`,
                   readOnly: !isEditMode || isDisabled,
                 },
               }}
               size="small"
               variant="filled"
-              className="Remz custom-bordered-input"
+              className="pu-Remz pu-custom-bordered-input"
               sx={{ width: 200 }}
             />
           </div>
@@ -4976,12 +5126,12 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                   },
                 }}
                 size="small"
                 variant="filled"
-                className="Remz custom-bordered-input"
+                className="pu-Remz pu-custom-bordered-input"
                 // sx={{ width: 250 }} // Adjust width as needed
               />
             </div>
@@ -5000,13 +5150,13 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     readOnly: !isEditMode || isDisabled,
                   },
                 }}
                 size="small"
                 variant="filled"
-                className="Remz custom-bordered-input"
+                className="pu-Remz pu-custom-bordered-input"
                 // sx={{ width: 250 }} // Adjust width as needed
               />
             </div>
@@ -5025,13 +5175,13 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     readOnly: !isEditMode || isDisabled,
                   },
                 }}
                 size="small"
                 variant="filled"
-                className="Remz custom-bordered-input"
+                className="pu-Remz pu-custom-bordered-input"
                 // sx={{ width: 250 }} // Adjust width as needed
               />
             </div>
@@ -5081,7 +5231,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   sx={{
                     color: "red",
                     fontWeight: "bold",
-                    fontSize: `${fsize}px`, // 👈 Dynamic font size
+                    fontSize: `${fontSize}px`, // 👈 Dynamic font size
                     backgroundColor: (!isEditMode || isDisabled) ? "#f0f0f0" : "white", // mimic disabled style
                     pointerEvents: (!isEditMode || isDisabled) ? "none" : "auto", // stop mouse clicks
                   }}
@@ -5112,7 +5262,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     color: 'red',
                   },
                 }}
@@ -5145,7 +5295,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     color: "red",
                   },
                 }}
@@ -5165,7 +5315,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     color: "red",
                   },
                 }}
@@ -5188,7 +5338,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 inputProps={{
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     backgroundColor: "white",
                     borderRadius: 5,
                   },
@@ -5210,7 +5360,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 inputProps={{
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     backgroundColor: "white",
                     borderRadius: 5,
                   },
@@ -5232,7 +5382,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 inputProps={{
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     backgroundColor: "white",
                     borderRadius: 5,
                   },
@@ -5255,7 +5405,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 inputProps={{
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     backgroundColor: "white",
                     borderRadius: 5,
                   },
@@ -5272,7 +5422,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
           </div> */}
           {/* Due Date */}
           <div style={{ display: "flex", flexDirection: "column",marginLeft:"auto",marginRight:5 }}>
-            <div className="duedatez">
+            <div>
               <InputMask
                 mask="99-99-9999"
                 value={formData.duedate}
@@ -5287,13 +5437,12 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                     label="INPUT DATE"
                     size="small"
                     variant="filled"
-                    fullWidth
-                    className="custom-bordered-input"
+                    className="pu-custom-bordered-input"
                     sx={{
-                      fontSize: `${fsize}px`,
+                      fontSize: `${fontSize}px`,
                       width: 165,
                       "& .MuiFilledInput-root": {
-                        height: 48,
+                        height: 40,
                       },
                       "& .MuiInputBase-input": {
                         paddingTop: "20px",
@@ -5314,12 +5463,12 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                   },
                 }}
                 size="small"
                 variant="filled"
-                className="custom-bordered-input"
+                className="pu-custom-bordered-input"
                 sx={{ width: 165 }} // Adjust width as needed
               />
             </div>
@@ -5332,12 +5481,12 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                   },
                 }}
                 size="small"
                 variant="filled"
-                className="custom-bordered-input"
+                className="pu-custom-bordered-input"
                 sx={{ width: 165 }} // Adjust width as needed
               />
             </div>
@@ -5348,7 +5497,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
           >
             <div>
               <TextField
-                className="TOTALFIELD custom-bordered-input"
+                className="pu-TOTALFIELD pu-custom-bordered-input"
                 id="tax"
                 value={formData.tax}
                 label="TOTAL GST"
@@ -5356,7 +5505,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                   },
                 }}
                 onFocus={(e) => e.target.select()}
@@ -5367,7 +5516,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
             </div>
             <div>
               <TextField
-                className="TOTALFIELD custom-bordered-input"
+                className="pu-TOTALFIELD pu-custom-bordered-input"
                 inputRef={expAfterGSTRef}
                 id="expafterGST"
                 value={formData.expafterGST}
@@ -5387,7 +5536,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                   },
                   readOnly: !isEditMode || isDisabled,
                 }}
@@ -5395,129 +5544,247 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                 variant="filled"
                 // sx={{ width: 150 }}
               />
-              {isModalOpenAfter && (
+              {isModalOpenAfter &&
+              ReactDOM.createPortal(
                 <div
+                  tabIndex={-1}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      closeModalAfter();
+                    }
+                  }}
+                  onClick={(e) => {
+                    if (e.target === e.currentTarget) {
+                      closeModalAfter();
+                    }
+                  }}
                   style={{
                     position: "fixed",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                    backgroundColor: "rgba(0,0,0,0.5)",
+                    inset: 0,
+                    width: "100vw",
+                    height: "100vh",
+                    background: "rgba(15, 23, 42, 0.18)",
+                    backdropFilter: "blur(3px)",
+                    WebkitBackdropFilter: "blur(3px)",
                     display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
-                    zIndex: 1000,
+                    zIndex: 999999,
+                    padding: "20px",
+                    boxSizing: "border-box",
                   }}
                 >
                   <div
+                    onClick={(e) => e.stopPropagation()}
                     style={{
-                      background: 'linear-gradient(to bottom, #edc5a7,#a5d8ed)',
-                      padding: "25px 30px",
-                      borderRadius: "12px",
-                      width: "450px",
-                      boxShadow: "0 8px 25px rgba(0,0,0,0.2)",
-                      animation: "fadeIn 0.3s ease-in-out",
+                      width: "100%",
+                      maxWidth: "620px",
+                      background: "#ffffff",
+                      borderRadius: "18px",
+                      boxShadow: "0 18px 50px rgba(15, 23, 42, 0.18)",
+                      border: "1px solid rgba(148, 163, 184, 0.22)",
+                      overflow: "hidden",
+                      boxSizing: "border-box",
                     }}
                   >
-                    <h2
+                    <div
                       style={{
-                        textAlign: "center",
-                        marginBottom: "20px",
-                        fontWeight: "600",
-                        color: "#333",
-                        fontSize:"18px",
+                        padding: "18px 22px 14px",
+                        borderBottom: "1px solid #e5e7eb",
+                        background: "linear-gradient(180deg, #ffffff 0%, #f8fafc 100%)",
+                        position: "relative",
                       }}
                     >
-                      EXPENSE AFTER TAX
-                    </h2>
-
-                    {/* Expense Rows */}
-                    {[
-                    { label: Expense6, rate: "Exp_rate6", amount: "Exp6" },
-                    { label: Expense7, rate: "Exp_rate7", amount: "Exp7" },
-                    { label: Expense8, rate: "Exp_rate8", amount: "Exp8" },
-                    { label: Expense9, rate: "Exp_rate9", amount: "Exp9" },
-                    { label: Expense10, rate: "Exp_rate10", amount: "Exp10" },
-                    ].map((item, index) => {
-                      const rateIndex = index * 2;
-                      const amountIndex = index * 2 + 1;
-
-                      return (
-                        <div
-                          key={index}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            marginBottom: "12px",
-                          }}
-                        >
-                          <div
-                            style={{
-                              flex: 1,
-                              fontWeight: "bold",
-                              color: "#444",
-                            }}
-                          >
-                            {item.label}
-                          </div>
-
-                          {/* RATE */}
-                          <input
-                            ref={(el) => (expAfterRefs.current[rateIndex] = el)}
-                            id={item.rate}
-                            value={formData[item.rate]}
-                            onChange={handleNumberChange}
-                            onKeyDown={(e) => handleKeyDownAfterw2(e, rateIndex)}
-                            placeholder="Rate"
-                            style={{
-                              width: "90px",
-                              padding: "6px",
-                              borderRadius: "6px",
-                              border: "1px solid black",
-                              marginRight: "8px",
-                              textAlign: "right",
-                            }}
-                          />
-
-                          {/* AMOUNT */}
-                          <input
-                            ref={(el) => (expAfterRefs.current[amountIndex] = el)}
-                            id={item.amount}
-                            value={formData[item.amount]}
-                            onChange={handleNumberChange}
-                            onKeyDown={(e) => handleKeyDownAfterw2(e, amountIndex)}
-                            placeholder="Amount"
-                            style={{
-                              width: "90px",
-                              padding: "6px",
-                              borderRadius: "6px",
-                              border: "1px solid black",
-                              textAlign: "right",
-                            }}
-                          />
-                        </div>
-                      );
-                    })}
-
-                    {/* Close Button */}
-                    <div style={{ textAlign: "center", marginTop: "20px" }}>
-                      <Button
-                        ref={closeAfterRef}
-                        onClick={closeModalAfter}
+                      <div
                         style={{
-                          backgroundColor: "#ff4d4f",
-                          border: "none",
-                          padding: "8px 20px",
-                          borderRadius: "6px",
-                          fontWeight: "500",
+                          fontSize: "19px",
+                          fontWeight: 800,
+                          color: "#0f172a",
+                          letterSpacing: "0.4px",
+                          textAlign: "center",
                         }}
                       >
-                        CLOSE
-                      </Button>
+                        EXPENSE AFTER TAX
+                      </div>
+
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#64748b",
+                          textAlign: "center",
+                          marginTop: 4,
+                        }}
+                      >
+                        Manage expense values after tax calculation
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={closeModalAfter}
+                        style={{
+                          position: "absolute",
+                          right: "14px",
+                          top: "14px",
+                          width: "34px",
+                          height: "34px",
+                          borderRadius: "10px",
+                          border: "1px solid #e2e8f0",
+                          background: "#ffffff",
+                          color: "#334155",
+                          cursor: "pointer",
+                          fontSize: "18px",
+                          fontWeight: 700,
+                          lineHeight: 1,
+                        }}
+                      >
+                        ×
+                      </button>
+                    </div>
+
+                    <div style={{ padding: "20px 22px 22px" }}>
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateColumns: "170px 1fr 1fr",
+                          gap: "12px 14px",
+                          alignItems: "center",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            color: "#475569",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                          }}
+                        >
+                          Expense
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            color: "#475569",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                            textAlign: "center",
+                          }}
+                        >
+                          Rate
+                        </div>
+                        <div
+                          style={{
+                            fontSize: "12px",
+                            fontWeight: 800,
+                            color: "#475569",
+                            textTransform: "uppercase",
+                            letterSpacing: "0.5px",
+                            textAlign: "center",
+                          }}
+                        >
+                          Amount
+                        </div>
+
+                        {[
+                          { label: Expense6, rate: "Exp_rate6", amount: "Exp6" },
+                          { label: Expense7, rate: "Exp_rate7", amount: "Exp7" },
+                          { label: Expense8, rate: "Exp_rate8", amount: "Exp8" },
+                          { label: Expense9, rate: "Exp_rate9", amount: "Exp9" },
+                          { label: Expense10, rate: "Exp_rate10", amount: "Exp10" },
+                        ].map((item, index) => {
+                          const rateIndex = index * 2;
+                          const amountIndex = index * 2 + 1;
+
+                          return (
+                            <React.Fragment key={index}>
+                              <div
+                                style={{
+                                  fontSize: "13px",
+                                  fontWeight: 700,
+                                  color: "#1e293b",
+                                  paddingLeft: "4px",
+                                }}
+                              >
+                                {item.label}
+                              </div>
+
+                              <input
+                                ref={(el) => (expAfterRefs.current[rateIndex] = el)}
+                                id={item.rate}
+                                value={formData[item.rate] || ""}
+                                onChange={handleNumberChange}
+                                onKeyDown={(e) => handleKeyDownAfterw2(e, rateIndex)}
+                                placeholder="Rate"
+                                style={{
+                                  width: "100%",
+                                  height: "40px",
+                                  border: "1px solid #cbd5e1",
+                                  outline: "none",
+                                  padding: "0 12px",
+                                  textAlign: "right",
+                                  fontSize: "14px",
+                                  borderRadius: "10px",
+                                  background: "#ffffff",
+                                  color: "#0f172a",
+                                  boxSizing: "border-box",
+                                }}
+                              />
+
+                              <input
+                                ref={(el) => (expAfterRefs.current[amountIndex] = el)}
+                                id={item.amount}
+                                value={formData[item.amount] || ""}
+                                onChange={handleNumberChange}
+                                onKeyDown={(e) => handleKeyDownAfterw2(e, amountIndex)}
+                                placeholder="Amount"
+                                style={{
+                                  width: "100%",
+                                  height: "40px",
+                                  border: "1px solid #cbd5e1",
+                                  outline: "none",
+                                  padding: "0 12px",
+                                  textAlign: "right",
+                                  fontSize: "14px",
+                                  borderRadius: "10px",
+                                  background: "#ffffff",
+                                  color: "#0f172a",
+                                  boxSizing: "border-box",
+                                }}
+                              />
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: "22px",
+                          display: "flex",
+                          justifyContent: "flex-end",
+                        }}
+                      >
+                        <Button
+                          ref={closeAfterRef}
+                          onClick={closeModalAfter}
+                          style={{
+                            minWidth: "110px",
+                            background: "#ffffff",
+                            border: "1px solid #cbd5e1",
+                            color: "#0f172a",
+                            fontWeight: 700,
+                            borderRadius: "10px",
+                            padding: "9px 16px",
+                            boxShadow: "0 4px 14px rgba(15, 23, 42, 0.06)",
+                          }}
+                        >
+                          CLOSE
+                        </Button>
+                      </div>
                     </div>
                   </div>
-                </div>
+                </div>,
+                document.body
               )}
             </div>
                <div>
@@ -5529,23 +5796,23 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
                   maxLength: 48,
                   style: {
                     height: 20,
-                    fontSize: `${fsize}px`,
+                    fontSize: `${fontSize}px`,
                     color: "red",
                     fontWeight: "bold",
                   },
                 }}
                 size="small"
                 variant="filled"
-                className="TOTALFIELD custom-bordered-input"
+                className="pu-TOTALFIELD pu-custom-bordered-input"
                 // sx={{ width: 150 }}
               />
             </div>
           </div>
         </div>
-        <div className="Buttonsgroupz">
+        <div className="pu-Buttonsgroupz">
           <Button
           ref={addButtonRef}
-            className="Buttonz"
+            className="pu-Buttonz"
             style={{background: color }}
             onClick={handleAdd}
             disabled={!isAddEnabled}
@@ -5553,7 +5820,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
             Add
           </Button>
           <Button
-            className="Buttonz"
+            className="pu-Buttonz"
             style={{background: color }}
             onClick={handleEditClick}
             disabled={!isAddEnabled}
@@ -5561,7 +5828,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
             Edit
           </Button>
           <Button
-            className="Buttonz"
+            className="pu-Buttonz"
             style={{background: color }}
             onClick={handlePrevious}
             disabled={!isPreviousEnabled}
@@ -5569,7 +5836,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
             Previous
           </Button>
           <Button
-            className="Buttonz"
+            className="pu-Buttonz"
             style={{background: color }}
             onClick={handleNext}
             disabled={!isNextEnabled}
@@ -5577,7 +5844,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
             Next
           </Button>
           <Button
-            className="Buttonz"
+            className="pu-Buttonz"
             style={{background: color }}
             onClick={handleFirst}
             disabled={!isFirstEnabled}
@@ -5585,7 +5852,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
             First
           </Button>
           <Button
-            className="Buttonz"
+            className="pu-Buttonz"
             style={{background: color }}
             onClick={handleLast}
             disabled={!isLastEnabled}
@@ -5593,7 +5860,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
             Last
           </Button>
           <Button
-            className="Buttonz"
+            className="pu-Buttonz"
             style={{background: color }}
             disabled={!isSearchEnabled}
             onClick={() => {
@@ -5617,7 +5884,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
 
           <Button
             ref={printButtonRef}
-            className="Buttonz"
+            className="pu-Buttonz"
             onClick={openPrintMenu}
             style={{background: color }}
             disabled={!isPrintEnabled}
@@ -5634,7 +5901,7 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
           onFaView={handleViewFAVoucher}
             />
           <Button
-            className="Buttonz"
+            className="pu-Buttonz"
             style={{background: color }}
             onClick={handleDeleteClick}
             disabled={!isDeleteEnabled}
@@ -5643,14 +5910,14 @@ const allFieldsCus = productsCus.reduce((fields, product) => {
           </Button>
           <Button
             onClick={handleExit}
-            className="Buttonz"
+            className="pu-Buttonz"
             style={{background: color }}
           >
             Exit
           </Button>
           <Button
             ref={saveButtonRef}
-            className="Buttonz"
+            className="pu-Buttonz"
             onClick={handleDataSave}
             disabled={!isSubmitEnabled}
             style={{background: color }}

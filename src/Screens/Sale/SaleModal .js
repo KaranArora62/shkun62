@@ -676,9 +676,9 @@ const SaleModal = ({ isOpen, onClose, onNavigate }) => {
   const focusTrapRef = useRef(null);
 
   const { company } = useContext(CompanyContext);
-  // const tenant = "03AAYFG4472A1ZG_01042025_31032026";
+  const tenant = "03AAYFG4472A1ZG_01042025_31032026";
 
-  const tenant = company?.databaseName;
+  // const tenant = company?.databaseName;
   
 
 const API_LIST = `https://www.shkunweb.com/shkunlive/${tenant}/tenant/api/sale-win`; // GET

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import {
   Modal,
   Box,
@@ -22,6 +22,7 @@ import DoneRoundedIcon from "@mui/icons-material/DoneRounded";
 import InputMask from "react-input-mask";
 import axios from "axios";
 import { CompanyContext } from "../Context/CompanyContext";
+import financialYear from "../Shared/financialYear";
 
 const style = {
   position: "absolute",
@@ -66,12 +67,31 @@ const RepostingModal = ({ open, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     reposting: "Sale Bills",
-    from: "01-04-2025",
-    to: "30-03-2026",
+    from: "",
+    to: "",
   });
 
+  const formatDate = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    const day = String(d.getDate()).padStart(2, "0");
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const year = d.getFullYear();
+    return `${day}-${month}-${year}`;
+  };
+
+  useEffect(() => {
+    const fy = financialYear.getFYDates();
+
+    setFormData((prev) => ({
+      ...prev,
+      from: formatDate(fy.start),
+      to: formatDate(fy.end),
+    }));
+  }, []);
+
   const { company } = useContext(CompanyContext);
-  const tenant = company?.databaseName;
+  const tenant = "03AAYFG4472A1ZG_01042025_31032026"
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -105,7 +125,7 @@ const RepostingModal = ({ open, onClose }) => {
       setLoading(true);
 
       const response = await axios.post(
-        `https://www.shkunweb.com/shkunlive/03AAYFG4472A1ZG_01042025_31032026/tenant${apiPath}`,
+        `https://www.shkunweb.com/shkunlive/${tenant}/tenant${apiPath}`,
         {
           repostingType: formData.reposting,
           fromDate: formData.from,
