@@ -934,25 +934,55 @@ export default function PartyWiseSumSale({ show, onClose }) {
       </Modal>
 
       {/* LEDGER SELECTION MODAL */}
-      <Modal show={ledgerModalOpen} onHide={() => setLedgerModalOpen(false)} centered size="lg">
-        <Modal.Header closeButton>
-          <Modal.Title>Select Ledger Accounts</Modal.Title>
+      <Modal
+        show={ledgerModalOpen}
+        onHide={() => setLedgerModalOpen(false)}
+        centered
+        size="lg"
+        dialogClassName="ledger-modern-modal"
+      >
+        <Modal.Header closeButton className="ledger-modal-header">
+          <div>
+            <Modal.Title className="ledger-modal-title">
+              Select Ledger Accounts
+            </Modal.Title>
+            <div className="ledger-modal-subtitle">
+              Search and select ledger accounts to include in the report.
+            </div>
+          </div>
         </Modal.Header>
 
-        <Modal.Body>
+        <Modal.Body className="ledger-modal-body">
+          <div className="ledger-search-box">
+            <div className="ledger-search-wrapper">
+              <span className="search-icon">🔍</span>
 
-          {/* LEDGER TABLE */}
-          <div
-            style={{
-              maxHeight: "350px",
-              overflowY: "auto",
-              padding: "10px",
-            }}
-          >
-            <Table className="custom-table" size="sm">
-              <thead style={{ position: "sticky", top: 0, zIndex: 1 }}>
+              <input
+                type="text"
+                className="ledger-search-input-modern"
+                placeholder="Search by account name or city..."
+                value={ledgerSearch}
+                onChange={(e) => setLedgerSearch(e.target.value)}
+              />
+
+              {ledgerSearch && (
+                <span
+                  className="clear-icon"
+                  onClick={() => setLedgerSearch("")}
+                >
+                  ✖
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="ledger-table-wrapper">
+            <Table className="ledger-modern-table" size="sm">
+              <thead>
                 <tr>
-                  <th style={{ width: "50px", textAlign: "center" }}>Select</th>
+                  <th className="text-center" style={{ width: "70px" }}>
+                    Select
+                  </th>
                   <th>Account Name</th>
                   <th>City</th>
                 </tr>
@@ -962,63 +992,57 @@ export default function PartyWiseSumSale({ show, onClose }) {
                 {ledgers
                   .filter(
                     (x) =>
-                      x.vacode.toLowerCase().includes(ledgerSearch.toLowerCase()) ||
-                      x.city.toLowerCase().includes(ledgerSearch.toLowerCase())
+                      x.vacode
+                        .toLowerCase()
+                        .includes(ledgerSearch.toLowerCase()) ||
+                      x.city.toLowerCase().includes(ledgerSearch.toLowerCase()),
                   )
                   .map((x, idx) => (
                     <tr key={idx}>
-                      <td style={{ textAlign: "center" }}>
+                      <td className="text-center">
                         <input
                           type="checkbox"
+                          className="ledger-checkbox"
                           checked={selectedLedgers.includes(x.vcode)}
                           onChange={() => toggleLedger(x.vcode)}
                         />
                       </td>
-                      <td>{x.vacode}</td>
-                      <td>{x.city}</td>
+                      <td className="ledger-name">{x.vacode}</td>
+                      <td>
+                        <span className="ledger-city-badge">{x.city}</span>
+                      </td>
                     </tr>
                   ))}
               </tbody>
             </Table>
           </div>
-
         </Modal.Body>
 
-        <Modal.Footer
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          {/* SEARCH BAR ON LEFT */}
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Search ledger..."
-            style={{ width: "300px" }}
-            value={ledgerSearch}
-            onChange={(e) => setLedgerSearch(e.target.value)}
-          />
+        <Modal.Footer className="ledger-modal-footer">
+          <div className="ledger-selected-count">
+            {selectedLedgers.length} ledger selected
+          </div>
 
-          {/* BUTTONS ON RIGHT */}
-          <div>
+          <div className="ledger-footer-buttons">
             <Button
               variant={selectAll ? "warning" : "success"}
               onClick={toggleSelectAll}
             >
               {selectAll ? "Unselect All" : "Select All"}
-            </Button>{" "}
-            <Button variant="secondary" onClick={() => setLedgerModalOpen(false)}>
+            </Button>
+
+            <Button
+              variant="secondary"
+              onClick={() => setLedgerModalOpen(false)}
+            >
               Close
-            </Button>{" "}
+            </Button>
+
             <Button variant="primary" onClick={() => setLedgerModalOpen(false)}>
               Apply
             </Button>
           </div>
         </Modal.Footer>
-
       </Modal>
     </>
   );

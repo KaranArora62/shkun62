@@ -376,22 +376,22 @@ export default function PartyWiseSummPur({ show, onClose }) {
 
     try {
       const [purchaseRes, ledgerRes] = await Promise.all([
-  axios.get(API_URL),
-  axios.get(LEDGER_API_URL),
-]);
+        axios.get(API_URL),
+        axios.get(LEDGER_API_URL),
+      ]);
 
-let arr = Array.isArray(purchaseRes.data) ? purchaseRes.data : [];
+      let arr = Array.isArray(purchaseRes.data) ? purchaseRes.data : [];
 
-const ledgerArr = Array.isArray(ledgerRes.data?.data)
-  ? ledgerRes.data.data
-  : [];
+      const ledgerArr = Array.isArray(ledgerRes.data?.data)
+        ? ledgerRes.data.data
+        : [];
 
-const ledgerMap = new Map();
+      const ledgerMap = new Map();
 
-ledgerArr.forEach((ledger) => {
-  const fd = ledger.formData || {};
-  ledgerMap.set(String(fd.acode || "").trim(), fd);
-});
+      ledgerArr.forEach((ledger) => {
+        const fd = ledger.formData || {};
+        ledgerMap.set(String(fd.acode || "").trim(), fd);
+      });
 
       // ⭐ FILTER BY CITY & STATE (case-insensitive)
       const filterCity = city.trim().toLowerCase();
