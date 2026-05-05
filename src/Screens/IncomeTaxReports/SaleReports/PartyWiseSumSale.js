@@ -27,6 +27,7 @@ import FieldCustomizeModal from "../../Shared/FieldCustomizeModal";
 
 const tenant = "03AAYFG4472A1ZG_01042025_31032026";
 const API_URL = `https://www.shkunweb.com/shkunlive/${tenant}/tenant/api/sale`;
+const LEDGER_API_URL = `https://www.shkunweb.com/shkunlive/${tenant}/tenant/api/ledgerAccount`;
 
 export default function PartyWiseSumSale({ show, onClose }) {
   const {dateFrom, companyName, companyAdd, companyCity } = useCompanySetup();
@@ -70,7 +71,224 @@ export default function PartyWiseSumSale({ show, onClose }) {
   const [maxValue, setMaxValue] = useState("");
   const [lessDrCrNote, setLessDrCrNote] = useState(false);
   const [summaryType, setSummaryType] = useState("total"); 
+
+  // Selection Modal
   const [fieldModalOpen, setFieldModalOpen] = useState(false);
+
+  const DEFAULT_FIELD_DATA = [
+    {
+      id: 1,
+      checked: true,
+      fieldName: "custName",
+      description: "Customer Name",
+      width: 180,
+      serialNo: 1,
+      total: false,
+      bold: false,
+    },
+    {
+      id: 2,
+      checked: true,
+      fieldName: "city",
+      description: "City",
+      width: 120,
+      serialNo: 2,
+      total: false,
+      bold: false,
+    },
+    {
+      id: 3,
+      checked: false,
+      fieldName: "gstno",
+      description: "GST No",
+      width: 150,
+      serialNo: 3,
+      total: false,
+      bold: false,
+    },
+    {
+      id: 4,
+      checked: false,
+      fieldName: "pan",
+      description: "PAN",
+      width: 120,
+      serialNo: 4,
+      total: false,
+      bold: false,
+    },
+    {
+      id: 5,
+      checked: true,
+      fieldName: "bags",
+      description: "Bags",
+      width: 90,
+      serialNo: 5,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 6,
+      checked: true,
+      fieldName: "qty",
+      description: "Qty",
+      width: 90,
+      serialNo: 6,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 7,
+      checked: true,
+      fieldName: "value",
+      description: "Value",
+      width: 120,
+      serialNo: 7,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 8,
+      checked: false,
+      fieldName: "igst",
+      description: "IGST",
+      width: 100,
+      serialNo: 8,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 9,
+      checked: false,
+      fieldName: "cgst",
+      description: "CGST",
+      width: 100,
+      serialNo: 9,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 10,
+      checked: false,
+      fieldName: "sgst",
+      description: "SGST",
+      width: 100,
+      serialNo: 10,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 11,
+      checked: false,
+      fieldName: "tax",
+      description: "Tax",
+      width: 100,
+      serialNo: 11,
+      total: true,
+      bold: false,
+    },
+    {
+      id: 12,
+      checked: false,
+      fieldName: "grandtotal",
+      description: "Grand Total",
+      width: 130,
+      serialNo: 12,
+      total: true,
+      bold: false,
+    },
+    { id: 13, checked: false, fieldName: "email", description: "Email", width: 180, serialNo: 13, total: false, bold: false },
+    { id: 14, checked: false, fieldName: "phone", description: "Phone", width: 120, serialNo: 14, total: false, bold: false },
+    { id: 15, checked: false, fieldName: "address", description: "Address", width: 220, serialNo: 15, total: false, bold: false },
+    { id: 16, checked: false, fieldName: "pinCode", description: "Pin Code", width: 100, serialNo: 16, total: false, bold: false },
+    { id: 17, checked: false, fieldName: "contactPerson", description: "Contact Person", width: 160, serialNo: 17, total: false, bold: false },
+    { id: 18, checked: false, fieldName: "bsgroup", description: "BS Group", width: 160, serialNo: 18, total: false, bold: false },
+    { id: 19, checked: false, fieldName: "payLimit", description: "Pay Limit", width: 100, serialNo: 19, total: true, bold: false },
+    { id: 20, checked: false, fieldName: "payDuedays", description: "Due Days", width: 100, serialNo: 20, total: false, bold: false },
+  ];
+
+  const [fieldOptions, setFieldOptions] = useState(() => {
+    const saved = localStorage.getItem("saleSumFieldOptions");
+    return saved ? JSON.parse(saved) : DEFAULT_FIELD_DATA;
+  });
+
+  useEffect(() => {
+    localStorage.setItem(
+      "saleSumFieldOptions",
+      JSON.stringify(fieldOptions),
+    );
+  }, [fieldOptions]);
+
+  function updateLabel(key, newLabel) {
+    setFieldOptions((prev) =>
+      prev.map((f) => (f.key === key ? { ...f, label: newLabel } : f)),
+    );
+  }
+
+  const [selectedFields, setSelectedFields] = useState([
+    "custName",
+    "city",
+    "bags",
+    "qty",
+    "value",
+  ]);
+
+  function toggleField(key) {
+    setSelectedFields((prev) =>
+      prev.includes(key) ? prev.filter((x) => x !== key) : [...prev, key],
+    );
+  }
+
+  function getExtraFields(rec, ledgerMap) {
+    const supplier = rec.customerDetails?.[0] || {};
+    const formData = rec.formData || {};
+
+    const vcode = String(supplier.Vcode || "").trim();
+    const ledger = ledgerMap?.get(vcode) || {};
+
+    const d = parseAnyDate(formData.date);
+
+    const formattedDate = d
+      ? `${String(d.getDate()).padStart(2, "0")}-${String(
+          d.getMonth() + 1
+        ).padStart(2, "0")}-${d.getFullYear()}`
+      : "";
+
+    const month = d
+      ? d.toLocaleString("en-IN", { month: "short", year: "numeric" })
+      : "";
+
+    return {
+      custName: supplier.vacode || ledger.ahead || "",
+      gstno: supplier.gstno || ledger.gstNo || "",
+      pan: supplier.pan || ledger.pan || "",
+      city: supplier.city || ledger.city || "",
+      state: supplier.state || ledger.state || "",
+
+      // Ledger API extra fields
+      email: ledger.email || "",
+      phone: ledger.phone || "",
+      address: ledger.add1 || "",
+      pinCode: ledger.pinCode || "",
+      contactPerson: ledger.cperson || "",
+      bsgroup: ledger.Bsgroup || "",
+      payLimit: ledger.payLimit || 0,
+      payDuedays: ledger.payDuedays || 0,
+
+      date: formattedDate,
+      month,
+
+      vtype: formData.vtype || "",
+      vno: formData.vno || "",
+      stype: formData.stype || "",
+      trpt: formData.trpt || "",
+
+      cgst: parseFloat(formData.cgst) || 0,
+      sgst: parseFloat(formData.sgst) || 0,
+      igst: parseFloat(formData.igst) || 0,
+      tax: parseFloat(formData.tax) || 0,
+      grandtotal: parseFloat(formData.grandtotal) || 0,
+    };
+  }
 
   // Ledger selection modal state
   const [ledgerModalOpen, setLedgerModalOpen] = useState(false);
@@ -121,8 +339,23 @@ export default function PartyWiseSumSale({ show, onClose }) {
     setPrintOpen(true); // open modal immediately (spinner shows)
 
     try {
-      const res = await axios.get(API_URL);
-      let arr = Array.isArray(res.data) ? res.data : [];
+      const [purchaseRes, ledgerRes] = await Promise.all([
+        axios.get(API_URL),
+        axios.get(LEDGER_API_URL),
+      ]);
+
+      let arr = Array.isArray(purchaseRes.data) ? purchaseRes.data : [];
+
+      const ledgerArr = Array.isArray(ledgerRes.data?.data)
+        ? ledgerRes.data.data
+        : [];
+
+      const ledgerMap = new Map();
+
+      ledgerArr.forEach((ledger) => {
+        const fd = ledger.formData || {};
+        ledgerMap.set(String(fd.acode || "").trim(), fd);
+      });
 
       // ⭐ FILTER BY CITY & STATE (case-insensitive)
       const filterCity = city.trim().toLowerCase();
@@ -171,21 +404,29 @@ export default function PartyWiseSumSale({ show, onClose }) {
       });
     }
 
+    const savedFieldData =
+      JSON.parse(localStorage.getItem("saleSumFieldData")) ||
+      DEFAULT_FIELD_DATA;
+
+    const selectedFieldData = savedFieldData
+      .filter((f) => f.checked)
+      .sort((a, b) => Number(a.serialNo) - Number(b.serialNo));
+
       // GROUP AFTER FILTERING
     let grouped = [];
 
     if (summaryType === "total") {
-      grouped = groupBySupplier(arr, { minQty, maxQty, minValue, maxValue }, reportType);
+      grouped = groupBySupplier(arr, { minQty, maxQty, minValue, maxValue }, reportType, ledgerMap);
     }
     else if (summaryType === "month") {
-      grouped = groupByMonth(arr, reportType);
+      grouped = groupByMonth(arr, reportType, ledgerMap);
     }
     else if (summaryType === "date") {
-      grouped = groupByDate(arr, reportType);
+      grouped = groupByDate(arr, reportType, ledgerMap);
     }
     else if (summaryType === "account") {
-      grouped = groupBySupplier(arr, { minQty, maxQty, minValue, maxValue }, reportType)
-        .sort((a, b) => a.supplierName.localeCompare(b.supplierName));
+      grouped = groupBySupplier(arr, { minQty, maxQty, minValue, maxValue }, reportType, ledgerMap)
+        .sort((a, b) => a.custName.localeCompare(b.custName));
     }
       setGroupedData(grouped);
     } catch (err) {
@@ -197,7 +438,7 @@ export default function PartyWiseSumSale({ show, onClose }) {
   }
 
   // Grouping function
-  function groupBySupplier(apiArray = [], filters = {}, reportType) {
+  function groupBySupplier(apiArray = [], filters = {}, reportType, ledgerMap) {
     const map = new Map();
 
     apiArray.forEach((rec) => {
@@ -239,8 +480,9 @@ export default function PartyWiseSumSale({ show, onClose }) {
 
       if (!map.has(vcode)) {
         map.set(vcode, {
-          supplierName: name, // display
-          vcode,              // internal
+          ...getExtraFields(rec, ledgerMap),
+          custName: name,
+          vcode,
           city,
           pan,
           bags: sums.bags,
@@ -258,7 +500,7 @@ export default function PartyWiseSumSale({ show, onClose }) {
     return Array.from(map.values());
   }
 
-  function groupByDate(apiArray = [], reportType) {
+  function groupByDate(apiArray = [], reportType,ledgerMap) {
     return apiArray.map(rec => {
       const supplier = rec.customerDetails?.[0] || {};
       const vcode = getVcode(supplier);  // ✅ FIX
@@ -275,13 +517,21 @@ export default function PartyWiseSumSale({ show, onClose }) {
         value = items.reduce((a, it) => a + (parseFloat(it.amount) || 0), 0);
       }
 
+      const d = parseAnyDate(rec.formData?.date);
+      const formattedDate = d
+        ? `${String(d.getDate()).padStart(2, "0")}-${String(
+            d.getMonth() + 1,
+          ).padStart(2, "0")}-${d.getFullYear()}`
+        : "";
       return {
-        date: rec.formData?.date?.substring(0, 10),
+        ...getExtraFields(rec, ledgerMap),
+        date: formattedDate,
         bags,
         qty,
         value,
         supplier: supplier.vacode || "",
-        vcode, // ✅ added
+        custName: supplier.vacode || "",
+        vcode,
       };
     });
   }
@@ -318,7 +568,7 @@ export default function PartyWiseSumSale({ show, onClose }) {
   }
 
   // GROUP BY MONTH + Supplier Name + City
-  function groupByMonth(apiArray = [], reportType) {
+  function groupByMonth(apiArray = [], reportType,ledgerMap) {
     const map = new Map();
 
     apiArray.forEach((rec) => {
@@ -333,7 +583,7 @@ export default function PartyWiseSumSale({ show, onClose }) {
 
       const supplier = rec.customerDetails?.[0] || {};
       const vcode = getVcode(supplier);  // ✅ FIX
-      const supplierName = (supplier.vacode || "Unknown Supplier").trim();
+      const custName = (supplier.vacode || "Unknown Supplier").trim();
       const city = supplier.city || "";
 
       const key = `${monthKey}__${vcode}`; // ✅ FIX
@@ -352,8 +602,9 @@ export default function PartyWiseSumSale({ show, onClose }) {
 
       if (!map.has(key)) {
         map.set(key, {
+          ...getExtraFields(rec, ledgerMap),
           month: monthKey,
-          supplierName,
+          custName,
           vcode,
           city,
           bags,
@@ -481,189 +732,208 @@ export default function PartyWiseSumSale({ show, onClose }) {
     setSelectAll(allVisibleSelected);
   }, [ledgerSearch, ledgers, selectedLedgers]);
 
+  const numericFields = [
+    "bags",
+    "qty",
+    "value",
+    "cgst",
+    "sgst",
+    "igst",
+    "tax",
+    "grandtotal",
+  ];
+
+  const qtyFields = ["bags", "qty"];
+
   function exportToExcel(filename, jsonData) {
     if (!jsonData || jsonData.length === 0) {
       alert("No data to export");
       return;
     }
 
-    // ⭐ 1️⃣ CUSTOM HEADER NAMES
-    const customHeaders = {
-      supplierName: "Customer Name",
-      city: "City",
-      pan: "PAN No",
-      bags: "Bags",
-      qty: "Quantity",
-      value: "Total Value",
-      month: "Month",
-      date: "Date",
-      supplier: "Customer"
-    };
+    const savedFieldData =
+      JSON.parse(localStorage.getItem("saleSumFieldData")) ||
+      DEFAULT_FIELD_DATA;
 
-    // Convert keys → readable headers
-    const finalData = jsonData.map((row) => {
-      const newRow = {};
-      Object.keys(row).forEach((k) => {
-        newRow[customHeaders[k] || k] = row[k];
-      });
-      return newRow;
-    });
+    let visibleFields = savedFieldData
+      .filter((f) => f.checked)
+      .sort((a, b) => Number(a.serialNo || 0) - Number(b.serialNo || 0))
+      .map((f) => ({
+        key: f.fieldName,
+        label: f.description,
+        width: Number(f.width) || 100,
+        total: f.total,
+        bold: f.bold,
+      }));
 
-    let header = Object.keys(finalData[0]);
-
-    if (summaryType === "date") {
-      // Reorder columns: put Supplier right after Date
-      const newOrder = ["Date", "Supplier"];
-
-      // Keep all other columns in original order
-      const remaining = header.filter(h => !newOrder.includes(h));
-
-      header = [...newOrder, ...remaining]; // ✅ Now allowed
+    // Auto add Month / Date according to summaryType
+    if (summaryType === "month") {
+      visibleFields = [
+        { key: "month", label: "Month", width: 100, total: false, bold: true },
+        ...visibleFields.filter((f) => f.key !== "month" && f.key !== "date"),
+      ];
     }
 
-    // 2️⃣ COMPANY & PERIOD TOP ROWS
+    if (summaryType === "date") {
+      visibleFields = [
+        { key: "date", label: "Date", width: 100, total: false, bold: true },
+        ...visibleFields.filter((f) => f.key !== "month" && f.key !== "date"),
+      ];
+    }
+
+    if (summaryType !== "month" && summaryType !== "date") {
+      visibleFields = visibleFields.filter(
+        (f) => f.key !== "month" && f.key !== "date"
+      );
+    }
+
+    const header = visibleFields.map((f) => f.label);
+
     const sheetData = [
       [companyName || "Company Name"],
       [companyAdd || "Company Address"],
-      [`SALE SUMMARY - Period From: ${fromDate}  To: ${toDate}`],
+      [`SALE SUMMARY - Period From: ${fromDate} To: ${toDate}`],
       [],
       header,
-      ...finalData.map(row => header.map(h => row[h]))
+      ...jsonData.map((row) =>
+        visibleFields.map((field) => row[field.key] ?? "")
+      ),
     ];
 
-    // 3️⃣ SUBTOTAL TOTAL ROW (BOTTOM)
-    const numericColumns = ["Bags", "Quantity", "Total Value"];
-    const totals = {};
+    // Total row
+    const totalRow = visibleFields.map((field, index) => {
+      if (index === 0) return "TOTAL";
 
-    header.forEach((h, index) => {
-      if (index === 0) {
-        totals[h] = "Total";
-      } else if (numericColumns.includes(h)) {
-        const colLetter = XLSX.utils.encode_col(index);
-        const firstRow = 5;
-        const lastDataRow = 4 + finalData.length;
-        totals[h] = { f: `SUBTOTAL(9,${colLetter}${firstRow + 1}:${colLetter}${lastDataRow + 1})` };
-      } else {
-        totals[h] = "";
+      if (field.total) {
+        const total = jsonData.reduce(
+          (sum, row) => sum + (parseFloat(row[field.key]) || 0),
+          0
+        );
+        return total;
+      }
+
+      return "";
+    });
+
+    sheetData.push(totalRow);
+
+    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+    ws["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: header.length - 1 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: header.length - 1 } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: header.length - 1 } },
+    ];
+
+    // Column width from modal
+    ws["!cols"] = visibleFields.map((field) => ({
+      wch: Math.max(8, Math.round((Number(field.width) || 100) / 8)),
+    }));
+
+    const HEADER_ROW = 4;
+    const DATA_START_ROW = 5;
+    const TOTAL_ROW = sheetData.length - 1;
+
+    // Top rows style
+    ["A1", "A2", "A3"].forEach((cell, i) => {
+      if (ws[cell]) {
+        ws[cell].s = {
+          font: { bold: true, sz: i === 0 ? 16 : 12 },
+          alignment: { horizontal: "center", vertical: "center" },
+        };
       }
     });
 
-    sheetData.push(header.map(h => totals[h]));
+    // Header style
+    visibleFields.forEach((field, colIdx) => {
+      const addr = XLSX.utils.encode_cell({ r: HEADER_ROW, c: colIdx });
 
-    // Build worksheet
-    const ws = XLSX.utils.aoa_to_sheet(sheetData);
-
-    // ⭐ APPLY STYLING TO TOP ROWS
-
-    const totalColumns = header.length - 1;
-
-    // A1 → Company Name (Font 16, Bold, Center)
-    if (ws["A1"]) {
-      ws["A1"].s = {
-        font: { bold: true, sz: 16 },
-        alignment: { horizontal: "center", vertical: "center" }
-      };
-    }
-
-    // A2 → Company Address (Font 12, Bold, Center)
-    if (ws["A2"]) {
-      ws["A2"].s = {
-        font: { bold: true, sz: 12 },
-        alignment: { horizontal: "center", vertical: "center" }
-      };
-    }
-
-    // A3 → Period Row (Font 12, Bold, Center)
-    if (ws["A3"]) {
-      ws["A3"].s = {
-        font: { bold: true, sz: 12 },
-        alignment: { horizontal: "center", vertical: "center" }
-      };
-    }
-
-    // Merge Top 3 Rows
-    ws["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: totalColumns } }, // Company Name
-      { s: { r: 1, c: 0 }, e: { r: 1, c: totalColumns } }, // Address
-      { s: { r: 2, c: 0 }, e: { r: 2, c: totalColumns } }, // Period
-    ];
-
-    // 4️⃣ COLUMN WIDTHS (AUTO-FIT)
-
-    ws["!cols"] = header.map((h) => {
-      const maxLen = Math.max(
-        h.length,
-        ...finalData.map((row) => (row[h] ? row[h].toString().length : 0))
-      );
-      return { wch: maxLen + 3 };
-    });
-
-    const HEADER_BG = "4F81BD";
-
-    // 5️⃣ HEADER STYLE
-    header.forEach((_, colIdx) => {
-      const addr = XLSX.utils.encode_cell({ r: 4, c: colIdx });
       if (ws[addr]) {
         ws[addr].s = {
-          font: { bold: true, color: { rgb: "FFFFFF" } },
-          fill: { patternType: "solid", fgColor: { rgb: HEADER_BG } },
-          alignment: { horizontal: "center" },
+          font: {
+            bold: true,
+            color: { rgb: "FFFFFF" },
+          },
+          fill: {
+            patternType: "solid",
+            fgColor: { rgb: "4F81BD" },
+          },
+          alignment: {
+            horizontal: numericFields.includes(field.key) ? "right" : "left",
+          },
           border: {
             top: { style: "thin" },
             bottom: { style: "thin" },
             left: { style: "thin" },
-            right: { style: "thin" }
-          }
+            right: { style: "thin" },
+          },
         };
       }
     });
 
-    // 6️⃣ NUMERIC ALIGNMENT & BORDERS
-    const range = XLSX.utils.decode_range(ws["!ref"]);
+    // Body style
+    for (let r = DATA_START_ROW; r < TOTAL_ROW; r++) {
+      visibleFields.forEach((field, c) => {
+        const addr = XLSX.utils.encode_cell({ r, c });
+        const cell = ws[addr];
 
-    for (let R = 5; R <= range.e.r; R++) {
-      for (let C = 0; C < header.length; C++) {
-        const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
-        if (!cell) continue;
+        if (!cell) return;
 
-        const isNumeric = numericColumns.includes(header[C]);
+        const isNumeric = numericFields.includes(field.key);
 
         cell.s = {
+          font: {
+            bold: field.bold || false,
+          },
           alignment: {
             horizontal: isNumeric ? "right" : "left",
-            vertical: "center"
+            vertical: "center",
+          },
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
           },
         };
 
-        if (isNumeric && !isNaN(cell.v)) {
+        if (isNumeric && !isNaN(Number(cell.v))) {
           cell.t = "n";
-          cell.z = "0.00";
+          cell.z = qtyFields.includes(field.key) ? "0.000" : "0.00";
         }
-      }
+      });
     }
 
-    // 7️⃣ TOTAL ROW STYLE
-    const totalRowIndex = finalData.length + 5;
+    // Total row style
+    visibleFields.forEach((field, c) => {
+      const addr = XLSX.utils.encode_cell({ r: TOTAL_ROW, c });
+      const cell = ws[addr];
 
-    header.forEach((_, colIdx) => {
-      const addr = XLSX.utils.encode_cell({ r: totalRowIndex, c: colIdx });
-      if (ws[addr]) {
-        ws[addr].s = {
-          font: { bold: true },
-          fill: { patternType: "solid", fgColor: { rgb: "D9D9D9" } },
-          alignment: { horizontal: colIdx === 0 ? "left" : "right" }
-        };
+      if (!cell) return;
+
+      cell.s = {
+        font: { bold: true },
+        fill: {
+          patternType: "solid",
+          fgColor: { rgb: "D9D9D9" },
+        },
+        alignment: {
+          horizontal: numericFields.includes(field.key) ? "right" : "left",
+        },
+        border: {
+          top: { style: "thin" },
+          bottom: { style: "thin" },
+          left: { style: "thin" },
+          right: { style: "thin" },
+        },
+      };
+
+      if (field.total && numericFields.includes(field.key)) {
+        cell.t = "n";
+        cell.z = qtyFields.includes(field.key) ? "0.000" : "0.00";
       }
     });
 
-    // 8️⃣ MERGE COMPANY NAME / ADD / PERIOD ROWS
-    ws["!merges"] = [
-      { s: { r: 0, c: 0 }, e: { r: 0, c: header.length - 1 } },
-      { s: { r: 1, c: 0 }, e: { r: 1, c: header.length - 1 } },
-      { s: { r: 2, c: 0 }, e: { r: 2, c: header.length - 1 } }
-    ];
-
-    // 9️⃣ CREATE FILE
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sale Summary");
 
@@ -867,10 +1137,12 @@ export default function PartyWiseSumSale({ show, onClose }) {
                 <Button variant="outline-secondary" onClick={() => setLedgerModalOpen(true)}>
                   Select Ledger
                 </Button>
-                <Button variant="dark" onClick={() => setFieldModalOpen(true)}>
+                <Button
+                  variant="outline-primary"
+                  onClick={() => setFieldModalOpen(true)}
+                >
                   Customize Fields
                 </Button>
-
                 <FieldCustomizeModal
                   show={fieldModalOpen}
                   onHide={() => setFieldModalOpen(false)}
@@ -903,7 +1175,21 @@ export default function PartyWiseSumSale({ show, onClose }) {
           ) : (
             <>
               <div>
-                <PartyWisePrint
+                  <PartyWisePrint
+                    ref={printRef}
+                    groupedData={groupedData}
+                    fieldData={
+                      JSON.parse(localStorage.getItem("saleSumFieldData")) ||
+                      DEFAULT_FIELD_DATA
+                    }
+                    summaryType={summaryType}
+                    periodFrom={format(fromDate)}
+                    periodTo={format(toDate)}
+                    companyName={companyName}
+                    companyAdd={companyAdd}
+                    companyCity={companyCity}
+                  />
+                {/* <PartyWisePrint
                   ref={printRef}
                   groupedData={groupedData}
                   periodFrom={format(fromDate)}
@@ -912,7 +1198,7 @@ export default function PartyWiseSumSale({ show, onClose }) {
                   companyAdd={companyAdd}
                   companyCity={companyCity}
                   handleExport={handleExport}
-                />
+                /> */}
               </div>
             </>
           )}
@@ -1044,6 +1330,13 @@ export default function PartyWiseSumSale({ show, onClose }) {
           </div>
         </Modal.Footer>
       </Modal>
+
+      <FieldCustomizeModal
+        show={fieldModalOpen}
+        onHide={() => setFieldModalOpen(false)}
+        defaultFieldData={DEFAULT_FIELD_DATA}
+        storageKey="saleSumFieldData"
+      />
     </>
   );
 }

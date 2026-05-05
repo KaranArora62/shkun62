@@ -240,56 +240,56 @@ export default function PartyWiseSummPur({ show, onClose }) {
   }
 
   function getExtraFields(rec, ledgerMap) {
-  const supplier = rec.supplierdetails?.[0] || {};
-  const formData = rec.formData || {};
+    const supplier = rec.supplierdetails?.[0] || {};
+    const formData = rec.formData || {};
 
-  const vcode = String(supplier.Vcode || "").trim();
-  const ledger = ledgerMap?.get(vcode) || {};
+    const vcode = String(supplier.Vcode || "").trim();
+    const ledger = ledgerMap?.get(vcode) || {};
 
-  const d = parseAnyDate(formData.date);
+    const d = parseAnyDate(formData.date);
 
-  const formattedDate = d
-    ? `${String(d.getDate()).padStart(2, "0")}-${String(
-        d.getMonth() + 1
-      ).padStart(2, "0")}-${d.getFullYear()}`
-    : "";
+    const formattedDate = d
+      ? `${String(d.getDate()).padStart(2, "0")}-${String(
+          d.getMonth() + 1
+        ).padStart(2, "0")}-${d.getFullYear()}`
+      : "";
 
-  const month = d
-    ? d.toLocaleString("en-IN", { month: "short", year: "numeric" })
-    : "";
+    const month = d
+      ? d.toLocaleString("en-IN", { month: "short", year: "numeric" })
+      : "";
 
-  return {
-    supplierName: supplier.vacode || ledger.ahead || "",
-    gstno: supplier.gstno || ledger.gstNo || "",
-    pan: supplier.pan || ledger.pan || "",
-    city: supplier.city || ledger.city || "",
-    state: supplier.state || ledger.state || "",
+    return {
+      supplierName: supplier.vacode || ledger.ahead || "",
+      gstno: supplier.gstno || ledger.gstNo || "",
+      pan: supplier.pan || ledger.pan || "",
+      city: supplier.city || ledger.city || "",
+      state: supplier.state || ledger.state || "",
 
-    // Ledger API extra fields
-    email: ledger.email || "",
-    phone: ledger.phone || "",
-    address: ledger.add1 || "",
-    pinCode: ledger.pinCode || "",
-    contactPerson: ledger.cperson || "",
-    bsgroup: ledger.Bsgroup || "",
-    payLimit: ledger.payLimit || 0,
-    payDuedays: ledger.payDuedays || 0,
+      // Ledger API extra fields
+      email: ledger.email || "",
+      phone: ledger.phone || "",
+      address: ledger.add1 || "",
+      pinCode: ledger.pinCode || "",
+      contactPerson: ledger.cperson || "",
+      bsgroup: ledger.Bsgroup || "",
+      payLimit: ledger.payLimit || 0,
+      payDuedays: ledger.payDuedays || 0,
 
-    date: formattedDate,
-    month,
+      date: formattedDate,
+      month,
 
-    vtype: formData.vtype || "",
-    vno: formData.vno || "",
-    stype: formData.stype || "",
-    trpt: formData.trpt || "",
+      vtype: formData.vtype || "",
+      vno: formData.vno || "",
+      stype: formData.stype || "",
+      trpt: formData.trpt || "",
 
-    cgst: parseFloat(formData.cgst) || 0,
-    sgst: parseFloat(formData.sgst) || 0,
-    igst: parseFloat(formData.igst) || 0,
-    tax: parseFloat(formData.tax) || 0,
-    grandtotal: parseFloat(formData.grandtotal) || 0,
-  };
-}
+      cgst: parseFloat(formData.cgst) || 0,
+      sgst: parseFloat(formData.sgst) || 0,
+      igst: parseFloat(formData.igst) || 0,
+      tax: parseFloat(formData.tax) || 0,
+      grandtotal: parseFloat(formData.grandtotal) || 0,
+    };
+  }
   // function getExtraFields(rec) {
   //   const supplier = rec.supplierdetails?.[0] || {};
   //   const formData = rec.formData || {};
@@ -772,319 +772,189 @@ export default function PartyWiseSummPur({ show, onClose }) {
   }, [ledgerSearch, ledgers, selectedLedgers]);
 
   const numericFields = [
-  "bags",
-  "qty",
-  "value",
-  "cgst",
-  "sgst",
-  "igst",
-  "tax",
-  "grandtotal",
-];
+    "bags",
+    "qty",
+    "value",
+    "cgst",
+    "sgst",
+    "igst",
+    "tax",
+    "grandtotal",
+  ];
 
-const qtyFields = ["bags", "qty"];
-  // function exportToExcel(filename, jsonData) {
-  //   if (!jsonData || jsonData.length === 0) {
-  //     alert("No data to export");
-  //     return;
-  //   }
+  const qtyFields = ["bags", "qty"];
 
-  //   // ⭐ 1️⃣ CUSTOM HEADER NAMES
-  //   const customHeaders = {
-  //     supplierName: "Supplier",
-  //     city: "City",
-  //     pan: "PAN No",
-  //     bags: "Bags",
-  //     qty: "Quantity",
-  //     value: "Total Value",
-  //     month: "Month",
-  //     date: "Date",
-  //     supplier: "Supplier",
-  //   };
-
-  //   // Convert keys → readable headers
-  //   const finalData = jsonData.map((row) => {
-  //     const newRow = {};
-  //     Object.keys(row).forEach((k) => {
-  //       newRow[customHeaders[k] || k] = row[k];
-  //     });
-  //     return newRow;
-  //   });
-
-  //   let header = Object.keys(finalData[0]);
-
-  //   if (summaryType === "date") {
-  //     // Reorder columns: put Supplier right after Date
-  //     const newOrder = ["Date", "Supplier"];
-
-  //     // Keep all other columns in original order
-  //     const remaining = header.filter((h) => !newOrder.includes(h));
-
-  //     header = [...newOrder, ...remaining]; // ✅ Now allowed
-  //   }
-
-  //   // 2️⃣ COMPANY & PERIOD TOP ROWS
-  //   const sheetData = [
-  //     [companyName || "Company Name"],
-  //     [companyAdd || "Company Address"],
-  //     [`PURCHASE SUMMARY - Period From: ${fromDate}  To: ${toDate}`],
-  //     [],
-  //     header,
-  //     ...finalData.map((row) => header.map((h) => row[h])),
-  //   ];
-
-  //   // 3️⃣ SUBTOTAL TOTAL ROW (BOTTOM)
-  //   const numericColumns = ["Bags", "Quantity", "Total Value"];
-  //   const totals = {};
-
-  //   header.forEach((h, index) => {
-  //     if (index === 0) {
-  //       totals[h] = "Total";
-  //     } else if (numericColumns.includes(h)) {
-  //       const colLetter = XLSX.utils.encode_col(index);
-  //       const firstRow = 5;
-  //       const lastDataRow = 4 + finalData.length;
-  //       totals[h] = {
-  //         f: `SUBTOTAL(9,${colLetter}${firstRow + 1}:${colLetter}${lastDataRow + 1})`,
-  //       };
-  //     } else {
-  //       totals[h] = "";
-  //     }
-  //   });
-
-  //   sheetData.push(header.map((h) => totals[h]));
-
-  //   // Build worksheet
-  //   const ws = XLSX.utils.aoa_to_sheet(sheetData);
-
-  //   // ⭐ APPLY STYLING TO TOP ROWS
-
-  //   const totalColumns = header.length - 1;
-
-  //   // A1 → Company Name (Font 16, Bold, Center)
-  //   if (ws["A1"]) {
-  //     ws["A1"].s = {
-  //       font: { bold: true, sz: 16 },
-  //       alignment: { horizontal: "center", vertical: "center" },
-  //     };
-  //   }
-
-  //   // A2 → Company Address (Font 12, Bold, Center)
-  //   if (ws["A2"]) {
-  //     ws["A2"].s = {
-  //       font: { bold: true, sz: 12 },
-  //       alignment: { horizontal: "center", vertical: "center" },
-  //     };
-  //   }
-
-  //   // A3 → Period Row (Font 12, Bold, Center)
-  //   if (ws["A3"]) {
-  //     ws["A3"].s = {
-  //       font: { bold: true, sz: 12 },
-  //       alignment: { horizontal: "center", vertical: "center" },
-  //     };
-  //   }
-
-  //   // Merge Top 3 Rows
-  //   ws["!merges"] = [
-  //     { s: { r: 0, c: 0 }, e: { r: 0, c: totalColumns } }, // Company Name
-  //     { s: { r: 1, c: 0 }, e: { r: 1, c: totalColumns } }, // Address
-  //     { s: { r: 2, c: 0 }, e: { r: 2, c: totalColumns } }, // Period
-  //   ];
-
-  //   // 4️⃣ COLUMN WIDTHS (AUTO-FIT)
-
-  //   ws["!cols"] = header.map((h) => {
-  //     const maxLen = Math.max(
-  //       h.length,
-  //       ...finalData.map((row) => (row[h] ? row[h].toString().length : 0)),
-  //     );
-  //     return { wch: maxLen + 3 };
-  //   });
-
-  //   const HEADER_BG = "4F81BD";
-
-  //   // 5️⃣ HEADER STYLE
-  //   header.forEach((_, colIdx) => {
-  //     const addr = XLSX.utils.encode_cell({ r: 4, c: colIdx });
-  //     if (ws[addr]) {
-  //       ws[addr].s = {
-  //         font: { bold: true, color: { rgb: "FFFFFF" } },
-  //         fill: { patternType: "solid", fgColor: { rgb: HEADER_BG } },
-  //         alignment: { horizontal: "center" },
-  //         border: {
-  //           top: { style: "thin" },
-  //           bottom: { style: "thin" },
-  //           left: { style: "thin" },
-  //           right: { style: "thin" },
-  //         },
-  //       };
-  //     }
-  //   });
-
-  //   // 6️⃣ NUMERIC ALIGNMENT & BORDERS
-  //   const range = XLSX.utils.decode_range(ws["!ref"]);
-
-  //   for (let R = 5; R <= range.e.r; R++) {
-  //     for (let C = 0; C < header.length; C++) {
-  //       const cell = ws[XLSX.utils.encode_cell({ r: R, c: C })];
-  //       if (!cell) continue;
-
-  //       const isNumeric = numericColumns.includes(header[C]);
-
-  //       cell.s = {
-  //         alignment: {
-  //           horizontal: isNumeric ? "right" : "left",
-  //           vertical: "center",
-  //         },
-  //       };
-
-  //       if (isNumeric && !isNaN(cell.v)) {
-  //         cell.t = "n";
-  //         cell.z = "0.00";
-  //       }
-  //     }
-  //   }
-
-  //   // 7️⃣ TOTAL ROW STYLE
-  //   const totalRowIndex = finalData.length + 5;
-
-  //   header.forEach((_, colIdx) => {
-  //     const addr = XLSX.utils.encode_cell({ r: totalRowIndex, c: colIdx });
-  //     if (ws[addr]) {
-  //       ws[addr].s = {
-  //         font: { bold: true },
-  //         fill: { patternType: "solid", fgColor: { rgb: "D9D9D9" } },
-  //         alignment: { horizontal: colIdx === 0 ? "left" : "right" },
-  //       };
-  //     }
-  //   });
-
-  //   // 8️⃣ MERGE COMPANY NAME / ADD / PERIOD ROWS
-  //   ws["!merges"] = [
-  //     { s: { r: 0, c: 0 }, e: { r: 0, c: header.length - 1 } },
-  //     { s: { r: 1, c: 0 }, e: { r: 1, c: header.length - 1 } },
-  //     { s: { r: 2, c: 0 }, e: { r: 2, c: header.length - 1 } },
-  //   ];
-
-  //   // 9️⃣ CREATE FILE
-  //   const wb = XLSX.utils.book_new();
-  //   XLSX.utils.book_append_sheet(wb, ws, "Purchase Summary");
-
-  //   XLSX.writeFile(wb, filename + ".xlsx");
-  // }
   function exportToExcel(filename, jsonData) {
-  if (!jsonData || jsonData.length === 0) {
-    alert("No data to export");
-    return;
-  }
+    if (!jsonData || jsonData.length === 0) {
+      alert("No data to export");
+      return;
+    }
 
-  const savedFieldData =
-    JSON.parse(localStorage.getItem("purSumFieldData")) ||
-    DEFAULT_FIELD_DATA;
+    const savedFieldData =
+      JSON.parse(localStorage.getItem("purSumFieldData")) ||
+      DEFAULT_FIELD_DATA;
 
-  let visibleFields = savedFieldData
-    .filter((f) => f.checked)
-    .sort((a, b) => Number(a.serialNo || 0) - Number(b.serialNo || 0))
-    .map((f) => ({
-      key: f.fieldName,
-      label: f.description,
-      width: Number(f.width) || 100,
-      total: f.total,
-      bold: f.bold,
+    let visibleFields = savedFieldData
+      .filter((f) => f.checked)
+      .sort((a, b) => Number(a.serialNo || 0) - Number(b.serialNo || 0))
+      .map((f) => ({
+        key: f.fieldName,
+        label: f.description,
+        width: Number(f.width) || 100,
+        total: f.total,
+        bold: f.bold,
+      }));
+
+    // Auto add Month / Date according to summaryType
+    if (summaryType === "month") {
+      visibleFields = [
+        { key: "month", label: "Month", width: 100, total: false, bold: true },
+        ...visibleFields.filter((f) => f.key !== "month" && f.key !== "date"),
+      ];
+    }
+
+    if (summaryType === "date") {
+      visibleFields = [
+        { key: "date", label: "Date", width: 100, total: false, bold: true },
+        ...visibleFields.filter((f) => f.key !== "month" && f.key !== "date"),
+      ];
+    }
+
+    if (summaryType !== "month" && summaryType !== "date") {
+      visibleFields = visibleFields.filter(
+        (f) => f.key !== "month" && f.key !== "date"
+      );
+    }
+
+    const header = visibleFields.map((f) => f.label);
+
+    const sheetData = [
+      [companyName || "Company Name"],
+      [companyAdd || "Company Address"],
+      [`PURCHASE SUMMARY - Period From: ${fromDate} To: ${toDate}`],
+      [],
+      header,
+      ...jsonData.map((row) =>
+        visibleFields.map((field) => row[field.key] ?? "")
+      ),
+    ];
+
+    // Total row
+    const totalRow = visibleFields.map((field, index) => {
+      if (index === 0) return "TOTAL";
+
+      if (field.total) {
+        const total = jsonData.reduce(
+          (sum, row) => sum + (parseFloat(row[field.key]) || 0),
+          0
+        );
+        return total;
+      }
+
+      return "";
+    });
+
+    sheetData.push(totalRow);
+
+    const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+    ws["!merges"] = [
+      { s: { r: 0, c: 0 }, e: { r: 0, c: header.length - 1 } },
+      { s: { r: 1, c: 0 }, e: { r: 1, c: header.length - 1 } },
+      { s: { r: 2, c: 0 }, e: { r: 2, c: header.length - 1 } },
+    ];
+
+    // Column width from modal
+    ws["!cols"] = visibleFields.map((field) => ({
+      wch: Math.max(8, Math.round((Number(field.width) || 100) / 8)),
     }));
 
-  // Auto add Month / Date according to summaryType
-  if (summaryType === "month") {
-    visibleFields = [
-      { key: "month", label: "Month", width: 100, total: false, bold: true },
-      ...visibleFields.filter((f) => f.key !== "month" && f.key !== "date"),
-    ];
-  }
+    const HEADER_ROW = 4;
+    const DATA_START_ROW = 5;
+    const TOTAL_ROW = sheetData.length - 1;
 
-  if (summaryType === "date") {
-    visibleFields = [
-      { key: "date", label: "Date", width: 100, total: false, bold: true },
-      ...visibleFields.filter((f) => f.key !== "month" && f.key !== "date"),
-    ];
-  }
+    // Top rows style
+    ["A1", "A2", "A3"].forEach((cell, i) => {
+      if (ws[cell]) {
+        ws[cell].s = {
+          font: { bold: true, sz: i === 0 ? 16 : 12 },
+          alignment: { horizontal: "center", vertical: "center" },
+        };
+      }
+    });
 
-  if (summaryType !== "month" && summaryType !== "date") {
-    visibleFields = visibleFields.filter(
-      (f) => f.key !== "month" && f.key !== "date"
-    );
-  }
+    // Header style
+    visibleFields.forEach((field, colIdx) => {
+      const addr = XLSX.utils.encode_cell({ r: HEADER_ROW, c: colIdx });
 
-  const header = visibleFields.map((f) => f.label);
+      if (ws[addr]) {
+        ws[addr].s = {
+          font: {
+            bold: true,
+            color: { rgb: "FFFFFF" },
+          },
+          fill: {
+            patternType: "solid",
+            fgColor: { rgb: "4F81BD" },
+          },
+          alignment: {
+            horizontal: numericFields.includes(field.key) ? "right" : "left",
+          },
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+      }
+    });
 
-  const sheetData = [
-    [companyName || "Company Name"],
-    [companyAdd || "Company Address"],
-    [`PURCHASE SUMMARY - Period From: ${fromDate} To: ${toDate}`],
-    [],
-    header,
-    ...jsonData.map((row) =>
-      visibleFields.map((field) => row[field.key] ?? "")
-    ),
-  ];
+    // Body style
+    for (let r = DATA_START_ROW; r < TOTAL_ROW; r++) {
+      visibleFields.forEach((field, c) => {
+        const addr = XLSX.utils.encode_cell({ r, c });
+        const cell = ws[addr];
 
-  // Total row
-  const totalRow = visibleFields.map((field, index) => {
-    if (index === 0) return "TOTAL";
+        if (!cell) return;
 
-    if (field.total) {
-      const total = jsonData.reduce(
-        (sum, row) => sum + (parseFloat(row[field.key]) || 0),
-        0
-      );
-      return total;
+        const isNumeric = numericFields.includes(field.key);
+
+        cell.s = {
+          font: {
+            bold: field.bold || false,
+          },
+          alignment: {
+            horizontal: isNumeric ? "right" : "left",
+            vertical: "center",
+          },
+          border: {
+            top: { style: "thin" },
+            bottom: { style: "thin" },
+            left: { style: "thin" },
+            right: { style: "thin" },
+          },
+        };
+
+        if (isNumeric && !isNaN(Number(cell.v))) {
+          cell.t = "n";
+          cell.z = qtyFields.includes(field.key) ? "0.000" : "0.00";
+        }
+      });
     }
 
-    return "";
-  });
+    // Total row style
+    visibleFields.forEach((field, c) => {
+      const addr = XLSX.utils.encode_cell({ r: TOTAL_ROW, c });
+      const cell = ws[addr];
 
-  sheetData.push(totalRow);
+      if (!cell) return;
 
-  const ws = XLSX.utils.aoa_to_sheet(sheetData);
-
-  ws["!merges"] = [
-    { s: { r: 0, c: 0 }, e: { r: 0, c: header.length - 1 } },
-    { s: { r: 1, c: 0 }, e: { r: 1, c: header.length - 1 } },
-    { s: { r: 2, c: 0 }, e: { r: 2, c: header.length - 1 } },
-  ];
-
-  // Column width from modal
-  ws["!cols"] = visibleFields.map((field) => ({
-    wch: Math.max(8, Math.round((Number(field.width) || 100) / 8)),
-  }));
-
-  const HEADER_ROW = 4;
-  const DATA_START_ROW = 5;
-  const TOTAL_ROW = sheetData.length - 1;
-
-  // Top rows style
-  ["A1", "A2", "A3"].forEach((cell, i) => {
-    if (ws[cell]) {
-      ws[cell].s = {
-        font: { bold: true, sz: i === 0 ? 16 : 12 },
-        alignment: { horizontal: "center", vertical: "center" },
-      };
-    }
-  });
-
-  // Header style
-  visibleFields.forEach((field, colIdx) => {
-    const addr = XLSX.utils.encode_cell({ r: HEADER_ROW, c: colIdx });
-
-    if (ws[addr]) {
-      ws[addr].s = {
-        font: {
-          bold: true,
-          color: { rgb: "FFFFFF" },
-        },
+      cell.s = {
+        font: { bold: true },
         fill: {
           patternType: "solid",
-          fgColor: { rgb: "4F81BD" },
+          fgColor: { rgb: "D9D9D9" },
         },
         alignment: {
           horizontal: numericFields.includes(field.key) ? "right" : "left",
@@ -1096,77 +966,18 @@ const qtyFields = ["bags", "qty"];
           right: { style: "thin" },
         },
       };
-    }
-  });
 
-  // Body style
-  for (let r = DATA_START_ROW; r < TOTAL_ROW; r++) {
-    visibleFields.forEach((field, c) => {
-      const addr = XLSX.utils.encode_cell({ r, c });
-      const cell = ws[addr];
-
-      if (!cell) return;
-
-      const isNumeric = numericFields.includes(field.key);
-
-      cell.s = {
-        font: {
-          bold: field.bold || false,
-        },
-        alignment: {
-          horizontal: isNumeric ? "right" : "left",
-          vertical: "center",
-        },
-        border: {
-          top: { style: "thin" },
-          bottom: { style: "thin" },
-          left: { style: "thin" },
-          right: { style: "thin" },
-        },
-      };
-
-      if (isNumeric && !isNaN(Number(cell.v))) {
+      if (field.total && numericFields.includes(field.key)) {
         cell.t = "n";
         cell.z = qtyFields.includes(field.key) ? "0.000" : "0.00";
       }
     });
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Purchase Summary");
+
+    XLSX.writeFile(wb, filename + ".xlsx");
   }
-
-  // Total row style
-  visibleFields.forEach((field, c) => {
-    const addr = XLSX.utils.encode_cell({ r: TOTAL_ROW, c });
-    const cell = ws[addr];
-
-    if (!cell) return;
-
-    cell.s = {
-      font: { bold: true },
-      fill: {
-        patternType: "solid",
-        fgColor: { rgb: "D9D9D9" },
-      },
-      alignment: {
-        horizontal: numericFields.includes(field.key) ? "right" : "left",
-      },
-      border: {
-        top: { style: "thin" },
-        bottom: { style: "thin" },
-        left: { style: "thin" },
-        right: { style: "thin" },
-      },
-    };
-
-    if (field.total && numericFields.includes(field.key)) {
-      cell.t = "n";
-      cell.z = qtyFields.includes(field.key) ? "0.000" : "0.00";
-    }
-  });
-
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, "Purchase Summary");
-
-  XLSX.writeFile(wb, filename + ".xlsx");
-}
 
   function handleExport() {
     if (summaryType === "total") {
