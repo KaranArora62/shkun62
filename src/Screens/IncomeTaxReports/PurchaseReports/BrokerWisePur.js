@@ -7,6 +7,22 @@ import useCompanySetup from "../../Shared/useCompanySetup";
 import * as XLSX from 'sheetjs-style';
 import AccountWisePrint from "./AccountWisePrint";
 import financialYear from "../../Shared/financialYear";
+import {
+  TextField,
+  MenuItem,
+  FormControlLabel,
+  Checkbox,
+  Radio,
+  RadioGroup,
+  Button as MuiButton,
+  Paper,
+  Typography,
+  Box,
+  Stack,
+  Divider,
+  InputAdornment,
+} from "@mui/material";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 const tenant = "03AAYFG4472A1ZG_01042025_31032026";
 const API_URL = `https://www.shkunweb.com/shkunlive/${tenant}/tenant/api/purchase`;
@@ -36,7 +52,7 @@ export default function BrokerWisePur({ show, onClose }) {
 
   const [city, setCity] = useState("");
   const [summaryType, setSummaryType] = useState("account");
-  const [reportType, setReportType] = useState("With GST");
+  const [reportType, setReportType] = useState("Without GST");
   const [stateName, setStateName] = useState("");
   const [minQty, setMinQty] = useState("");
   const [maxQty, setMaxQty] = useState("");
@@ -470,233 +486,243 @@ export default function BrokerWisePur({ show, onClose }) {
   return (
     <>
     {/* MAIN FILTER MODAL */}
-    <Modal show={show} onHide={onClose} size="xl" centered backdrop="static" keyboard={true}>
-      <Modal.Body style={{ background: "#f8f9fa" }}>
-        <Form
-          style={{
-            background: "white",
-            padding: "25px",
-            borderRadius: "12px",
-            boxShadow: "0 3px 10px rgba(0,0,0,0.1)",
-          }}
-        >
-        <h4
-          className="header"
-          style={{marginTop:0,marginLeft:"32%",fontSize:"22px"}}
-        >
-          BROKER WISE PURCHASE SUMMARY
-        </h4>
+    <Modal
+      show={show}
+      onHide={onClose}
+      size="xl"
+      centered
+      backdrop="static"
+      keyboard
+    >
+      <Modal.Body
+        style={{
+          background: "linear-gradient(135deg, #f8fbff 0%, #eef4ff 100%)",
+          padding: "24px",
+          borderRadius: "18px",
+        }}
+      >
+        <Box sx={{ mb: 3, textAlign: "center" }}>
+          <Typography variant="h5" fontWeight={800} color="#1e293b">
+            Purchase Summary Broker Wise
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            Filter purchase records and generate broker-wise summary reports
+          </Typography>
+        </Box>
 
-          {/* MAIN 2-COLUMN CONTAINER */}
-          <div style={{ display: "flex", gap: "25px", marginTop:"5px" }}>
+        <Box sx={{ display: "flex", gap: 3 }}>
+          <Paper sx={cardSx}>
+            <Typography variant="subtitle1" fontWeight={700} sx={{ mb: 2 }}>
+              Basic Filters
+            </Typography>
 
-            {/* LEFT CONTAINER */}
-            <div
-              style={{
-                flex: 1,
-                background: "#f5f6f7",
-                padding: "20px",
-                borderRadius: "10px",
-              }}
-            >
-              {/* FROM DATE ROW */}
-              <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
-                <label className="form-label" style={{ width: "120px" }}>From Date</label>
-                <InputMask
-                  mask="99-99-9999"
-                  placeholder="dd-mm-yyyy"
-                  value={fromDate}
-                  onChange={(e) => setFromDate(e.target.value)}
-                >
-                  {(inputProps) => <input {...inputProps} className="form-control" />}
-                </InputMask>
-              </div>
+            <Stack spacing={2}>
+              <InputMask
+                mask="99-99-9999"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+              >
+                {(inputProps) => (
+                  <TextField
+                    {...inputProps}
+                    label="From Date"
+                    placeholder="dd-mm-yyyy"
+                    fullWidth
+                    size="small"
+                    sx={fieldSx}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <CalendarMonthIcon fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+              </InputMask>
 
-              {/* TO DATE ROW */}
-              <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
-                <label className="form-label" style={{ width: "120px"}}>To Date</label>
-                <InputMask
-                  mask="99-99-9999"
-                  placeholder="dd-mm-yyyy"
-                  value={toDate}
-                  onChange={(e) => setToDate(e.target.value)}
-                >
-                  {(inputProps) => <input {...inputProps} className="form-control" />}
-                </InputMask>
-              </div>
+              <InputMask
+                mask="99-99-9999"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+              >
+                {(inputProps) => (
+                  <TextField
+                    {...inputProps}
+                    label="Upto Date"
+                    placeholder="dd-mm-yyyy"
+                    fullWidth
+                    size="small"
+                    sx={fieldSx}
+                    InputProps={{
+                      startAdornment: (
+                        <InputAdornment position="start">
+                          <CalendarMonthIcon fontSize="small" />
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                )}
+              </InputMask>
 
-              {/* CITY ROW */}
-              <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
-                <label className="form-label" style={{ width: "120px" }}>City</label>
-                <Form.Control
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                />
-              </div>
+              <TextField
+                label="City"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+                fullWidth
+                size="small"
+                sx={fieldSx}
+              />
 
-              <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
-                <label className="form-label" style={{ width: "120px" }}>State</label>
-                <Form.Control
-                  value={stateName}
-                  onChange={(e) => setStateName(e.target.value)}
-                />
-              </div>
+              <TextField
+                label="State"
+                value={stateName}
+                onChange={(e) => setStateName(e.target.value)}
+                fullWidth
+                size="small"
+                sx={fieldSx}
+              />
               
-              {/* AGENT */}
-              <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
-                <label className="form-label" style={{ width: "120px" }}>Agent</label>
-                <Form.Control
-                  value={agent}
-                  onChange={(e) => setAgent(e.target.value)}
-                />
-              </div>
+              <TextField
+                label="Agent"
+                value={agent}
+                onChange={(e) => setAgent(e.target.value)}
+                fullWidth
+                size="small"
+                sx={fieldSx}
+              />
 
-              <div style={{ display: "flex", alignItems: "center", marginBottom: "12px"  }}>
-              <label className="form-label">Report Type</label>
-              <Form.Select
-                className="reportType"
+              <TextField
+                select
+                label="Report Type"
                 value={reportType}
                 onChange={(e) => setReportType(e.target.value)}
+                fullWidth
+                size="small"
+                sx={fieldSx}
               >
-                <option>With GST</option>
-                <option>Without GST</option>
-              </Form.Select>
-              </div>
+                <MenuItem value="With GST">With GST</MenuItem>
+                <MenuItem value="Without GST">Without GST</MenuItem>
+              </TextField>
 
-              {/* TAX TYPE */}
-               <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
-                  <label style={{}}>Tax Type</label>
-                  <Form.Select
-                    className="taxType"
-                    value={taxType}
-                    onChange={(e) => setTaxType(e.target.value)}
-                  >
-                    <option>All</option>
-                    <option value="GST Sale (RD)">GST Sale (RD)</option>
-                    <option value="IGST Sale (RD)">IGST Sale (RD)</option>
-                    <option value="GST (URD)">GST (URD)</option>
-                    <option value="IGST (URD)">IGST (URD)</option>
-                    <option value="Tax Free Within State">Tax Free Within State</option>
-                    <option value="Tax Free Interstate">Tax Free Interstate</option>
-                    <option value="Export Sale">Export Sale</option>
-                    <option value="Export Sale(IGST)">Export Sale(IGST)</option>
-                    <option value="Including GST">Including GST</option>
-                    <option value="Including IGST">Including IGST</option>
-                    <option value="Not Applicable">Not Applicable</option>
-                    <option value="Exempted Sale">Exempted Sale</option>
-                  </Form.Select>
-                </div>
-              {/* LESS DR/CR */}
-              <div className="form-check mt-2">
-                <input
-                  type="checkbox"
-                  className="form-check-input"
-                  checked={lessDrCr}
-                  onChange={(e) => setLessDrCr(e.target.checked)}
-                />
-                <label className="form-check-label">Less Dr/Cr Note</label>
-              </div>
-            </div>
+              <TextField
+                select
+                label="Tax Type"
+                value={taxType}
+                onChange={(e) => setTaxType(e.target.value)}
+                fullWidth
+                size="small"
+                sx={fieldSx}
+              >
+                <MenuItem value="All">All</MenuItem>
+                <MenuItem value="GST Sale (RD)">GST Sale (RD)</MenuItem>
+                <MenuItem value="IGST Sale (RD)">IGST Sale (RD)</MenuItem>
+                <MenuItem value="GST (URD)">GST (URD)</MenuItem>
+                <MenuItem value="IGST (URD)">IGST (URD)</MenuItem>
+                <MenuItem value="Tax Free Within State">
+                  Tax Free Within State
+                </MenuItem>
+                <MenuItem value="Tax Free Interstate">
+                  Tax Free Interstate
+                </MenuItem>
+                <MenuItem value="Export Sale">Export Sale</MenuItem>
+                <MenuItem value="Export Sale(IGST)">
+                  Export Sale(IGST)
+                </MenuItem>
+                <MenuItem value="Including GST">Including GST</MenuItem>
+                <MenuItem value="Including IGST">Including IGST</MenuItem>
+                <MenuItem value="Not Applicable">Not Applicable</MenuItem>
+                <MenuItem value="Exempted Sale">Exempted Sale</MenuItem>
+              </TextField>
+            </Stack>
+          </Paper>
 
-            {/* RIGHT CONTAINER */}
-            <div
-              style={{
-                flex: 1,
-                background: "#f5f6f7",
-                padding: "20px",
-                borderRadius: "10px",
-              }}
+          <Paper sx={cardSx}>
+            <Typography variant="subtitle1" fontWeight={700}>
+              Summary Options
+            </Typography>
+
+            <RadioGroup
+              row // ✅ makes everything in one line
+              value={summaryType}
+              onChange={(e) => setSummaryType(e.target.value)}
             >
-              <h5 style={{ marginBottom: "15px", fontWeight: 600 }}>Summary Type</h5>
+              <FormControlLabel
+                value="account"
+                control={<Radio />}
+                label="Total Summary"
+              />
+              <FormControlLabel
+                value="month"
+                control={<Radio />}
+                label="Month Wise"
+              />
+              <FormControlLabel
+                value="date"
+                control={<Radio />}
+                label="Date Wise"
+              />
+            </RadioGroup>
 
-              <div className="form-check mb-1">
-                <input
-                  type="radio"
-                  className="form-check-input"
-                  name="summaryType"
-                  value="account"
-                  checked={summaryType === "account"}
-                  onChange={(e) => setSummaryType(e.target.value)}
-                />
-                <label className="form-check-label">Account Wise</label>
-              </div>
+            <Stack spacing={1}>
+              <TextField
+                label="Min Qty"
+                value={minQty}
+                onChange={(e) => setMinQty(e.target.value)}
+                size="small"
+                fullWidth
+                sx={fieldSx}
+              />
+              <TextField
+                label="Max Qty"
+                value={maxQty}
+                onChange={(e) => setMaxQty(e.target.value)}
+                size="small"
+                fullWidth
+                sx={fieldSx}
+              />
+              <TextField
+                label="Min Value"
+                value={minValue}
+                onChange={(e) => setMinValue(e.target.value)}
+                size="small"
+                fullWidth
+                sx={fieldSx}
+              />
+              <TextField
+                label="Max Value"
+                value={maxValue}
+                onChange={(e) => setMaxValue(e.target.value)}
+                size="small"
+                fullWidth
+                sx={fieldSx}
+              />
 
-              <div className="form-check mb-1">
-                <input
-                  type="radio"
-                  className="form-check-input"
-                  name="summaryType"
-                  value="month"
-                  checked={summaryType === "month"}
-                  onChange={(e) => setSummaryType(e.target.value)}
-                />
-                <label className="form-check-label">Month Wise</label>
-              </div>
-
-              <div className="form-check mb-4">
-                <input
-                  type="radio"
-                  className="form-check-input"
-                  name="summaryType"
-                  value="date"
-                  checked={summaryType === "date"}
-                  onChange={(e) => setSummaryType(e.target.value)}
-                />
-                <label className="form-check-label">Date Wise</label>
-              </div>
-
-              <div style={rowStyle}>
-                  <label style={labelStyle}>Min Qty</label>
-                  <Form.Control
-                    value={minQty}
-                    onChange={(e) => setMinQty(e.target.value)}
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={lessDrCr}
+                    onChange={(e) => setLessDrCr(e.target.checked)}
                   />
-              </div>
+                }
+                label="Less Dr/Cr Note"
+              />
+            </Stack>
 
-              <div style={rowStyle}>
-                <label style={labelStyle}>Max Qty</label>
-                <Form.Control
-                  value={maxQty}
-                  onChange={(e) => setMaxQty(e.target.value)}
-                />
-              </div>
-
-              {/* Min Max Value */}
-              <div style={rowStyle}>
-                <label style={labelStyle}>Min Value</label>
-                <Form.Control
-                  value={minValue}
-                  onChange={(e) => setMinValue(e.target.value)}
-                />
-              </div>
-
-              <div style={rowStyle}>
-                <label style={labelStyle}>Max Value</label>
-                <Form.Control
-                  value={maxValue}
-                  onChange={(e) => setMaxValue(e.target.value)}
-                />
-              </div>
-              <div
-              style={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: "10px",
-                marginTop: "25px",
-              }}
-          >
-            <Button variant="primary" onClick={onOpenPrint}>
-              Print
-            </Button>
-            <Button variant="secondary" onClick={onClose}>
-              Exit
-            </Button>
-              </div>
-            </div>
-          </div>
-
-          {/* BUTTONS */}
-        </Form>
+            <Box
+              sx={{ display: "flex", justifyContent: "flex-end", gap: 1.5 }}
+            >
+              <MuiButton variant="contained" onClick={onOpenPrint}>
+                PRINT
+              </MuiButton>
+              <MuiButton variant="contained"
+                color="inherit" 
+                onClick={onClose}>
+                EXIT
+              </MuiButton>
+            </Box>
+          </Paper>
+        </Box>
       </Modal.Body>
     </Modal>
 
@@ -747,3 +773,17 @@ const labelStyle = {
   fontWeight: "600",
 };
 
+const fieldSx = {
+  "& .MuiOutlinedInput-root": {
+    borderRadius: "12px",
+    backgroundColor: "#fff",
+  },
+};
+
+const cardSx = {
+  flex: 1,
+  p: 2,
+  borderRadius: "20px",
+  boxShadow: "0 10px 30px rgba(15, 23, 42, 0.08)",
+  border: "1px solid #eef2f7",
+};
